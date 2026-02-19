@@ -1,0 +1,139 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Koala.Portal.Core.ViewModels.PortalViewModels.UserProfilInfoViewModel
+
+@{
+
+
+    ViewData["Title"] = "Profil Bilgilerim";
+    ViewData["ActivePage"] = "UserProfile";
+   
+}
+<div class="container-fluid">
+    <!--begin::Profile Account Information-->
+    <div class="d-flex flex-row">
+        <partial name="_ProfileAsidePartial" />
+        <!--begin::Content-->
+        <div class="flex-row-fluid ml-lg-8">
+            <!--begin::Card-->
+            <div class="card card-custom card-stretch">
+                <!--begin::Header-->
+                <div class="card-header py-3">
+                    <div class="card-title align-items-start flex-column">
+                        <h3 class="card-label font-weight-bolder text-dark">Profil Yönetimi</h3>
+                        <span class="text-muted font-weight-bold font-size-sm mt-1">Kişisel bilgilerinizi güncelleyebilirsiniz</span>
+                    </div>
+
+                </div>
+                <!--end::Header-->
+                <!--begin::Form-->
+                <form class="form" asp-controller="UserAccount" asp-action="UserProfile" method="post" enctype="multipart/form-data">
+                    <div class="alert alert-danger" role="alert" asp-validation-summary="ModelOnly">
+                    </div>
+                    <!--begin::Body-->
+                    <div class="card-body">
+                     
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label" asp-for="Avatar"></label>
+                            <div class="col-lg-9 col-xl-6">
+                                <div class="custom-file">
+                                    <input class="form-control form-control-lg form-control-solid custom-file-input" type="file" asp-for="Avatar" accept="image/png, image/jpeg" />
+                                    <label class="custom-file-label" for="customFile">Dosya Seçiniz</label>
+                                </div>
+
+                                <span asp-validation-for="Avatar" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label" asp-for="Name"></label>
+                            <div class="col-lg-9 col-xl-6">
+                                <input class="form-control form-control-lg form-control-solid" placeholder="Adınız" asp-for="Name" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label" asp-for="Lastname"></label>
+                            <div class="col-lg-9 col-xl-6">
+                                <input class="form-control form-control-lg form-control-solid" placeholder="Soyadınız" asp-for="Lastname" />
+                                <span asp-validation-for="Lastname" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label" asp-for="Title"></label>
+                            <div class="col-lg-9 col-xl-6">
+                                <input class="form-control form-control-lg form-control-solid" asp-for="Title" placeholder="Ünvanınız" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+                      
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label" asp-for="BirthDate"></label>
+                            <div class="col-lg-9 col-xl-6">
+                                <input class="form-control form-control-lg form-control-solid" asp-for="BirthDate" placeholder="Doğum Tarihiniz" />
+                                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label" asp-for="PhoneNumber"></label>
+                            <div class="col-lg-9 col-xl-6">
+                                <div class="input-group input-group-lg input-group-solid">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="la la-phone"></i>
+                                        </span>
+                                    </div>
+                                    <input class="form-control form-control-lg form-control-solid" asp-for="PhoneNumber" placeholder="Telefon Numarasnız" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <span class="form-text text-muted">Telefon numaranızı başında sıfır olmadan yazınız.Örnek : 555 111 2233 </span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-xl-3 col-lg-3 col-form-label" asp-for="Email"></label>
+                            <div class="col-lg-9 col-xl-6">
+                                <div class="input-group input-group-lg input-group-solid">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="la la-at"></i>
+                                        </span>
+                                    </div>
+                                    <input class="form-control form-control-lg form-control-solid" asp-for="Email" placeholder="E-Posta Adresiniz" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-toolbar">
+                            <button type="submit" class="btn btn-success mr-2">Profil Güncelle</button>
+                        </div>
+                    </div>
+                    <!--end::Body-->
+                </form>
+                <!--end::Form-->
+            </div>
+        </div>
+        <!--end::Content-->
+    </div>
+    <!--end::Profile Account Information-->
+</div>
+
+
+@section Scripts
+    {
+
+
+    <script type="text/javascript">
+        $('#BirthDate').datepicker({
+            format: 'dd-mm-yyyy'
+        });
+        $("#avatar").change(function() {
+
+        });
+
+        document.getElementById('avatar').addEventListener('change', function (e) {
+            if (e.target.files[0]) {
+                document.body.append('You selected ' + e.target.files[0].name);
+            }
+        });
+
+    </script>
+}

@@ -1,0 +1,86 @@
+v 02.01 Beta : 
+ - Destek Kayýtlarýnda bulunan bazý hatalar giderildi.
+ - Kullanýcý hesabý oturum süresi 15 dakidan 2 saate çýkarýldý
+ - Destek kayýtlarý web User sekmesinde proje yönetim yetkisi aktif edildi
+ - Destek kayýtlarý listesine kayýt öncelik durumu eklendi
+
+v 02.02 Beta : 
+Destek kaydý güncelleme modülünde detek tipi güncellemesi eklendi
+Çalýþýyor olduðu kayýtlarýn yanýnda kýrmýzý çalýþýyor simgesi eklendi
+
+v 02.03 Beta : 
+Destek Kayýtlarý Görünürlük, üzerine alma ve atama kurallarý belirlenen þekilde güncellendi.
+Baþkasýnýn Kaydýný Üzerine Alýrken Açýklama Alaný Giriþ Sayýsý 10 Karakterden Uzun Olacak Þeklinde Güncellendi
+Profil altýnda bulunan GetPass Baðlandýsý Onarýldý
+Destek Kaydý oluþturma ekranýnda arama saati otomatik olarak  dashboard ilk açýlma zamaný görünüyordu, popup pencerenin açýldý zaman olarak güncellendi.
+BUG Report : Bakým anlaþmasý olamayan firmalar kayýt kapatabiliyordu, kurallara göre yeniden düzenlendi.
+||======================================================================================================================================================================||
+||														Belirlenen Kurallar  																							||
+||				1 - Benim Kayýtlarým : 																																	||
+||																																										||
+||					-Departman farketmeksizin benim adýma açýlmýþ veya çalýþan kullanýcý benim olduðum kayýtlarý														||
+||																																										||
+||				Bana açýlmýþ ise üzerime alabilirim																														||
+||				Çalýþan kullanýcý ben isem güncelleyebilirim																											||
+||	------------------------------------------------------------------------------------------------------------------------------------------------------------------  ||
+||				Departman kayýtlarým : 																																	||
+||				 - Bulunduðum departmana açýlmýþ, 																														||
+||				 - Çalýþan kullanýcý benim olmadýðým ve birinin üzerine aldýðý,																							||
+||				 - Bana açýlmýþ ancak çalýþan kullanýcý baþkasý																											||
+||				 																																						||
+||				Eðer firma proje firmasý ise : Yetkili kullanýcý (Support.TransferToUser + Support.ProjectSupport) Kendi üzerine alabilir veya kullanýcýya atayabilir.	||
+||				Eðer proje firmasý deðil ise : Yetkili kullanýcý (Support.TransferToUser) Kendi üzerine alabilir veya kullanýcýya atayabilir.							||
+||	------------------------------------------------------------------------------------------------------------------------------------------------------------------  ||
+||				Açýk Kayýtlar :																																			||
+||					-Çalýþan kullanýcýsý bulunmayan ve Cevap bekleyen olarak açýlmýþ kayýtlar																			||
+||																																										||
+||				Eðer firma proje firmasý ise : Yetkili kullanýcý (Support.TransferToUser + Support.ProjectSupport) Kendi üzerine alabilir veya kullanýcýya atayabilir.	||
+||				Eðer firma proje firmasý ise : Yetkili kullanýcý (Support.ProjectSupport) Kendi üzerine alabilir.														||
+||				Eðer proje firmasý deðil ise : Yetkili kullanýcý (Support.TransferToUser) Kendi üzerine alabilir veya kullanýcýya atayabilir.							||
+||	------------------------------------------------------------------------------------------------------------------------------------------------------------------  ||
+||				Web User : Çalýþan kullanýcýsý bulunmayan ve Web User olarak açýlmýþ kayýtlar																			||
+||				 																																						||
+||				Eðer firma proje firmasý ise : Yetkili kullanýcý (Support.TransferToUser + Support.ProjectSupport) Kendi üzerine alabilir veya kullanýcýya atayabilir.	||
+||				Eðer firma proje firmasý ise : Yetkili kullanýcý (Support.ProjectSupport) Kendi üzerine alabilir.														||
+||				Eðer proje firmasý deðil ise : Yetkili kullanýcý (Support.TransferToUser) Kendi üzerine alabilir veya kullanýcýya atayabilir.							||
+||																																										||
+||======================================================================================================================================================================||																																										
+
+v 02.04 Beta : 
+Açýk kayýtlar grafik olarak dashboard da gösterildi
+Ticket Numarasý 6 Hane Olacak Güncellendi
+Yeni kayýt oluþtururken tarih ve saatin popup ekraný açýldýðý zamaný otomatik olarak seçmesi saðlandý
+Dashboard KPI Hesaplamalarý Yeni kurallara göre düzenlendi
+Kullanýcýlarýn birbirine destek kaydý aktarabilmeleri saðlandý
+
+v 02.25 Beta : 
+Alpemix Müþteri Dosyasý Sisteme Eklendi
+Destek Kayýtlarý Web User kayýtlarýnýn Görüntülenmesi Düzeltildi
+Proje Firmalarýnýn Baþýna Kýrmýzý (Proje Firmasý) - Etiketi Eklendi
+
+v 02.26 Beta : 
+Firma Bilgisi Sayfasýna Destek Kaydý oluþturma eklendi
+GetPass Entegrasyon Algoritmasý Güncellendi
+
+
+v 02.27 Beta : 
+Yetkilendirme algoritmasýnda ve yetkilendirmelerde güncellemeler yapýldý
+Ýzin tipleri eklendi (Listele, Ekle, Güncelle, Durum deðiþtir)
+
+v 02.28 Beta : 
+Uygulama yönetimi yetkileri kontrol edildi,controler güncellendi
+
+
+
+Proje Yönetimi
+Etkinlik takvimi ve izin yönetimi
+ 
+  
+  
+  
+
+
+
+  Müþteri Destek Kayýtlarý Sayfasý	
+  Aylýk Destek Kaydý Oraný Grafik
+  

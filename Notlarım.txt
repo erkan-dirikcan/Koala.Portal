@@ -1,0 +1,47 @@
+ Scaffold-DbContext "Server=10.34.68.3; Database=SistemCrm; User Id=sa; Password=P0rtakal; TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir CrmModels -UseDatabaseNames -NoPluralize -force
+
+ Gerektiðinde tuple kullanmaktan çekinme
+ var nesne=(nesne1,nesne2)
+   return View(nesne)
+   @model (Nesne1Tipi n1,Nesne2Tipi n2)
+
+   Post içi : 
+   [HttpPost]
+   public ActionResult Test([Bind(Prefix="Item1")] Nesne1Tipi nesne1,[Bind(Prefix="Item2")] Nesne2Tipi nesne2)
+
+   TagHelpers kullanmayý unutma
+   Query string okuma
+ 1-var qs=Request.QueryString;
+ 2-var a=Request.Query["a"]
+
+ Use StaticFiles incele..!
+ URL Helper : 
+
+
+ EF Uniq index için
+ [Index(nameof(Url), IsUnique = true)]
+
+ Ef index için 
+ [Index(nameof(FirstName), nameof(LastName))]
+
+ EF  Constraint ekleme
+
+ EF Configuration  index
+  modelBuilder.Entity<Blog>()
+        .HasIndex(b => b.Url)
+        .HasFilter("[Url] IS NOT NULL");
+
+  EF Configuration Uniq index
+    modelBuilder.Entity<Blog>()
+        .HasIndex(b => b.Url)
+        .IsUnique()
+        .HasFilter(null);
+
+EF Configuration Constraint ekleme
+modelBuilder
+        .Entity<Product>()
+        .ToTable(b => b.HasCheckConstraint("CK_Prices", "[Price] > [DiscountedPrice]"));
+
+switch on off
+ $('#crt_logo_cb').prop('checked', true);
+ $('#crt_logo_cb').prop('checked', false);

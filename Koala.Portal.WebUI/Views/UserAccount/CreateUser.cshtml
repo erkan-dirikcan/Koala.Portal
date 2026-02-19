@@ -1,0 +1,109 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Koala.Portal.Core.ViewModels.PortalViewModels.CreateUserViewModel
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    ViewData["ActivePage"] = "CreateUser";
+    ViewData["MenuToggle"] = "UserAccount";
+    var crmUsers = (List<SelectListItem>)ViewData["CrmUsers"]!;
+    var getPassUsers = (List<SelectListItem>)ViewData["GetPassUsers"]!;
+}
+
+
+<div class="d-flex flex-column-fluid">
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <form name="CreateUserForm" id="CreateUserForm" asp-action="CreateUser" asp-controller="UserAccount" method="post">
+                    <div class="card card-custom card-stretch gutter-b">
+                        <div class="card-header border-0 py-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label font-weight-bolder text-dark">Kullanıcı Yönetimi</span>
+                                <span class="text-muted mt-3 font-weight-bold font-size-sm">Yeni Kullanıcı Ekle</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0 pb-3">
+                            <div class="tab-content">
+
+                                <div asp-validation-summary="ModelOnly"></div>
+
+                                <div class="form-group row">
+                                    <label asp-for="Name" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="Name" type="text" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="Lastname" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="Lastname" type="text" />
+                                        <span asp-validation-for="Lastname" class="text-danger"></span>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group row">
+                                    <label asp-for="Title" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="Title" type="text" />
+                                        <span asp-validation-for="Title" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="Email" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" type="email" asp-for="Email" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label asp-for="Password" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" type="password" asp-for="Password" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="PhoneNumber" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" type="text" asp-for="PhoneNumber" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label asp-for="Oid" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <select class="form-control form-control-sm" asp-for="Oid" asp-items="crmUsers"> </select>
+                                        <span asp-validation-for="Oid" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="SKey" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <select class="form-control form-control-sm" asp-for="SKey" asp-items="getPassUsers"> </select>
+                                        <span asp-validation-for="Oid" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary mr-2">Kullanıcı Ekle</button>
+                            <a href="~/UserAccount" class="btn btn-secondary">Vazgeç</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts
+    {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script type="text/javascript">
+        $('#Oid').select2({
+            placeholder: ""
+        });
+        $('#SKey').select2({
+            placeholder: ""
+        });
+    </script>
+}

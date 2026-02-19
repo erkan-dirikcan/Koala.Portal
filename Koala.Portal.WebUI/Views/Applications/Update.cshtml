@@ -1,0 +1,110 @@
+﻿@model Koala.Portal.Core.ViewModels.PortalViewModels.UpdateApplicationsViewModel
+@{
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    ViewData["ActivePage"] = "ApplicationsList";
+    ViewData["MenuToggle"] = "Applications";
+}
+    <div class="d-flex flex-column-fluid">
+
+        <div class="container-fluid">
+
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <form name="CreateUserForm" id="UpdateApplicationForm" asp-action="Update" asp-controller="Applications" method="post">
+                        <div class="card card-custom card-stretch gutter-b">
+                            <div class="card-header border-0 py-5">
+                                <h3 class="card-title align-items-start flex-column">
+                                    <span class="card-label font-weight-bolder text-dark">Uygulama Yönetimi</span>
+                                    <span class="text-muted mt-3 font-weight-bold font-size-sm">Uygulama Güncelle</span>
+                                </h3>
+                            </div>
+                            <div class="card-body pt-0 pb-3">
+                                <div class="tab-content">
+                                    <div asp-validation-summary="ModelOnly"></div>
+                                <div class="form-group row">
+
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Paket Uygulama</label>
+                                    <div class="col-1">
+                                        <span class="switch switch-outline switch-sm switch-icon switch-success">
+                                            <label>
+                                                <input type="checkbox" asp-for="IsPackageApplication" />
+                                                <span></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                    <label class="col-2 col-form-label">Uygulama Modülleri Var</label>
+                                    <div class="col-1">
+                                        <span class="switch switch-outline switch-sm switch-icon switch-success">
+                                            <label>
+                                                <input type="checkbox" asp-for="IsMultiModuleApplication" />
+                                                <span></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Uygulama Adı</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <input class="form-control form-control-sm" asp-for="Name" type="text" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Uygulama Açıklaması</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <input class="form-control form-control-sm" asp-for="Description" type="text" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Uygulama Kimliği</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <input class="form-control form-control-sm" asp-for="AppId" type="text" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Geçerlilik Tarihi</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <div class="input-group date" id="ExpDate_date" data-target-input="nearest">
+                                            <input type="text" class="form-control datetimepicker-input" placeholder="Select date &amp; time" id="ExpDate" name="ExpDate" value="@Model.ExpDate" data-target="#ExpDate_date" />
+                                            <div class="input-group-append" data-target="#ExpDate_date" data-toggle="datetimepicker">
+                                                <span class="input-group-text">
+                                                    <i class="ki ki-calendar"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Kullanıcı Sayısı (Sınırsız için 0)</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <input asp-for="MaxUserCount" type="text" class="form-control bootstrap-touchspin-vertical-btn" value="0" placeholder="0" />
+                                        <span asp-validation-for="MaxUserCount" class="text-danger"></span>
+                                    </div>
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Uygulama SecretKey</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <input class="form-control form-control-sm" asp-for="ApplicationSecretKey" type="text" />
+                                        <span asp-validation-for="ApplicationSecretKey" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-warning mr-2">Uygulama Güncelle</button>
+                                    <a href="~/Applications" class="btn btn-secondary">Vazgeç</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+
+        </div>
+
+    </div>
+
+@section Scripts
+{
+    <script src="~/js/custom/createapplicationpage.js"></script>
+}

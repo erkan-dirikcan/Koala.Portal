@@ -1,0 +1,87 @@
+﻿@model Koala.Portal.Core.ViewModels.PortalViewModels.HelpDeskProblemDetailInfoViewModels
+@{
+    ViewData["Title"] = "Problem - " + Model.Title;
+}
+<div class="d-flex flex-column-fluid">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-custom">
+                    <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                        <div class="card-title">
+                            <h3 class="card-label">
+                                @Model.Title Çözümleri
+                                <span class="d-block text-muted pt-2 font-size-sm">@Html.Raw(Model.Content)</span>
+                                <span class="d-block text-muted pt-2 font-size-sm"><strong>@Model.Views</strong> Görüntüleme</span>
+                            </h3>
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="card-body">
+
+                        <!--begin::Card-->
+                        <div class="card card-custom gutter-b">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <h3 class="card-label">Çözümler</h3>
+                                </div>
+                            </div>
+                            <!--begin::Accordion-->
+                            <div class="card-body">
+                                @{
+                                    @for (int i = 0; i < Model.HelpDeskSolitions.Count; i++)
+                                    {
+                                        <div class="accordion accordion-toggle-arrow" id="SolutionAccordion_@i">
+                                            <div class="card">
+                                                <div class="card-header" id="solutionTitle_@i">
+                                                    <div class="card-title collapsed" data-toggle="collapse" data-target="#solutionAccordionContent_@i">
+                                                        <i class="flaticon-tool-1"></i>@Model.HelpDeskSolitions[i].Title
+                                                    </div>
+                                                </div>
+                                                <div id="solutionAccordionContent_@i" class="collapse" data-parent="#SolutionAccordion_@i">
+                                                    <div class="card-body">@Html.Raw(Model.HelpDeskSolitions[i].Content)</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                   
+
+
+                                    // @for (int i = 0; i < Model.HelpDeskSolitions.Count; i++)
+                                    // {
+                                    //     <div class="accordion accordion-toggle-arrow " id="SolutionAccordion">
+                                    //         <div class="card">
+                                    //             <div class="card-header" id="headingOne4">
+                                    //                 <div class="card-title collapsed" data-toggle="collapse" data-target="#solutionAccordion" id="@Model.HelpDeskSolitions[i].Id">
+                                    //                     <i class="flaticon-tool-1"></i>@Model.HelpDeskSolitions[i].Title
+                                    //                 </div>
+                                    //             </div>
+                                    //             <div id="@Model.HelpDeskSolitions[i].Id" class="collapse " data-parent="#SolutionAccordion">
+                                    //                 <div class="card-body">@Html.Raw(Model.Content)</div>
+                                    //             </div>
+                                    //         </div>
+                                    //     </div>
+                                    // }
+                                }
+                            </div>
+                            <!--end::Accordion-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        // Kart başlığına tıklandığında içeriği açıp kapatma işlevselliği ekleme
+        $('.card-header').click(function () {
+            var $collapse = $(this).find('.collapse');
+            $collapse.collapse('toggle');
+        });
+    </script>
+}

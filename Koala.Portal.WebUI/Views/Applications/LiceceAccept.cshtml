@@ -1,0 +1,125 @@
+﻿@using Koala.Portal.Core.Dtos
+@model List<Koala.Portal.Core.ViewModels.PortalViewModels.ApplicationLicencesListViewModel>
+@{
+    ViewData["Title"] = "Bekleyen Lisans Onayları";
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    ViewData["ActivePage"] = "WaitingLicence";
+    ViewData["MenuToggle"] = "Applications";
+}
+<div class="d-flex flex-column-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-custom">
+                    <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                        <div class="card-title">
+                            <h3 class="card-label">
+                                Uygulama Yönetimi
+                                <span class="d-block text-muted pt-2 font-size-sm">Onay Bekleyen Lisanslar</span>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(infoMessage))
+                        {
+
+                            <div class="alert alert-success" role="alert">
+                                @infoMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+
+                            <div class="alert alert-danger" role="alert">
+                                @errorMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <table class="table table-bordered table-hover" id="waitingLicanceTable" style="margin-top: 13px !important">
+                            <thead>
+                                <tr>
+                                    <th title="Name">Uygulama Adı</th>
+                                    <th title="Name">En Fazla Lisans Sayısı</th>
+                                    <th title="Name">Aktif Lisans Sayısı</th>
+                                    <th title="Name">Anakart Seri Numarası</th>
+                                    <th title="Name">Bilgisayar Adı</th>
+                                    <th title="Name">Talep Tarihi</th>
+                                    <th title="Action">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    var statusClass = "";
+                                    var status = "";
+                                    var maxUser = item.MaxUserCount > 0 ?
+                                    $"<span class=\"label label-light-info label-pill label-inline mr-2\">{item.MaxUserCount} Kullanıcı</span>" :
+                                    "<span class=\"label label-light-success label-pill label-inline mr-2\">Sınırsız Kullanıcı</span>";
+
+                                    switch (item.Status)
+                                    {
+                                        case StatusEnum.Active:
+                                            statusClass = "label-success";
+                                            status = "Aktif";
+                                            break;
+                                        case StatusEnum.Pasive:
+                                            statusClass = "label-danger";
+                                            status = "Pasif";
+                                            break;
+                                        case StatusEnum.Deleted:
+                                            statusClass = "label-danger"; https://localhost:7245/Applications/ChangeStatus/4a0cc818-f191-11ee-95d9-e848b8c82000?status=Pasive
+                                            status = "Silinmiş";
+                                            break;
+                                        case StatusEnum.Expiration:
+                                            statusClass = "label-warning";
+                                            status = "Süresi Dolmuş";
+                                            break;
+                                    }
+
+                                    var trClass = item.MaxUserCount <= item.ActiveUserCount ? "table-danger" : "";
+
+
+
+                                    <tr class="@trClass">
+                                        <td>@item.ApplicationName</td>
+                                        <td title="Name">@item.MaxUserCount</td>
+                                        <td title="Name">@item.ActiveUserCount</td>
+                                        <td>
+                                            @item.MainboardId
+                                        </td>
+                                        <td>@item.PcName</td>
+
+                                        <td>
+                                            @item.CreateDate.ToString("dd-MM-yyyy HH:mm")
+                                        </td>
+
+                                        <td>
+                                            <a data-id="@item.Id" data-maxuser="@item.MaxUserCount" data-activeuser="@item.ActiveUserCount" id="accept-licance-bt"  class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="Kabul Et" data-theme="dark"><i class="flaticon2-check-mark"></i></a>
+                                            <a data-id="@item.Id"  id="reject-licance-bt"  class="btn btn-icon btn-danger btn-sm" data-toggle="tooltip" title="Reddet" data-theme="dark"><i class="far fa-thumbs-down"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/custom/applicationconfirmlist.js"></script>
+}

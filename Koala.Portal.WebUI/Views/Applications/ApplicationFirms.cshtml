@@ -1,0 +1,228 @@
+﻿@using Koala.Portal.Core.Dtos
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService;
+@model IEnumerable<Koala.Portal.Core.ViewModels.PortalViewModels.GetApplicationFirmListViewModel>
+@{
+    ViewData["Title"] = "Uygulama Firmaları";
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"]!.ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"]!.ToString();
+    var appName = (string)TempData["AppName"];
+    ViewData["ActivePage"] = "ApplicationsList";
+    ViewData["MenuToggle"] = "Applications";
+}
+
+
+<div class="d-flex flex-column-fluid">
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card card-custom">
+                    <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                        <div class="card-title">
+                            <h3 class="card-label">
+                                Uygulama Yönetimi
+                                <span class="d-block text-muted pt-2 font-size-sm">@appName Uygulaması Firma Listesi</span>
+                            </h3>
+                        </div>
+                        <div class="card-toolbar">
+
+                            <!--begin::Button-->
+                            @if (AuthorizationService.AuthorizeAsync(User, "AppLicationManagement.Create").Result.Succeeded)
+                            {
+                                <a class="btn btn-primary font-weight-bolder" id="add-application-firm-bt">
+                                    <span class="svg-icon svg-icon-md">
+
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24" />
+                                                <path d="M17.2718029,8.68536757 C16.8932864,8.28319382 16.9124644,7.65031935 17.3146382,7.27180288 C17.7168119,6.89328641 18.3496864,6.91246442 18.7282029,7.31463817 L22.7282029,11.5646382 C23.0906029,11.9496882 23.0906029,12.5503176 22.7282029,12.9353676 L18.7282029,17.1853676 C18.3496864,17.5875413 17.7168119,17.6067193 17.3146382,17.2282029 C16.9124644,16.8496864 16.8932864,16.2168119 17.2718029,15.8146382 L20.6267538,12.2500029 L17.2718029,8.68536757 Z M6.72819712,8.6853647 L3.37324625,12.25 L6.72819712,15.8146353 C7.10671359,16.2168091 7.08753558,16.8496835 6.68536183,17.2282 C6.28318808,17.6067165 5.65031361,17.5875384 5.27179713,17.1853647 L1.27179713,12.9353647 C0.909397125,12.5503147 0.909397125,11.9496853 1.27179713,11.5646353 L5.27179713,7.3146353 C5.65031361,6.91246155 6.28318808,6.89328354 6.68536183,7.27180001 C7.08753558,7.65031648 7.10671359,8.28319095 6.72819712,8.6853647 Z" fill="#000000" fill-rule="nonzero" />
+                                                <rect fill="#000000" opacity="0.3" transform="translate(12.000000, 12.000000) rotate(-345.000000) translate(-12.000000, -12.000000) " x="11" y="4" width="2" height="16" rx="1" />
+                                            </g>
+                                        </svg>
+
+                                    </span>Uygulama Firması Ekle
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(infoMessage))
+                        {
+
+                            <div class="alert alert-success" role="alert">
+                                @infoMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+
+                            <div class="alert alert-danger" role="alert">
+                                @errorMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <table class="table table-bordered table-hover" id="applicationFirmTable" style="margin-top: 13px !important">
+                            <thead>
+                                <tr>
+                                    <th title="Name">Firma Adı</th>
+                                    <th title="Description">Son Kullanım Tarihi</th>
+                                    @if (AuthorizationService.AuthorizeAsync(User, "AppLicationManagement.Create").Result.Succeeded)
+                                    {
+                                        <th title="Action">İşlemler</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+
+                                    <tr>
+                                        <td>(@item.Firm.Code) - @item.Firm.Title</td>
+                                        <td>
+                                            @item.ExpDate?.ToString("dd-MM-yyyy")
+                                        </td>
+
+                                        @if (AuthorizationService.AuthorizeAsync(User, "AppLicationManagement.Create").Result.Succeeded)
+                                        {
+                                            <td>
+                                                <button class="btn btn-icon btn-warning btn-sm create-firm-code" data-id="@item.Id" data-FirmId="@item.Firm.Id" data-applicationId="@item.Application.Id" data-toggle="tooltip" title="Firma Lisans Kodu Oluştur" data-theme="dark"><i class="fas fa-laptop-code"></i></button>
+                                                <button class="btn btn-icon btn-success btn-sm update-firm-exp-date" data-id="@item.Id" data-FirmId="@item.Firm.Id" data-applicationId="@item.Application.Id" data-toggle="tooltip" title="Uygulama Firması Son Kullanım Tarihi Güncelle" data-theme="dark"><i class="far fa-calendar-alt"></i></button>
+                                            </td>
+
+                                        }
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="add-application-firm-Code-modal" tabindex="-1" role="dialog" aria-labelledby="support-send-to-user-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-application-firm-modal-title">Uygulama Firması Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="">
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Firma Kodu</label>
+                        <div class="col-lg-10 col-md-10 col-sm-12">
+                            <div class="input-group">
+                                <input type="text" id="firm-code-tb" class="form-control" readonly="readonly" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-success" id="GetCode" name="GetCode" type="button"><i class="fas fa-laptop-code"></i></button>
+                                    <button class="btn btn-secondary" id="CopyCode" name="CopyCode" type="button"><i class="far fa-copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="add-application-firm-modal" tabindex="-1" role="dialog" aria-labelledby="support-send-to-user-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-application-firm-modal-title">Uygulama Firması Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="">
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Firma</label>
+                        <div class="col-lg-10 col-md-10 col-sm-12">
+                            <firm-select selected-id="" id="selected-application-firm-sl" name="selected-application-firm-sl"></firm-select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                <button type="button" id="add-firm-to-application-bt" class="btn btn-success font-weight-bold">Uygulamaya Firma Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="update-application-firm-exp-date-modal" tabindex="-1" role="dialog" aria-labelledby="support-send-to-user-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-application-firm-modal-title">Uygulama Firması Son Kullanım Tarihi Güncelle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="">
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Tarih Seçin</label>
+                        <div class="col-lg-10 col-md-10 col-sm-12">
+                            <div class="input-group date" id="ExpDate_date" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input" placeholder="Select date &amp; time" id="ExpDate" name="ExpDate" value="@DateTime.Now.ToString("dd-MM-yyyy")" data-target="#ExpDate_date" />
+                                <div class="input-group-append" data-target="#ExpDate_date" data-toggle="datetimepicker">
+                                    <span class="input-group-text">
+                                        <i class="ki ki-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                <button type="button" id="update-exp_date-bt" class="btn btn-warning font-weight-bold">Uygulamaya Firma Son Kullanım Tarihini Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts
+{
+    <script src="~/js/custom/applicationfirmlist.js"></script>
+}

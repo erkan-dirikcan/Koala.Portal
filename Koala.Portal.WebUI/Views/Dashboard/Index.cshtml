@@ -1,0 +1,43 @@
+﻿@using Koala.Portal.Core.ViewModels.CrmViewModels
+@model (List<CrmSupportListViewModel> supportList, List<CrmUserFullNameInfoViewModel> crmUsers, List<CrmUserDepartmentsViewModel> userDepartments, List<CrmDailySupportChartViewModel> chartData, CrmDashboardKpiDbViewModel kpis, List<CrmDailySupportChartViewModel> chartData1)
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["ActivePage"] = "Dashboard";
+}
+
+<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+
+    <!--begin::Entry-->
+    <div class="d-flex flex-column-fluid">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Dashboard-->
+            @await Html.PartialAsync("_DashboardKpiPartial", Model.kpis)
+            <!--begin::Row-->
+           
+            <div class="row">
+                @await Html.PartialAsync("_SupportListPartial", (Model.supportList, Model.crmUsers, Model.userDepartments))
+                @await Html.PartialAsync("_SupportChartPartial", (Model.chartData, Model.chartData1))
+            </div>
+            @await Html.PartialAsync("_SupportModalsPartial")
+            <!--end::Row-->
+            <!--end::Dashboard-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::Entry-->
+</div>
+
+@section Scripts
+{
+    @* <script src="~/js/Custom/DashBoard.js"></script> *@
+    <script src="~/js/custom/supportpartialpage.js"></script>
+    <script src="~/js/Custom/SupportModalPartialPage.js"></script>
+    <script src="~/js/Custom/SupportChart.js"></script>
+
+    <script type="text/javascript">
+        $("#priority").select2();
+
+        $('#kt_datetimepicker_1').datetimepicker();
+    </script>
+}

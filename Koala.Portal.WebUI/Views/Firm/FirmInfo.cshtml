@@ -1,0 +1,231 @@
+﻿@using System.Text
+@using Koala.Portal.Core.ViewModels.CrmViewModels
+@model (InfoCrmFirmViewModel firm, List<CrmSupportListViewModel> supports,List<CrmUserFullNameInfoViewModel> crmUsers,List<CrmUserDepartmentsViewModel> userDepartments)
+@{
+    ViewData["Title"] = "FirmInfo";
+    ViewData["ActivePage"] = "Firm";
+    TempData["IsFirm"] = true;
+
+    var phones = Model.firm.Phones.Select(x => $"({x.AreaCode}) {x.Number}").ToList();
+}
+
+<div class="d-flex flex-column-fluid">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Card-->
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <!--begin: Title-->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap">
+                            <div class="mr-3">
+                                <!--begin::Name-->
+                                <a href="#" class="d-flex align-items-center text-dark text-hover-primary font-size-h5 font-weight-bold mr-3">
+                                    (@Model.firm.Code) - @Model.firm.Title
+                                    <i class="flaticon2-correct text-success icon-md ml-2"></i>
+                                </a>
+                                <!--end::Name-->
+                                <!--begin::Contacts-->
+                                <div class="d-flex flex-wrap my-2">
+                                    <a href="#" class="text-muted text-hover-primary font-weight-bold mr-lg-8 mr-5 mb-lg-0 mb-2">
+                                        <span class="svg-icon svg-icon-md svg-icon-gray-500 mr-1">
+                                            <!--begin::Svg Icon | path:C:\wamp64\www\keenthemes\legacy\metronic\theme\html\demo1\dist/../src/media/svg/icons\Devices\iPhone-X.svg-->
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24" />
+                                                    <path d="M8,2.5 C7.30964406,2.5 6.75,3.05964406 6.75,3.75 L6.75,20.25 C6.75,20.9403559 7.30964406,21.5 8,21.5 L16,21.5 C16.6903559,21.5 17.25,20.9403559 17.25,20.25 L17.25,3.75 C17.25,3.05964406 16.6903559,2.5 16,2.5 L8,2.5 Z" fill="#000000" opacity="0.3" />
+                                                    <path d="M8,2.5 C7.30964406,2.5 6.75,3.05964406 6.75,3.75 L6.75,20.25 C6.75,20.9403559 7.30964406,21.5 8,21.5 L16,21.5 C16.6903559,21.5 17.25,20.9403559 17.25,20.25 L17.25,3.75 C17.25,3.05964406 16.6903559,2.5 16,2.5 L8,2.5 Z M8,1 L16,1 C17.5187831,1 18.75,2.23121694 18.75,3.75 L18.75,20.25 C18.75,21.7687831 17.5187831,23 16,23 L8,23 C6.48121694,23 5.25,21.7687831 5.25,20.25 L5.25,3.75 C5.25,2.23121694 6.48121694,1 8,1 Z M9.5,1.75 L14.5,1.75 C14.7761424,1.75 15,1.97385763 15,2.25 L15,3.25 C15,3.52614237 14.7761424,3.75 14.5,3.75 L9.5,3.75 C9.22385763,3.75 9,3.52614237 9,3.25 L9,2.25 C9,1.97385763 9.22385763,1.75 9.5,1.75 Z" fill="#000000" fill-rule="nonzero" />
+                                                </g>
+                                            </svg>
+                                        </span>
+                                        @foreach (var phone in phones)
+                                        {
+                                            var pFormt = "0" + phone.Replace(" ", "").Replace("(", "").Replace(")", "");
+                                            <a href="tel:@pFormt" class="">
+                                                @phone
+                                            </a>
+                                            <span>&nbsp;&nbsp;&nbsp; </span>
+                                        }
+                                        @*  @string.Join(", ", phones) *@
+                                    </a>
+                                    @*   <a href="#" class="text-muted text-hover-primary font-weight-bold mr-lg-8 mr-5 mb-lg-0 mb-2">
+                                    <span class="svg-icon svg-icon-md svg-icon-gray-500 mr-1">
+                                    <!--begin::Svg Icon | path:assets/media/svg/icons/Communication/Mail-notification.svg-->
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <rect x="0" y="0" width="24" height="24" />
+                                    <path d="M21,12.0829584 C20.6747915,12.0283988 20.3407122,12 20,12 C16.6862915,12 14,14.6862915 14,18 C14,18.3407122 14.0283988,18.6747915 14.0829584,19 L5,19 C3.8954305,19 3,18.1045695 3,17 L3,8 C3,6.8954305 3.8954305,6 5,6 L19,6 C20.1045695,6 21,6.8954305 21,8 L21,12.0829584 Z M18.1444251,7.83964668 L12,11.1481833 L5.85557487,7.83964668 C5.4908718,7.6432681 5.03602525,7.77972206 4.83964668,8.14442513 C4.6432681,8.5091282 4.77972206,8.96397475 5.14442513,9.16035332 L11.6444251,12.6603533 C11.8664074,12.7798822 12.1335926,12.7798822 12.3555749,12.6603533 L18.8555749,9.16035332 C19.2202779,8.96397475 19.3567319,8.5091282 19.1603533,8.14442513 C18.9639747,7.77972206 18.5091282,7.6432681 18.1444251,7.83964668 Z" fill="#000000" />
+                                    <circle fill="#000000" opacity="0.3" cx="19.5" cy="17.5" r="2.5" />
+                                    </g>
+                                    </svg>
+                                    <!--end::Svg Icon-->
+                                    </span>@Model.firm.
+                                    </a> *@
+
+
+                                </div>
+                                <!--end::Contacts-->
+                            </div>
+                            <div class="my-lg-0 my-1">
+                                <a href="#" class="btn btn-sm btn-light-success font-weight-bolder text-uppercase mr-3">Sözleşme Güncelle</a>
+                                <a href="#" class="btn btn-sm btn-info font-weight-bolder text-uppercase">Proje Ekle</a>
+                            </div>
+                        </div>
+                        <!--end: Title-->
+
+                    </div>
+                    <!--end: Info-->
+                </div>
+                <div class="separator separator-solid my-7"></div>
+                <!--begin: Items-->
+                <div class="d-flex align-items-center flex-wrap">
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-app icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Toplam Proje</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>0
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-support icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Cevaplanan Destek Kaydı</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
+                                x.TicketStateOid == "bd6344e9-e338-47a3-b6c0-38d9385b80b4" ||
+                                x.TicketStateOid == "07d17e00-b999-4a39-8c01-4e0ceb1925fd" ||
+                                x.TicketStateOid == "a048ac84-9dde-4a2c-86aa-d3ef76506103" ||
+                                x.TicketStateOid == "e4bea484-e65c-4161-9b7e-95631a36928b")
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-file-2 icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Cevap Bekleyen Destek Kaydı</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
+                                (x.TicketStateOid != "bd6344e9-e338-47a3-b6c0-38d9385b80b4" &&
+                                x.TicketStateOid != "07d17e00-b999-4a39-8c01-4e0ceb1925fd" &&
+                                x.TicketStateOid != "a048ac84-9dde-4a2c-86aa-d3ef76506103" &&
+                                x.TicketStateOid != "e4bea484-e65c-4161-9b7e-95631a36928b") &&
+                                x.TicketStateOid != "439e8fb4-b576-4650-83de-656ee3cfd3e7")
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-support icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Logoda Bekliyen Destek Kaydı</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
+                                x.TicketStateOid == "439e8fb4-b576-4650-83de-656ee3cfd3e7")
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-chat-1 icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Toplam Destek Kaydı</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count()
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+
+                </div>
+                <!--begin: Items-->
+            </div>
+        </div>
+
+        <div class="row">
+            @* <div class="card card-custom gutter-b col-md-12"> *@
+            @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
+            @await Html.PartialAsync("_SupportModalsPartial")
+            @*  </div> *@
+        </div>
+
+        <div class="card  card-custom">
+            <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                <div class="card-title">
+                    <h3 class="card-label">
+                        Yetkililer
+                        <span class="d-block text-muted pt-2 font-size-sm">Logo CRM'den Aktarılmış @Model.firm.Title Yetkilileri</span>
+                    </h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover" id="FirmContactTable" style="margin-top: 13px !important">
+                    <thead>
+                        <tr>
+                            <th title="Name">Ad</th>
+                            <th title="Lastname">Soyad</th>
+                            <th title="Email1">E-Posta 1</th>
+                            <th title="Email2">E-Posta 2</th>
+                            <th title="Email3">E-Posta 3</th>
+                            <th title="Phone">Telefon</th>
+                            <th title="Action">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.firm.Contacts)
+                        {
+                            var phn = new StringBuilder();
+                            foreach (var crmPhonesInfoViewModel in item.Phones)
+                            {
+                                phn.Append($" <a href='tel:0{crmPhonesInfoViewModel.AreaCode}{crmPhonesInfoViewModel.Number}'>({crmPhonesInfoViewModel.AreaCode}) - {crmPhonesInfoViewModel.Number}</a><br />");
+                            }
+                            @*  var userPhones = item.Phones.Select(x => $"({x.AreaCode}) - {x.Number}").ToList();
+
+
+                        var userPhone = string.Join("<br />", userPhones); *@
+
+                            <tr>
+                                <td title="Name">@item.Name</td>
+                                <td title="Lastname">@item.LastName</td>
+                                <td title="Email1">@item.EmailAddress1</td>
+                                <td title="Email2">@item.EmailAddress2</td>
+                                <td title="Email3">@item.EmailAddress3</td>
+                                <td title="Phone">@Html.Raw(phn.ToString())</td>
+                                <td>
+                                    <button name="update-contact-email" data-id="@item.Oid" class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="E-Posta Güncelle" data-theme="dark"><i class="flaticon2-mail"></i></button>
+                                    <button name="update-contact-portal-status" data-id="@item.Oid" class="btn btn-icon btn-primary btn-sm" data-toggle="tooltip" title="Portal Kullanıcı Güncelle"><i class="flaticon-user-settings"></i></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/custom/supportpartialpage.js"></script>
+    <script src="~/js/Custom/SupportModalPartialPage.js"></script>
+    <script src="~/js/custom/FirmContactList.js"></script>
+}

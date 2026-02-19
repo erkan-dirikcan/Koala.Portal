@@ -1,0 +1,124 @@
+﻿@model IEnumerable<Koala.Portal.Core.ViewModels.PortalViewModels.ClaimListForModuleViewModels>
+@{
+    var ClaimInfo = ViewData["ClaimInfo"]!.ToString()!;
+    ViewData["Title"] = "UpdateClaim";
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    ViewData["ActivePage"] = "Settings";
+    ViewData["MenuToggle"] = "Modules";
+    var moduleId = Model.FirstOrDefault().ModuleId;
+}
+<div class="d-flex flex-column-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card card-custom card-stretch gutter-b">
+                    <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="card-label font-weight-bolder text-dark">@ClaimInfo Yetki Yönetimi</span>
+                            <span class="text-muted mt-3 font-weight-bold font-size-sm">Yetki Güncelle</span>
+                        </h3>
+                        <div class="card-toolbar">
+
+                            <!--begin::Button-->
+                            <a href="/Module/AddClaim/@moduleId" class="btn btn-primary font-weight-bolder">
+                                <span class="svg-icon svg-icon-md">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                            <rect x="0" y="0" width="24" height="24" />
+                                            <circle fill="#000000" cx="9" cy="15" r="6" />
+                                            <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+                                        </g>
+                                    </svg>
+                                    <!--end::Svg Icon-->
+                                </span>Modüle Yetki Ekle
+                            </a>
+                            <!--end::Button-->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(infoMessage))
+                        {
+
+                            <div class="alert alert-success" role="alert">
+                                @infoMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+
+                            <div class="alert alert-danger" role="alert">
+                                @errorMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <table class="table table-bordered table-hover" id="ClaimDetailTable" style="margin-top: 13px !important">
+                            <thead>
+                                <tr>
+                                    <th title="Name">Yetki Adı</th>
+                                    <th title="Display Name">Yetki Görünen Adı</th>
+                                    <th title="Description">Açıklama</th>
+                                    <th title="Action">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td title="Name">@item.Name</td>
+                                        <td title="Display Name">@item.DisplayName</td>
+                                        <td title="Description">@item.Description</td>
+                                        <td>
+                                            <a asp-controller="Module" asp-action="UpdateClaim" asp-route-id="@item.Id" class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="Düzenle" data-theme="dark"><i class="flaticon-edit"></i></a>
+                                            <button type="button" class="btn btn-icon btn-danger btn-sm DeleteClaim" data-id="@item.Id" data-name="@item.Name" data-toggle="tooltip" title="Sil" data-theme="dark"><i class="flaticon-delete"></i></button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="DeleteClaimModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete_claim_title">Yetki Sil</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="flex-grow-1 p-8 card-rounded bgi-no-repeat d-flex align-items-center" style="background-color: #FFF4DE; background-position: left bottom; background-size: auto 100%; background-image: url(/media/svg/illustrations/copy.svg)">
+                    <div class="row">
+                        <div class="col-12 col-xl-5"></div>
+                        <div class="col-12 col-xl-7">
+                            <h4 class="text-danger font-weight-bolder"></h4>
+                            <p class="text-dark-50 my-5 font-size-xl font-weight-bold" id="delete_claim_content"></p>
+                            <a href="javascript:;" class="btn btn-danger font-weight-bold py-2 px-6" id="delete_claim">Yetki Sil</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/js/custom/ClaimDetailPage.js"></script>
+}

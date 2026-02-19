@@ -1,0 +1,28 @@
+﻿@model (List<Koala.Portal.Core.ViewModels.CrmViewModels.CrmSupportListViewModel> supportList,List<Koala.Portal.Core.ViewModels.CrmViewModels.CrmUserFullNameInfoViewModel> crmUsers, List<Koala.Portal.Core.ViewModels.CrmViewModels.CrmUserDepartmentsViewModel> userDepartments)
+@{
+    ViewData["Title"] = "DashboardPage";
+    ViewData["ActivePage"] = "UserDashboard";
+}
+<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+    <div class="d-flex flex-column-fluid">
+    <div class="container-fluid">
+        <!--begin::Profile Account Information-->
+        <div class="d-flex flex-row">
+            <partial name="_ProfileAsidePartial" />
+            <!--begin::Content-->
+            <div class="flex-row-fluid ml-lg-8">
+                <!--begin::Card-->
+                @await Html.PartialAsync("_SupportListPartial", (Model.supportList, Model.crmUsers,Model.userDepartments))
+            </div>
+            <!--end::Content-->
+            </div>
+        </div>
+
+    </div>
+</div>
+@await Html.PartialAsync("_SupportModalsPartial")
+@section Scripts
+{
+    <script src="~/js/custom/supportpartialpage.js"></script>
+    <script src="~/js/Custom/SupportModalPartialPage.js"></script>
+}

@@ -1,0 +1,191 @@
+﻿@using Koala.Portal.Core.Dtos
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IAuthorizationService AuthorizationService;
+@model IEnumerable<Koala.Portal.Core.ViewModels.PortalViewModels.UserListViewModel>;
+@{
+    ViewData["Title"] = "Index";
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    ViewData["ActivePage"] = "UserList";
+    ViewData["MenuToggle"] = "UserAccount";
+}
+<div class="d-flex flex-column-fluid">
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-custom">
+                    <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                        <div class="card-title">
+                            <h3 class="card-label">
+                                Kullanıcı Yönetimi
+                                <span class="d-block text-muted pt-2 font-size-sm">Kullanıcı Listesi</span>
+                            </h3>
+                        </div>
+                        <div class="card-toolbar">
+
+                            <!--begin::Button-->
+                            @if (AuthorizationService.AuthorizeAsync(User, "ManageUser.CreateUser").Result.Succeeded)
+                            {
+                                <a asp-action="CreateUser" asp-controller="UserAccount" class="btn btn-primary font-weight-bolder">
+                                    <span class="svg-icon svg-icon-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                <rect x="0" y="0" width="24" height="24" />
+                                                <circle fill="#000000" cx="9" cy="15" r="6" />
+                                                <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+                                            </g>
+                                        </svg>
+                                    </span>Yeni Kullanıcı Ekle
+                                </a>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(infoMessage))
+                        {
+
+                            <div class="alert alert-success" role="alert">
+                                @infoMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+
+                            <div class="alert alert-danger" role="alert">
+                                @errorMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <table class="table table-bordered table-hover" id="UserTable" style="margin-top: 13px !important">
+                            <thead>
+                                <tr>
+                                    <th title="Fullname">Ad Soyad</th>
+                                    <th title="Title">Ünvan</th>
+                                    <th title="Email">E-Posta</th>
+                                    <th title="PhoneNumber">Telefon</th>
+                                    @*<th title="PhoneNumber">Roller</th>*@
+                                    <th title="PhoneNumber">Durum</th>
+                                    <th title="Action">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Fullname</td>
+                                        <td>@item.Title</td>
+                                        <td>@item.Email</td>
+                                        <td>@item.PhoneNumber</td>
+                                        @* <td><user-roles user-id="@item.Id"></user-roles></td>*@
+                                        <td>@item.Status</td>
+                                        <td>
+                                            @if (AuthorizationService.AuthorizeAsync(User, "ManageUser.UpdateUserRoles").Result.Succeeded)
+                                            {
+                                                <a asp-controller="UserAccount" asp-action="AsignRoleToUser" asp-route-UserId="@item.Id" class="btn btn-icon btn-primary btn-sm" data-toggle="tooltip" title="Rolleri Düzenle" data-theme="dark"><i class="flaticon-list-2"></i></a>
+                                            }
+                                            @if (AuthorizationService.AuthorizeAsync(User, "ManageUser.UpdateUser").Result.Succeeded)
+                                            {
+                                                <a asp-controller="UserAccount" asp-action="UpdateUser" asp-route-userId="@item.Id" class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="Güncelle" data-theme="dark"><i class="flaticon-edit"></i></a>
+
+
+                                                @if (item.Status == (int)UserStatusEnum.Active)
+                                                {
+                                                    <a asp-controller="UserAccount" asp-action="ChangeUserStatus" asp-route-UserId="@item.Id" asp-route-status="@UserStatusEnum.Passive" class="btn btn-icon btn-info btn-sm" data-toggle="tooltip" title="Kullanıcıyı Pasife Çek" data-theme="dark"> <i class="flaticon2-cancel"></i></a>
+                                                }
+                                                else if (item.Status == (int)UserStatusEnum.Passive)
+                                                {
+                                                    <a asp-controller="UserAccount" asp-action="ChangeUserStatus" asp-route-UserId="@item.Id" asp-route-status="@UserStatusEnum.Active" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="Kullanıcıyı Aktif Et" data-theme="dark"><i class="flaticon2-check-mark"></i></a>
+                                                }
+                                            }
+                                           @*  @if (AuthorizationService.AuthorizeAsync(User, "ManageUser.CreateUser").Result.Succeeded)
+                                            {
+                                                <a asp-controller="UserAccount" asp-action="ChangeUserStatus" asp-route-UserId="@item.Id" asp-route-status="@UserStatusEnum.Removed" class="btn btn-icon btn-danger btn-sm" data-toggle="tooltip" title="Kullanıcıyı Sil" data-theme="dark"><i class="flaticon2-trash"></i></a>
+                                            } *@
+                                            @if (AuthorizationService.AuthorizeAsync(User, "ManageUser.AddVocation").Result.Succeeded)
+                                            {
+                                                <a class="btn btn-icon btn-warning btn-sm add-vacation" data-toggle="tooltip" title="İzin Ekle" data-theme="dark" data-id="@item.Id"><i class="flaticon-map-location"></i></a>
+                                            }
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add-vacation-to-user-modal" tabindex="-1" role="dialog" aria-labelledby="add-vacation-to-user-modal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="add-vacation-to-user-modal-header">Kullanıcıya İzin Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="">
+                   
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-1 col-sm-12">Miktar</label>
+                        <div class=" col-lg-3 col-sm-12">
+                            <div class="input-group">
+                                <input type="text" id="add_vacation_amount" value="0" class="form-control" placeholder="İzin Miktarı Giriniz..." />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" type="button">Gün</button>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="col-form-label text-right col-lg-1 col-sm-12">Açıklama</label>
+                        <div class=" col-lg-7 col-sm-12">
+                            <textarea class="form-control" id="add_vacation_description" rows="1"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                <button type="button" id="add_vacation_bt" class="btn btn-success font-weight-bold">Kullanıcıya İzin Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script src="~/js/custom/userlist.js"></script>
+    <script type="text/javascript">
+        function getBusinessDatesCount (startDate, endDate) {
+            let count = 0;
+            const curDate = new Date(startDate.getTime());
+            while (curDate <= endDate) {
+                const dayOfWeek = curDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) count++;
+                curDate.setDate(curDate.getDate() + 1);
+            }
+            alert(count);
+            return count;
+        }
+
+    </script>
+}

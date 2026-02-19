@@ -1,0 +1,108 @@
+﻿@using Koala.Portal.Core.Dtos
+@model IEnumerable<Koala.Portal.Core.ViewModels.GetPassViewModels.GetPassGetUserInfoViewModels>
+@{
+    ViewData["Title"] = "GetPass";
+    ViewData["ActivePage"] = "GetPass";
+    var serverTypes = (List<SelectListDto<string>>)ViewBag.ServerTypes;
+}
+
+<div class="container-fluid">
+    <div class="d-flex flex-row">
+        <partial name="_ProfileAsidePartial" />
+        <div class="flex-row-fluid ml-lg-8">
+            <div class="card card-custom">
+                <div class="card-header py-3">
+                    <div class="card-title align-items-start flex-column">
+                        <h3 class="card-label font-weight-bolder text-dark">GetPass </h3>
+                        <span class="text-muted font-weight-bold font-size-sm mt-1">GetPass Ekranı</span>
+                    </div>
+                    <div class="card-toolbar">
+                        <a href="#" id="open-add-project-line-modal" class="btn btn-sm btn-primary font-weight-bolder text-uppercase">Faz Ekle</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-separate table-head-custom collapsed" id="MyData">
+                        <thead>
+                            <tr>
+                                <th>Kayıt Adı</th>
+                                <th>Firma Adı</th>
+                                <th>Sunucu Tipi</th>
+                                <th>VPN Uygulaması</th>
+                                <th>Ip Adresi, Local Ip, Port, Kullanıcı Adı, Şifre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.FirmName</td>
+                                    <td>@item.ServerType</td>
+                                    <td>@item.VpnAplication</td>
+                                    <td><button class="btn btn-success btn-sm show-detail" data-id="@item.Id">Göster</button></td>
+
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Kayıt Adı</th>
+                                <th>Firma Adı</th>
+                                <th>Sunucu Tipi</th>
+                                <th>VPN Uygulaması</th>
+                                <th>Ip Adresi, Local Ip, Port, Kullanıcı Adı, Şifre</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="DetailModal" class="modal fade " role="dialog">
+    <div class="modal-dialog modal-lg">
+
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="detail">Kayıt Detayları</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>Ip Adresi</th>
+                        <td id="ip_Det"></td>
+                    </tr>
+                    <tr>
+                        <th>Local Ip</th>
+                        <td id="localIp_Det"></td>
+                    </tr>
+                    <tr>
+                        <th>Port</th>
+                        <td id="port_Det"></td>
+                    </tr>
+                    <tr>
+                        <th>Kullanıcı Adı</th>
+                        <td id="userName_Det"></td>
+                    </tr>
+                    <tr>
+                        <th>Şifre</th>
+                        <td id="password_Det"></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script src="~/js/custom/getpasspage.js"></script>
+}

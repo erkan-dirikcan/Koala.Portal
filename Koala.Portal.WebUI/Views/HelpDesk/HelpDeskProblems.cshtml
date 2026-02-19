@@ -1,0 +1,64 @@
+﻿@using System.Text.RegularExpressions
+@model List<Koala.Portal.Core.ViewModels.PortalViewModels.HelpDeskProblemInfoViewModels>
+@{
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    ViewData["Title"] = "Yardım Masası Problemler";
+    var CategoryName = ViewData["CategoryName"]!.ToString()!;
+
+}
+<div class="d-flex flex-column-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card card-custom">
+                    <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                        <div class="card-title">
+                            <h3 class="card-label">
+                                Yardım Masası
+                                <span class="d-block text-muted pt-2 font-size-sm">Yardım Masası Merkezi </span>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-xl-12">
+                            <div class="card card-custom card-stretch gutter-b">
+                                <div class="card-header border-0">
+                                    <h3 class="card-title font-weight-bolder text-dark">@CategoryName.ToString() Problemleri</h3>
+                                </div>
+                                <div class="card-body pt-0">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        <div class="d-flex flex-wrap align-items-center justify-content-between w-100">
+                                            @for (var i = 0; i < Model.Count; i++)
+                                            {
+                                                var mr = Model[i];
+                                                <div class="d-flex flex-column align-items-cente py-2 w-75">
+                                                    <a href="/HelpDesk/Problem?problemId=@Model[i].Id" class="title"><i class="flaticon2-file text-info"></i>@Model[i].Title </a>
+                                                    <p class="txt">
+                                                        @{
+                                                            var content = "";
+                                                            string myContent = Regex.Replace(Model[i].Content, @"<(.|\n)*?>", string.Empty);
+                                                            content = myContent.Length > 80 ?
+                                                            myContent.Substring(0, 80) :
+                                                            myContent;
+                                                        }
+                                                        @Html.Raw(content)
+                                                    </p>
+                                                    <small><span class="info"><strong>@Model[i].Views</strong> Görüntüleme</span></small>
+                                                </div>
+                                                <!--begin::Label-->
+                                                @* <span class="label label-lg label-light-success label-inline font-weight-bold py-4">@CategoryName</span> *@
+                                                <!--end::Label-->
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

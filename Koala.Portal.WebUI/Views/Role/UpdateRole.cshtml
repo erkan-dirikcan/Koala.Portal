@@ -1,0 +1,48 @@
+﻿@model Koala.Portal.Core.ViewModels.PortalViewModels.UpdateRoleViewModel
+@{
+    ViewData["Title"] = "UpdateRole";
+}
+
+
+<div class="d-flex flex-column-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <form name="CreateModuleForm" id="CreateForm" asp-action="UpdateRole" asp-controller="Role" method="post">
+                    <div class="card card-custom card-stretch gutter-b">
+                        <div class="card-header border-0 py-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label font-weight-bolder text-dark">Rol Yönetimi</span>
+                                <span class="text-muted mt-3 font-weight-bold font-size-sm">Rol Güncelle</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0 pb-3">
+                            <div class="tab-content">
+                                <div asp-validation-summary="ModelOnly"></div>
+                                <input type="hidden" asp-for="Id" />
+                                <div class="form-group row">
+                                    <label asp-for="Name" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="Name" type="text" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="Description" class="col-md-1 col-form-label"></label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="Description" type="text" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary mr-2">Rol Güncelle</button>
+                            <a href="~/Role" class="btn btn-secondary">Vazgeç</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+

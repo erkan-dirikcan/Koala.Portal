@@ -1,0 +1,111 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Koala.Portal.Core.ViewModels.PortalViewModels.AddProjectViewModel
+@{
+    ViewData["Title"] = "Proje Ekle";
+    ViewData["ActivePage"] = "Projects";
+    var users = (List<SelectListItem>)TempData["Users"]!;
+    var firms = (List<SelectListItem>)TempData["Firms"]!;
+}
+
+<div class="d-flex flex-column-fluid">
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-lg-12">
+                <form name="CreateUserForm" id="CreateProjectForm" asp-action="CreateProject" asp-controller="Project" method="post">
+                    <div class="card card-custom card-stretch gutter-b">
+                        <div class="card-header border-0 py-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label font-weight-bolder text-dark">Proje Yönetimi</span>
+                                <span class="text-muted mt-3 font-weight-bold font-size-sm">Yeni Proje Ekle</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0 pb-3">
+                            <div class="tab-content">
+
+                                @*<div class="text-center">
+                                <h1 class="display-4">Hoşgeşdiniz</h1>
+                                <p>Koala Hakkında Daha Fazla Bilgiye Ulaşmak için  <a href="mailto:info@sistem-bilgisayar.com" target="_blank">Mail Atınız</a>.</p>
+                                </div>*@
+
+
+                                <div asp-validation-summary="ModelOnly"></div>
+
+                                <div class="form-group row">
+                                    <label class="col-md-2 col-form-label">Proje Adı</label>
+                                    <div class="col-md-4">
+                                        <input class="form-control form-control-sm" asp-for="ProjectName" type="text" />
+                                        <span asp-validation-for="ProjectName" class="text-danger"></span>
+                                    </div>
+                                    <label  class="col-md-2 col-form-label">Proje Yöneticisi</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control" asp-for="ProjectManagerId" asp-items="users" name="ProjectManagerId">
+                                        </select>
+                                        @*  <input class="form-control form-control-sm" asp-for="ProjectManagerId" type="text" /> *@
+                                        <span asp-validation-for="ProjectManagerId" class="text-danger"></span>
+                                    </div>
+                                   
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-2 col-form-label">Açıklama</label>
+                                    <div class="col-md-10">
+                                        <input class="form-control form-control-sm" asp-for="Description" type="text" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-2 col-form-label">Firma</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control" asp-for="FirmId" asp-items="firms" name="FirmId">
+                                        </select>
+                                        <span asp-validation-for="FirmId" class="text-danger"></span>
+                                    </div>
+                                    <label  class="col-md-2 col-form-label">Firma Proje Yöneticisi</label>
+                                    <div class="col-md-4">
+                                        <select class="form-control" asp-for="FirmPersonId" name="FirmPersonId">
+                                        </select>
+                                        @*  <input class="form-control form-control-sm" asp-for="ProjectManagerId" type="text" /> *@
+                                        <span asp-validation-for="FirmPersonId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-2 col-form-label">Servis Süresi</label>
+                                    <div class="col-md-4">
+                                        <input class="form-control form-control-sm" asp-for="ServiceHour" type="text" />
+                                        <span asp-validation-for="ServiceHour" class="text-danger"></span>
+                                    </div>
+                                    <label  class="col-md-2 col-form-label">Teslim Tarihi</label>
+                                    <div class="col-md-4">
+                                        <div class="input-group date" id="StartDate_time" data-target-input="nearest">
+                                            <input type="text" class="form-control datetimepicker-input" placeholder="Select date &amp; time" id="DueDate" value="@DateTime.Now.ToString("dd-MM-yyyy")" data-target="#StartDate_time" />
+                                            <div class="input-group-append" data-target="#StartDate_time" data-toggle="datetimepicker">
+                                                <span class="input-group-text">
+                                                    <i class="ki ki-calendar"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                       
+                                        <span asp-validation-for="DueDate" class="text-danger"></span>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary mr-2">Proje Ekle</button>
+                            <a href="~/Project" class="btn btn-secondary">Vazgeç</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/custom/ProjectCreatePage.js"></script>
+}

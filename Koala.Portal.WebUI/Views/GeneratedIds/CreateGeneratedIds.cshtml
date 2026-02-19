@@ -1,0 +1,74 @@
+﻿@model Koala.Portal.Core.ViewModels.PortalViewModels.CreateGeneratedIdsViewModel
+@{
+    ViewData["Title"] = "CreateGeneratedIds";
+    ViewData["ActivePage"] = "GeneratedIds";
+    ViewData["MenuToggle"] = "Settings";
+    var modules = (List<SelectListItem>)ViewData["ModuleName"]!;
+
+}
+<div class="d-flex flex-column-fluid">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <form name="CreateGeneratedIdForm" id="CreateForm" asp-action="CreateGeneratedIds" asp-controller="GeneratedIds" method="post">
+                    <div class="card card-custom card-stretch gutter-b">
+                        <div class="card-header border-0 py-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label font-weight-bolder text-dark">Oluşturulan Kimlik</span>
+                                <span class="text-muted mt-3 font-weight-bold font-size-sm">Yeni Kimlik Ekle</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0 pb-3">
+                            <div class="tab-content">
+                                <div asp-validation-summary="ModelOnly"></div>
+                                <div class="form-group row">
+                                    <label class="col-md-1 col-form-label">Modül</label>
+                                    <div class="col-md-5">
+                                        <select class="form-control form-control-sm" asp-for="ModuleId" asp-items="modules"> </select>
+                                        <span asp-validation-for="ModuleId" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="Prefix" class="col-md-1 col-form-label">Prefix</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="Prefix" type="text" />
+                                        <span asp-validation-for="Prefix" class="text-danger"></span>
+                                    </div>
+
+                                    <label asp-for="StartNumber" class="col-md-1 col-form-label">Başlangıç Numarası</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="StartNumber" type="text" />
+                                        <span asp-validation-for="StartNumber" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="LastNumber" class="col-md-1 col-form-label">Son Numarası</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="LastNumber" type="text" />
+                                        <span asp-validation-for="LastNumber" class="text-danger"></span>
+                                    </div>
+                                    <label asp-for="Digit" class="col-md-1 col-form-label">Digit</label>
+                                    <div class="col-md-5">
+                                        <input class="form-control form-control-sm" asp-for="Digit" type="text" />
+                                        <span asp-validation-for="Digit" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary mr-2"> Ekle</button>
+                            <a href="~/GeneratedIds" class="btn btn-secondary">Vazgeç</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script type="text/javascript">
+        $('#ModuleId').select2({
+            placeholder: ""
+        });
+    </script>
+}

@@ -1,0 +1,38 @@
+﻿namespace Koala.Portal.Core.CrmModels;
+
+public partial class CT_Contact_Roles
+{
+    public Guid Oid { get; set; }
+
+    public string? RoleCode { get; set; }
+
+    public string? RoleName { get; set; }
+
+    public bool? IsActive { get; set; }
+
+    public bool? CanUseInProposals { get; set; }
+
+    public bool? CanUseInLeads { get; set; }
+
+    public bool? CanUseInSales { get; set; }
+
+    public bool? CanUseInActivities { get; set; }
+
+    public Guid? _CreatedBy { get; set; }
+
+    public DateTime? _CreatedDateTime { get; set; }
+
+    public Guid? _LastModifiedBy { get; set; }
+
+    public DateTime? _LastModifiedDateTime { get; set; }
+
+    public int? OptimisticLockField { get; set; }
+
+    public int? GCRecord { get; set; }
+
+    public virtual ICollection<MT_Contact> MT_Contact { get; set; } = new List<MT_Contact>();
+
+    public virtual ST_User? _CreatedByNavigation { get; set; }
+
+    public virtual ST_User? _LastModifiedByNavigation { get; set; }
+}

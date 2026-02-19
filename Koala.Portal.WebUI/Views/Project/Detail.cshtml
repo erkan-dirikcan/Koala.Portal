@@ -1,0 +1,315 @@
+﻿@using Koala.Portal.Core.Dtos
+@using Koala.Portal.WebUI.TagHelpers
+@using Koala.Portal.Core.ViewModels.CrmViewModels
+@using Koala.Portal.Core.ViewModels.PortalViewModels
+kullanıcı, firma kullanıcı
+
+@model (ProjectDetailViewModel project, InfoCrmFirmViewModel firm, List<CrmSupportListViewModel> supports,List<CrmUserFullNameInfoViewModel> crmUsers,List<CrmUserDepartmentsViewModel> userDepartments,List<SelectListItem> localUsers)
+@{
+    ViewData["Title"] = "Proje Detay";
+    ViewData["ActivePage"] = "Project";
+    TempData["IsProject"] = true;
+    // var priority = (List<SelectListItem>)TempData["Priority"]!;
+    var phones = Model.firm.Phones.Select(x => $"({x.AreaCode}) {x.Number}").ToList();
+}
+
+<div class="d-flex flex-column-fluid">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Card-->
+        <div class="card card-custom gutter-b" >
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <!--begin: Title-->
+                        <div class="d-flex align-items-center justify-content-between flex-wrap">
+                            <div class="mr-3">
+                                <!--begin::Name-->
+                                <a href="#" class="d-flex align-items-center text-dark text-hover-primary font-size-h5 font-weight-bold mr-3">
+                                    (@Model.project.Firm.Code) - @Model.project.Firm.Title
+                                    <i class="flaticon2-correct text-success icon-md ml-2"></i>
+                                </a>
+                                <!--end::Name-->
+                                <!--begin::Contacts-->
+                                <div class="d-flex flex-wrap my-2">
+                                    <a href="#" class="text-muted text-hover-primary font-weight-bold mr-lg-8 mr-5 mb-lg-0 mb-2">
+                                        <span class="svg-icon svg-icon-md svg-icon-gray-500 mr-1">
+                                            <!--begin::Svg Icon | path:C:\wamp64\www\keenthemes\legacy\metronic\theme\html\demo1\dist/../src/media/svg/icons\Devices\iPhone-X.svg-->
+                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="0" y="0" width="24" height="24" />
+                                                    <path d="M8,2.5 C7.30964406,2.5 6.75,3.05964406 6.75,3.75 L6.75,20.25 C6.75,20.9403559 7.30964406,21.5 8,21.5 L16,21.5 C16.6903559,21.5 17.25,20.9403559 17.25,20.25 L17.25,3.75 C17.25,3.05964406 16.6903559,2.5 16,2.5 L8,2.5 Z" fill="#000000" opacity="0.3" />
+                                                    <path d="M8,2.5 C7.30964406,2.5 6.75,3.05964406 6.75,3.75 L6.75,20.25 C6.75,20.9403559 7.30964406,21.5 8,21.5 L16,21.5 C16.6903559,21.5 17.25,20.9403559 17.25,20.25 L17.25,3.75 C17.25,3.05964406 16.6903559,2.5 16,2.5 L8,2.5 Z M8,1 L16,1 C17.5187831,1 18.75,2.23121694 18.75,3.75 L18.75,20.25 C18.75,21.7687831 17.5187831,23 16,23 L8,23 C6.48121694,23 5.25,21.7687831 5.25,20.25 L5.25,3.75 C5.25,2.23121694 6.48121694,1 8,1 Z M9.5,1.75 L14.5,1.75 C14.7761424,1.75 15,1.97385763 15,2.25 L15,3.25 C15,3.52614237 14.7761424,3.75 14.5,3.75 L9.5,3.75 C9.22385763,3.75 9,3.52614237 9,3.25 L9,2.25 C9,1.97385763 9.22385763,1.75 9.5,1.75 Z" fill="#000000" fill-rule="nonzero" />
+                                                </g>
+                                            </svg>
+                                        </span>
+                                        @foreach (var phone in phones)
+                                        {
+                                            var pFormt = "0" + phone.Replace(" ", "").Replace("(", "").Replace(")", "");
+                                            <a href="tel:@pFormt" class="">
+                                                @phone
+                                            </a>
+                                            <span>&nbsp;&nbsp;&nbsp; </span>
+                                        }
+                                        @*  @string.Join(", ", phones) *@
+                                    </a>
+
+
+                                </div>
+                                <!--end::Contacts-->
+                            </div>
+                            <div class="my-lg-0 my-1">
+                                <a href="#" class="btn btn-sm btn-light-success font-weight-bolder text-uppercase mr-3">Dosya Ekle</a>
+                            </div>
+                        </div>
+                        <!--end: Title-->
+                    </div>
+                    <!--end: Info-->
+                </div>
+                <div class="separator separator-solid my-7"></div>
+                <!--begin: Items-->
+                <div class="d-flex align-items-center flex-wrap">
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-app icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Toplam Faz</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>0
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-support icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Toplam İş</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
+                                x.TicketStateOid == "bd6344e9-e338-47a3-b6c0-38d9385b80b4" ||
+                                x.TicketStateOid == "07d17e00-b999-4a39-8c01-4e0ceb1925fd" ||
+                                x.TicketStateOid == "a048ac84-9dde-4a2c-86aa-d3ef76506103" ||
+                                x.TicketStateOid == "e4bea484-e65c-4161-9b7e-95631a36928b")
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-file-2 icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Toplam Destek Kaydı</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
+                                (x.TicketStateOid != "bd6344e9-e338-47a3-b6c0-38d9385b80b4" &&
+                                x.TicketStateOid != "07d17e00-b999-4a39-8c01-4e0ceb1925fd" &&
+                                x.TicketStateOid != "a048ac84-9dde-4a2c-86aa-d3ef76506103" &&
+                                x.TicketStateOid != "e4bea484-e65c-4161-9b7e-95631a36928b") &&
+                                x.TicketStateOid != "439e8fb4-b576-4650-83de-656ee3cfd3e7")
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-file-2 icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Toplam Dosya</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
+                                (x.TicketStateOid != "bd6344e9-e338-47a3-b6c0-38d9385b80b4" &&
+                                x.TicketStateOid != "07d17e00-b999-4a39-8c01-4e0ceb1925fd" &&
+                                x.TicketStateOid != "a048ac84-9dde-4a2c-86aa-d3ef76506103" &&
+                                x.TicketStateOid != "e4bea484-e65c-4161-9b7e-95631a36928b") &&
+                                x.TicketStateOid != "439e8fb4-b576-4650-83de-656ee3cfd3e7")
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                    <!--begin: Item-->
+                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
+                        <span class="mr-4">
+                            <i class="flaticon-file-2 icon-2x text-muted font-weight-bold"></i>
+                        </span>
+                        <div class="d-flex flex-column text-dark-75">
+                            <span class="font-weight-bolder font-size-sm">Toplam Faz Notu</span>
+                            <span class="font-weight-bolder font-size-h5">
+                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
+                                (x.TicketStateOid != "bd6344e9-e338-47a3-b6c0-38d9385b80b4" &&
+                                x.TicketStateOid != "07d17e00-b999-4a39-8c01-4e0ceb1925fd" &&
+                                x.TicketStateOid != "a048ac84-9dde-4a2c-86aa-d3ef76506103" &&
+                                x.TicketStateOid != "e4bea484-e65c-4161-9b7e-95631a36928b") &&
+                                x.TicketStateOid != "439e8fb4-b576-4650-83de-656ee3cfd3e7")
+                            </span>
+                        </div>
+                    </div>
+                    <!--end: Item-->
+                </div>
+                <!--begin: Items-->
+            </div>
+        </div>
+
+        <div class="card card-custom gutter-b">
+            <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                <div class="card-title">
+                    <h3 class="card-label">
+                        Proje Fazları
+                        <span class="d-block text-muted pt-2 font-size-sm">@Model.project.ProjectName Proje Fazları</span>
+                    </h3>
+
+                </div>
+                <div class="card-toolbar">
+                    <a href="#" id="open-add-project-line-modal" class="btn btn-sm btn-primary font-weight-bolder text-uppercase">Faz Ekle</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-hover" id="ProjectLineTable" style="margin-top: 13px !important">
+                    <thead>
+                        <tr>
+                            <th title="Title">Proje Adı</th>
+                            <th title="DueDate">Teslim Tarihi</th>
+                            <th title="StartDate">Başlangıç Tarihi</th>
+                            <th title="LineOfficial">Faz Yöneticisi</th>
+                            <th title="LineFirmOfficial">Firma Yetkilisi</th>
+                            <th title="Phone">Telefon</th>
+                            <th title="Email">E-Posta</th>
+                            <th title="Priority">Öncelik</th>
+                            <th title="RowOrder">Sıralama</th>
+                            <th title="Action">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.project.ProjectLines)
+                        {
+                            @*   var phn = new StringBuilder();
+                        foreach (var crmPhonesInfoViewModel in item.Phones)
+                        {
+                        phn.Append($" <a href='tel:0{crmPhonesInfoViewModel.AreaCode}{crmPhonesInfoViewModel.Number}'>({crmPhonesInfoViewModel.AreaCode}) - {crmPhonesInfoViewModel.Number}</a><br />");
+                        }
+                        var userPhones = item.Phones.Select(x => $"({x.AreaCode}) - {x.Number}").ToList();
+
+
+                        var userPhone = string.Join("<br />", userPhones); *@
+
+                            <tr>
+                                <th title="Title">Proje Adı</th>
+                                <th title="DueDate">Teslim Tarihi</th>
+                                <th title="StartDate">Başlangıç Tarihi</th>
+                                <th title="LineOfficial">Faz Yöneticisi</th>
+                                <th title="LineFirmOfficial">Firma Yetkilisi</th>
+                                <th title="Phone">Telefon</th>
+                                <th title="Email">E-Posta</th>
+                                <th title="Priority">Öncelik</th>
+                                <th title="RowOrder">Sıralama</th>
+                                <td>
+                                    <a class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="E-Posta Güncelle" data-theme="dark"><i class="flaticon2-mail"></i></a>
+                                    <a class="btn btn-icon btn-primary btn-sm" data-toggle="tooltip" title="Portal Kullanıcı Güncelle"><i class="flaticon-user-settings"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
+            @await Html.PartialAsync("_SupportModalsPartial")
+        </div>
+    </div>
+
+    @* <div class="row">
+    @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
+    @await Html.PartialAsync("_SupportModalsPartial")
+    </div> *@
+
+</div>
+<div class="modal fade" id="add-project-line-modal" tabindex="-1" role="dialog" aria-labelledby="createSupportModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSupportModalLabel"><span class="text-danger">(@Model.project.ProjectCode) - @Model.project.ProjectName</span> isimli projeye faz ekle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+              
+                <form class="form">
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Adı</label>
+                        <div class=" col-lg-4 col-sm-12">
+                            <input type="text" id="add_LineTitle" name="add_LineTitle" class="form-control" />
+                        </div>
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Sıra Numarası</label>
+                        <div class=" col-lg-4 col-sm-12">
+                            <input type="text" class="form-control" id="add_LineRowNumber" name="add_LineRowNumber" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Yöneticisi</label>
+                        <div class=" col-lg-4 col-sm-12">
+                            <user-select id="add_LineOfficialId" name="add_LineOfficialId"></user-select>
+                           
+                        </div>
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Firma Yetkilisi</label>
+                        <div class=" col-lg-4 col-sm-12">
+                            <firm-contact-select  id="add_LineFirmOfficial" name="add_LineFirmOfficial" firm-id="@Model.firm.Id"></firm-contact-select>
+                           
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Öncelik</label>
+                        <div class=" col-lg-4 col-sm-12">
+                            <priority-enum-select selected-value="@PriorityEnum.Normal" id="add_LinePriority" name="add_LinePriority"></priority-enum-select>
+                        </div>
+                        <label class="col-form-label text-right col-lg-2 col-sm-12">Teslim Tarihi</label>
+                        <div class="col-lg-4 col-sm-12">
+                            <div class="input-group date" id="add_DueDate" data-target-input="nearest">
+                                <input class="form-control form-control-lg form-control-solid" id="add_DueDate_tb" data-target="#add_DueDate" placeholder="Teslim Tarihi Seçiniz" />
+                                <div class="input-group-append" data-target="#add_DueDate" data-toggle="datetimepicker">
+                                    <span class="input-group-text">
+                                        <i class="ki ki-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-1">
+                        <label for="add_LineDescription">
+                            Faz Açıklaması
+                            <span class="text-danger"></span>
+                        </label>
+                        <textarea class="form-control" id="add_LineDescription" rows="3"></textarea>
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                <button type="button" id="crt_sup_save_bt" class="btn btn-success font-weight-bold">Destek Kaydı Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts
+{
+    <script src="~/js/custom/supportpartialpage.js"></script>
+    <script src="~/js/Custom/SupportModalPartialPage.js"></script>
+    <script src="~/js/Custom/ProjectDetailPage.js"></script>
+}

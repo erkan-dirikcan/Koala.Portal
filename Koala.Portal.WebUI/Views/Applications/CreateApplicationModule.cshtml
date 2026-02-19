@@ -1,0 +1,71 @@
+﻿@model Koala.Portal.Core.ViewModels.PortalViewModels.CreateApplicationModulesViewModel
+@{
+    ViewData["Title"] = "Uygulama Modülü Ekle";
+    ViewData["ActivePage"] = "WaitingLicence";
+    ViewData["MenuToggle"] = "CreateApplicationModule";
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    var modules = (List<SelectListItem>)TempData["modules"];
+}
+
+
+<div class="d-flex flex-column-fluid">
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-lg-12">
+                <form name="CreateUserForm" id="CreateFixtureForm" asp-action="Create" asp-controller="Applications" method="post">
+                    <div class="card card-custom card-stretch gutter-b">
+                        <div class="card-header border-0 py-5">
+                            <h3 class="card-title align-items-start flex-column">
+                                <span class="card-label font-weight-bolder text-dark">Uygulama Yönetimi</span>
+                                <span class="text-muted mt-3 font-weight-bold font-size-sm">Yeni Uygulama Ekle</span>
+                            </h3>
+                        </div>
+                        <div class="card-body pt-0 pb-3">
+                            <div class="tab-content">
+                                <div asp-validation-summary="ModelOnly"></div>
+
+                                <div class="form-group row">
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Modül Adı</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <input class="form-control form-control-sm" asp-for="Name" type="text" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    <label class="col-form-label text-right col-lg-2 col-sm-12">Modül Açıklaması</label>
+                                    <div class=" col-lg-4 col-sm-12">
+                                        <input class="form-control form-control-sm" asp-for="Desctiption" type="text" />
+                                        <span asp-validation-for="Desctiption" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label asp-for="ApplicationId" class="col-form-label text-right col-lg-2 col-sm-12"></label>
+                                    <div class="col-lg-10 col-sm-12">
+                                        <select class="form-control form-control-sm" asp-for="ApplicationId" asp-items="modules"> </select>
+                                        <span asp-validation-for="ApplicationId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary mr-2">Uygulama Ekle</button>
+                                <a href="~/Applications" class="btn btn-secondary">Vazgeç</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <script src="~/js/custom/CreateApplicationModulePage.js"></script>
+}

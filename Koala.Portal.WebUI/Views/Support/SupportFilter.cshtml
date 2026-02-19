@@ -1,0 +1,190 @@
+﻿@model List<Koala.Portal.Core.ViewModels.CrmViewModels.CrmSupportListViewModel>
+@{
+    ViewData["Title"] = "Destek Kayıtları";
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    var users = (List<SelectListItem>)TempData["Users"]!;
+    var firms = (List<SelectListItem>)TempData["Firms"]!;
+    var supportTypes = (List<SelectListItem>)TempData["SupportTypes"];
+    var now = DateTime.Now;
+    var morning = new DateTime(now.Year, now.Month, now.Day, 8, 0, 0);
+    ViewData["ActivePage"] = "SupportFilter";
+
+}
+
+<div class="d-flex flex-column-fluid">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Card-->
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <!--begin: Title-->
+                        <form asp-action="SupportFilter" , asp-controller="Support" method="post">
+                            <div class="form-group row mt-3">
+                                <label class="col-lg-1 col-form-label text-lg-right">Kullanıcı:</label>
+                                <div class="col-lg-3">
+                                    <select class="form-control" id="ActiveWorkingUserOid" asp-items="users" name="ActiveWorkingUserOid">
+                                    </select>
+                                </div>
+                                <label class="col-lg-1 col-form-label text-lg-right">Destek Durumu:</label>
+                                <div class="col-lg-7">
+
+                                    <select class="form-control" id="Statuses"  asp-items="supportTypes" name="Statuses" multiple="multiple">
+                                    </select>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group row mt-3">
+                                <label class="col-lg-1 col-form-label text-lg-right">Başlangıç Tarihi:</label>
+                                <div class="col-lg-2">
+                                    <div class="input-group date" id="StartDate_time" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" id="StartDate" name="StartDate" value="@morning.ToString("dd-MM-yyyy HH:mm")" data-target="#StartDate_time" />
+                                        <div class="input-group-append" data-target="#StartDate_time" data-toggle="datetimepicker">
+                                            <span class="input-group-text">
+                                                <i class="ki ki-calendar"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <label class="col-lg-1 col-form-label text-lg-right">Bitiş Tarihi:</label>
+                                <div class="col-lg-2">
+
+                                    <div class="input-group date" id="EndDate_time" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" id="EndDate" name="EndDate" value="@DateTime.Now.ToString("dd-MM-yyyy HH:mm")" data-target="#EndDate_time" />
+                                        <div class="input-group-append" data-target="#EndDate_time" data-toggle="datetimepicker">
+                                            <span class="input-group-text">
+                                                <i class="ki ki-calendar"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <label class="col-lg-1 col-form-label text-lg-right">Firma:</label>
+                                <div class="col-lg-3">
+
+                                    <select class="form-control" id="Firm" asp-items="firms" name="Firm">
+                                    </select>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="my-lg-0 my-1">
+                                        <button type="submit" class="btn btn-sm btn-info font-weight-bolder text-uppercase">Kayıtları Getir</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <!--end: Title-->
+
+                    </div>
+                    <!--end: Info-->
+                </div>
+                <div class="separator separator-solid my-7"></div>
+                @if (!string.IsNullOrEmpty(infoMessage))
+                {
+
+                    <div class="alert alert-success" role="alert">
+                        @infoMessage
+                        <div class="alert-close">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                            </button>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+
+                    <div class="alert alert-danger" role="alert">
+                        @errorMessage
+                        <div class="alert-close">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                            </button>
+                        </div>
+                    </div>
+                }
+                @if (Model != null)
+                {
+                    <table class="table table-bordered table-hover" id="supportTable" style="margin-top: 13px !important">
+                        <thead>
+                            <tr>
+                                <th>Oid</th>
+                                <th title="TicketId">Kayıt Numarası</th>
+                                <th title="Firm">Firma</th>
+                                <th title="Contact">Yetkili</th>
+                                <th title="Title">Başlık</th>
+                                <th title="TicketAramaTarihi">Arama Tarihi</th>
+                                <th title="ActiveWorkingUser">Çalışan Kullanıcı</th>
+                                <th title="Notes">Müşteri Talebi</th>
+                                <th title="State">Durum</th>
+                                <th title="ActionTaken">Yapılan İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderBy(x => x.TicketAramaTarihi))
+                            {
+                                var workUserData = users.FirstOrDefault(x => x.Value == item.ActiveWorkingUser);
+                                var workUser = "";
+                                try
+                                {
+                                    if (workUserData != null)
+                                    {
+                                        workUser = workUserData.Text;
+
+                                    }
+
+                                }
+                                catch (Exception)
+                                {
+                                    workUser = "-";
+                                }
+                                <tr>
+
+                                    <td>@item.Oid</td>
+                                    <td title="TicketId">@item.TicketId</td>
+                                    @if (item.TicketFirmNavigation != null)
+                                    {
+
+                                        <td title="Firm">(@item.TicketFirmNavigation.Code) - @item.TicketFirmNavigation.Title</td>
+                                    }
+                                    else
+                                    {
+                                        <td title="Firm">-</td>
+
+                                    }
+                                    @if (item.TicketContactNavigation != null)
+                                    {
+
+                                        <td title="Contact">@item.TicketContactNavigation.Name</td>
+                                    }
+                                    else
+                                    {
+                                        <td title="Contact">-</td>
+
+                                    }
+                                    
+                                    <td title="Title">@item.Title</td>
+                                    <td title="TicketAramaTarihi">@item.TicketAramaTarihi?.ToString("dd-MM-yyyy HH:mm")</td>
+                                    <td title="ActiveWorkingUser">@workUser</td>
+                                    <td title="Notes">@item.Notes</td>
+                                    <td title="State">@item.TicketStateNavigation.TicketStateDescription</td>
+                                    <td title="ActionTaken">@item.TicketYapilanIslem</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script src="~/js/custom/supportfilterpage.js"></script>
+}
+

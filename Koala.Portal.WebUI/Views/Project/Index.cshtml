@@ -1,0 +1,121 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model List<Koala.Portal.Core.ViewModels.PortalViewModels.ProjectListViewModel>
+@{
+    ViewData["Title"] = "Proje Listesi";
+    var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
+    var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
+    ViewData["ActivePage"] = "Projects";
+}
+
+<div class="d-flex flex-column-fluid">
+
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card card-custom">
+                    <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                        <div class="card-title">
+                            <h3 class="card-label">
+                                Proje Yönetimi
+                                <span class="d-block text-muted pt-2 font-size-sm">Proje Listesi</span>
+                            </h3>
+                        </div>
+                        <div class="card-toolbar">
+
+                            <!--begin::Button-->
+                            <a asp-action="CreateProject" asp-controller="Project" class="btn btn-primary font-weight-bolder">
+                                <span class="svg-icon svg-icon-md">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                            <rect x="0" y="0" width="24" height="24" />
+                                            <circle fill="#000000" cx="9" cy="15" r="6" />
+                                            <path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+                                        </g>
+                                    </svg>
+                                    <!--end::Svg Icon-->
+                                </span>Proje Ekle
+                            </a>
+                            <!--end::Button-->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(infoMessage))
+                        {
+
+                            <div class="alert alert-success" role="alert">
+                                @infoMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+
+                            <div class="alert alert-danger" role="alert">
+                                @errorMessage
+                                <div class="alert-close">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true"><i class="ki ki-close"></i></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <table class="table table-bordered table-hover" id="ProjectTable" style="margin-top: 13px !important">
+                            <thead>
+                                <tr>
+                                    <th title="ProjectCode">Proje Kodu</th>
+                                    <th title="ProjectName">Proje Adı</th>
+                                    <th title="ProjectManager">Proje Yöneticisi</th>
+                                    <th title="Firm">Firma</th>
+                                    <th title="StartDate">Başlangıç Tarihi</th>
+                                    <th title="DueDate">Termin Tarihi</th>
+                                    <th title="Action">İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.ProjectCode</td>
+                                        <td>@item.ProjectName</td>
+                                        <td>@item.ProjectManager</td>
+                                        <td>@item.Firm</td>
+                                        <td>@item.StartDate</td>
+                                        
+                                        <td>@item.DueDate</td>
+                                        <td>
+                                            <a asp-controller="Project" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="Güncelle" data-theme="dark"><i class="flaticon-edit"></i></a>
+                                            <a class="btn btn-icon btn-info btn-sm" data-toggle="tooltip" title="Dosya Ekle" data-theme="dark"><i class="flaticon-file-1"></i></a>
+                                            <a asp-controller="Project" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="Faz Güncelle" data-theme="dark"><i class="flaticon-list"></i></a>
+                                            @*           @if (item.IsActive)
+                                            {
+                                                <a asp-controller="Fixture" asp-action="FixtureChangeStatus" asp-route-id="@item.Id" asp-route-status="@false" class="btn btn-icon btn-danger btn-sm" data-toggle="tooltip" title="Pasife Çek" data-theme="dark"> <i class="flaticon2-cancel"></i></a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Fixture" asp-action="FixtureChangeStatus" asp-route-id="@item.Id" asp-route-status="@true" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="Aktif Et" data-theme="dark"><i class="flaticon2-check-mark"></i></a>
+                                            } *@
+
+                                        </td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/custom/ProjectListPage.js"></script>
+}
