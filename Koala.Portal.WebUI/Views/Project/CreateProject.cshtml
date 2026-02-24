@@ -58,13 +58,15 @@
                                 <div class="form-group row">
                                     <label class="col-md-2 col-form-label">Firma</label>
                                     <div class="col-md-4">
-                                        <select class="form-control" asp-for="FirmId" asp-items="firms" name="FirmId">
+                                        <select class="form-control select2" asp-for="FirmId" asp-items="firms" name="FirmId" data-placeholder="Firma Seçin">
+                                            <option value="">Seçiniz</option>
                                         </select>
                                         <span asp-validation-for="FirmId" class="text-danger"></span>
                                     </div>
                                     <label  class="col-md-2 col-form-label">Firma Proje Yöneticisi</label>
                                     <div class="col-md-4">
-                                        <select class="form-control" asp-for="FirmPersonId" name="FirmPersonId">
+                                        <select class="form-control select2" asp-for="FirmPersonId" name="FirmPersonId" data-placeholder="Firma Yetkilisi Seçin">
+                                            <option value="">Seçiniz</option>
                                         </select>
                                         @*  <input class="form-control form-control-sm" asp-for="ProjectManagerId" type="text" /> *@
                                         <span asp-validation-for="FirmPersonId" class="text-danger"></span>

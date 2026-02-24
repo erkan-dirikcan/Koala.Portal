@@ -7,6 +7,8 @@ namespace Koala.Portal.Core.Services
     {
         Task<Response> AddAsync(AddProjectLineViewModel model);
         Task<Response> UpdateAsync(UpdateProjectLineViewModel model, string id);
+        Task<Response> DeleteAsync(string id);
+        Task<Response> ChangeStateStatusAsync(ProjectLineChangeStateStatusViewModel model);
         Task<Response<List<ProjectLineListViewModel>>> GetProjectLineListAsync(string projectId);
         Task<Response<ProjectLineDetailViewModel>> GetProjectLineDetailAsync(string id);
 

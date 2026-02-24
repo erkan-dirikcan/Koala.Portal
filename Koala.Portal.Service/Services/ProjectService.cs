@@ -139,7 +139,15 @@ namespace Koala.Portal.Service.Services
         {
             try
             {
-                var res = await _repository.GetByIdAsyc(id);
+                var res = await _repository
+                    .Where(x => x.Id == id)
+                    .Include(x => x.ProjectLines)
+                        .ThenInclude(x => x.LineOffcial)
+                    .Include(x => x.ProjectLines)
+                        .ThenInclude(x => x.LineFirmOffcial)
+                    .Include(x => x.Firm)
+                    .FirstOrDefaultAsync();
+
                 if (res == null)
                 {
                     return Response<ProjectDetailViewModel>.FailData(404, "Proje Bilgilerine Ulaşılamadı", $"{id} kimlik bilgisine sahip projenin bilgilerine ulaşılamadı.", true);

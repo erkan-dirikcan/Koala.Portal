@@ -18,6 +18,8 @@ namespace Koala.Portal.Repository.Repositories
 
         public async Task AddAsync(ProjectLine projectLine)
         {
+            projectLine.UpdateTime = DateTime.Now;
+            projectLine.UpdateUser=projectLine.CreateUser;
             await _dbSet.AddAsync(projectLine);
         }
 

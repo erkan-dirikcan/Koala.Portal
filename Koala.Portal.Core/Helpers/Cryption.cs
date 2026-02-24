@@ -8,6 +8,7 @@ namespace Koala.Portal.Core.Helpers
     //TODO: Static class dan çıkarılıp dp eklenecek
     public static class Cryption
     {
+        //134DD406A5F8AC4D838386E0FB6F70F2
         private static readonly byte[] sKey = new byte[] { 0x13, 0x4D, 0xD4, 0x06, 0xA5, 0xF8, 0xAC, 0x4D, 0x83, 0x83, 0x86, 0xE0, 0xFB, 0x6F, 0x70, 0xF2 };
    
         //private static readonly Logger<> _logger = LogManager.GetCurrentClassLogger();

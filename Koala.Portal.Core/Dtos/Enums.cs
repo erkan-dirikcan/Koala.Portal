@@ -293,7 +293,7 @@
         WaitingForSomeoneElse = 0x03,
         Deferred = 0x04,
         Completed = 0x05,
-        Canceled = 0x06
+        Cancellled = 0x06
     }
     public enum ProjectLineWorkStatusEnum
     {

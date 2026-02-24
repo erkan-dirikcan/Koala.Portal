@@ -12,7 +12,7 @@ namespace Koala.Portal.Core.Models
         }
 
         public string Id { get; set; } = Tools.CreateGuidStr();
-        public string ParentId { get; set; }
+        public string? ParentId { get; set; }
 
         public string Name { get; set; }
 

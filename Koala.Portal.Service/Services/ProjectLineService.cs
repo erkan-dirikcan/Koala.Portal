@@ -149,5 +149,72 @@ namespace Koala.Portal.Service.Services
             }
         }
 
+        public async Task<Response> DeleteAsync(string id)
+        {
+            try
+            {
+                var entity = await _repository.GetByIdAsyc(id);
+                if (entity == null)
+                {
+                    return Response.Fail(404, "Silinecek proje fazı bulunamadı", $"{id} kimlik bilgisine sahip faz bulunamadı.", true);
+                }
+
+                entity.Status = StatusEnum.Deleted;
+                entity.UpdateTime = DateTime.Now;
+                _repository.Update(entity);
+                await _unitOfWork.CommitAsync();
+                return Response.Success(200, "Proje Fazı Başarıyla Silindi.");
+            }
+            catch (Exception ex)
+            {
+                return Response.Fail(400, "Proje fazı silinirken bir hata oluştu.", ex.Message, false);
+            }
+        }
+
+        public async Task<Response> ChangeStateStatusAsync(ProjectLineChangeStateStatusViewModel model)
+        {
+            try
+            {
+                var entity = await _repository.GetByIdAsyc(model.Id);
+                if (entity == null)
+                {
+                    return Response.Fail(404, "Faz bulunamadı", $"{model.Id} kimlik bilgisine sahip faz bulunamadı.", true);
+                }
+
+                // Durum değişikliğine göre tarihleri ayarla
+                if (model.Status == ProjectLineStatusEnum.InProgress && entity.StateStatus == ProjectLineStatusEnum.NotStarted)
+                {
+                    // Faza başlanıyorsa başlangıç tarihini set et
+                    entity.StartDate = DateTime.Now;
+                }
+                else if (model.Status == ProjectLineStatusEnum.Completed)
+                {
+                    // Faz tamamlanıyorsa bitiş tarihini set et
+                    entity.EndDate = DateTime.Now;
+                }
+
+                entity.StateStatus = model.Status;
+                entity.CancelDescription = model.CancelDescription;
+                entity.UpdateTime = DateTime.Now;
+                _repository.Update(entity);
+                await _unitOfWork.CommitAsync();
+
+                string statusText = model.Status switch
+                {
+                    ProjectLineStatusEnum.NotStarted => "Başlamadı",
+                    ProjectLineStatusEnum.InProgress => "Devam Ediyor",
+                    ProjectLineStatusEnum.Completed => "Tamamlandı",
+                    ProjectLineStatusEnum.Cancellled => "İptal Edildi",
+                    _ => "Değiştirildi"
+                };
+
+                return Response.Success(200, $"Faz durumu '{statusText}' olarak değiştirildi.");
+            }
+            catch (Exception ex)
+            {
+                return Response.Fail(400, "Faz durumu değiştirilirken bir hata oluştu.", ex.Message, false);
+            }
+        }
+
     }
 }

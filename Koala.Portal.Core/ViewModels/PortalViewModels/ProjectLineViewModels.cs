@@ -7,6 +7,8 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
     {
         public string Id { get; set; }
         public string Project { get; set; }
+        public string? LineOfficialId { get; set; }
+        public string? LineFirmOfficialId { get; set; }
         public string? LineOfficial { get; set; }
         public string? LineFirmOfficial { get; set; }
         public string? Title { get; set; }
@@ -55,7 +57,7 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         public string? Description { get; set; }
         public DateTime? DueDate { get; set; }//
         public PriorityEnum Priority { get; set; }//
-        public int? RowOrdwer { get; set; }
+        public int? RowOrder { get; set; }
         public string? CreateUser { get; set; }
         public DateTime? CreateTime { get; set; }
     }

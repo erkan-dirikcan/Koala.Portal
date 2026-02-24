@@ -77,7 +77,7 @@ kullanıcı, firma kullanıcı
                         <div class="d-flex flex-column text-dark-75">
                             <span class="font-weight-bolder font-size-sm">Toplam Faz</span>
                             <span class="font-weight-bolder font-size-h5">
-                                <span class="text-dark-50 font-weight-bold"></span>0
+                                <span class="text-dark-50 font-weight-bold"></span>@(Model.project.ProjectLines?.Count() ?? 0)
                             </span>
                         </div>
                     </div>
@@ -176,44 +176,51 @@ kullanıcı, firma kullanıcı
                     <thead>
                         <tr>
                             <th title="Title">Proje Adı</th>
+                            <th title="StateStatus">Durum</th>
                             <th title="DueDate">Teslim Tarihi</th>
                             <th title="StartDate">Başlangıç Tarihi</th>
                             <th title="LineOfficial">Faz Yöneticisi</th>
                             <th title="LineFirmOfficial">Firma Yetkilisi</th>
-                            <th title="Phone">Telefon</th>
-                            <th title="Email">E-Posta</th>
                             <th title="Priority">Öncelik</th>
                             <th title="RowOrder">Sıralama</th>
                             <th title="Action">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.project.ProjectLines)
+                        @if (Model.project.ProjectLines != null && Model.project.ProjectLines.Any())
                         {
-                            @*   var phn = new StringBuilder();
-                        foreach (var crmPhonesInfoViewModel in item.Phones)
-                        {
-                        phn.Append($" <a href='tel:0{crmPhonesInfoViewModel.AreaCode}{crmPhonesInfoViewModel.Number}'>({crmPhonesInfoViewModel.AreaCode}) - {crmPhonesInfoViewModel.Number}</a><br />");
+                            @foreach (var item in Model.project.ProjectLines)
+                            {
+                                var statusBadge = item.StateStatus switch
+                                {
+                                    ProjectLineStatusEnum.NotStarted => "<span class='badge badge-secondary'>Başlamadı</span>",
+                                    ProjectLineStatusEnum.InProgress => "<span class='badge badge-info'>Devam Ediyor</span>",
+                                    ProjectLineStatusEnum.Completed => "<span class='badge badge-success'>Tamamlandı</span>",
+                                    ProjectLineStatusEnum.Cancellled => "<span class='badge badge-danger'>İptal Edildi</span>",
+                                    _ => "<span class='badge badge-secondary'>Belirsiz</span>"
+                                };
+                                <tr data-id="@item.Id" data-title="@item.Title" data-official-id="@item.LineOfficialId" data-firm-official-id="@item.LineFirmOfficialId" data-priority="@((int)item.Priority)" data-roworder="@item.RowOrder" data-description="@item.Description" data-duedate="@item.DueDate">
+                                    <td title="Title">@item.Title</td>
+                                    <td title="StateStatus">@Html.Raw(statusBadge)</td>
+                                    <td title="DueDate">@item.DueDate</td>
+                                    <td title="StartDate">@item.StartDate</td>
+                                    <td title="LineOfficial">@item.LineOfficial</td>
+                                    <td title="LineFirmOfficial">@item.LineFirmOfficial</td>
+                                    <td title="Priority">@item.Priority</td>
+                                    <td title="RowOrder">@item.RowOrder</td>
+                                    <td title="Action">
+                                        <button type="button" class="btn btn-icon btn-success btn-sm btn-start-phase" data-toggle="tooltip" title="Faza Başla" data-id="@item.Id"><i class="flaticon2-play"></i></button>
+                                        <button type="button" class="btn btn-icon btn-warning btn-sm btn-complete-phase" data-toggle="tooltip" title="Tamamla" data-id="@item.Id"><i class="flaticon2-check-mark"></i></button>
+                                        <button type="button" class="btn btn-icon btn-primary btn-sm btn-edit-phase" data-toggle="tooltip" title="Düzenle"><i class="flaticon2-pen"></i></button>
+                                        <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-phase" data-toggle="tooltip" title="Sil" data-id="@item.Id"><i class="flaticon2-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
                         }
-                        var userPhones = item.Phones.Select(x => $"({x.AreaCode}) - {x.Number}").ToList();
-
-
-                        var userPhone = string.Join("<br />", userPhones); *@
-
+                        else
+                        {
                             <tr>
-                                <th title="Title">Proje Adı</th>
-                                <th title="DueDate">Teslim Tarihi</th>
-                                <th title="StartDate">Başlangıç Tarihi</th>
-                                <th title="LineOfficial">Faz Yöneticisi</th>
-                                <th title="LineFirmOfficial">Firma Yetkilisi</th>
-                                <th title="Phone">Telefon</th>
-                                <th title="Email">E-Posta</th>
-                                <th title="Priority">Öncelik</th>
-                                <th title="RowOrder">Sıralama</th>
-                                <td>
-                                    <a class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="E-Posta Güncelle" data-theme="dark"><i class="flaticon2-mail"></i></a>
-                                    <a class="btn btn-icon btn-primary btn-sm" data-toggle="tooltip" title="Portal Kullanıcı Güncelle"><i class="flaticon-user-settings"></i></a>
-                                </td>
+                                <td colspan="9" class="text-center">Kayıtlı faz bulunmamaktadır.</td>
                             </tr>
                         }
                     </tbody>
@@ -225,15 +232,9 @@ kullanıcı, firma kullanıcı
             @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
             @await Html.PartialAsync("_SupportModalsPartial")
         </div>
-    </div>
 
-    @* <div class="row">
-    @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
-    @await Html.PartialAsync("_SupportModalsPartial")
-    </div> *@
-
-</div>
-<div class="modal fade" id="add-project-line-modal" tabindex="-1" role="dialog" aria-labelledby="createSupportModal" aria-hidden="true">
+        <!-- Faz Ekle Modal -->
+        <div class="modal fade" id="add-project-line-modal" tabindex="-1" role="dialog" aria-labelledby="createSupportModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -243,8 +244,9 @@ kullanıcı, firma kullanıcı
                 </button>
             </div>
             <div class="modal-body">
-              
-                <form class="form">
+
+                <form class="form" id="addProjectLineForm">
+                    <input type="hidden" id="add_ProjectId" name="add_ProjectId" value="@Model.project.Id" />
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Adı</label>
                         <div class=" col-lg-4 col-sm-12">
@@ -299,10 +301,82 @@ kullanıcı, firma kullanıcı
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                <button type="button" id="crt_sup_save_bt" class="btn btn-success font-weight-bold">Destek Kaydı Ekle</button>
+                <button type="button" id="add_project_line_save_bt" class="btn btn-success font-weight-bold">Faz Ekle</button>
             </div>
         </div>
     </div>
+</div>
+    </div>
+
+        <!-- Faz Düzenle Modal -->
+        <div class="modal fade" id="edit-project-line-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Faz Düzenle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form" id="editProjectLineForm">
+                            <input type="hidden" id="edit_Id" name="edit_Id" />
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Adı</label>
+                                <div class="col-lg-4 col-sm-12">
+                                    <input type="text" id="edit_Title" name="edit_Title" class="form-control" />
+                                </div>
+                                <label class="col-form-label text-right col-lg-2 col-sm-12">Sıra Numarası</label>
+                                <div class="col-lg-4 col-sm-12">
+                                    <input type="number" class="form-control" id="edit_RowOrder" name="edit_RowOrder" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Yöneticisi</label>
+                                <div class="col-lg-4 col-sm-12">
+                                    <user-select id="edit_LineOfficialId" name="edit_LineOfficialId"></user-select>
+                                </div>
+                                <label class="col-form-label text-right col-lg-2 col-sm-12">Firma Yetkilisi</label>
+                                <div class="col-lg-4 col-sm-12">
+                                    <firm-contact-select id="edit_LineFirmOfficialId" name="edit_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-2 col-sm-12">Öncelik</label>
+                                <div class="col-lg-4 col-sm-12">
+                                    <priority-enum-select selected-value="@PriorityEnum.Normal" id="edit_Priority" name="edit_Priority"></priority-enum-select>
+                                </div>
+                                <label class="col-form-label text-right col-lg-2 col-sm-12">Teslim Tarihi</label>
+                                <div class="col-lg-4 col-sm-12">
+                                    <div class="input-group date" id="edit_DueDate" data-target-input="nearest">
+                                        <input class="form-control form-control-lg form-control-solid" id="edit_DueDate_tb" data-target="#edit_DueDate" placeholder="Teslim Tarihi Seçiniz" />
+                                        <div class="input-group-append" data-target="#edit_DueDate" data-toggle="datetimepicker">
+                                            <span class="input-group-text">
+                                                <i class="ki ki-calendar"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label for="edit_Description">Faz Açıklaması</label>
+                                <textarea class="form-control" id="edit_Description" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                        <button type="button" id="edit_project_line_save_bt" class="btn btn-success font-weight-bold">Güncelle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    @* <div class="row">
+    @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
+    @await Html.PartialAsync("_SupportModalsPartial")
+    </div> *@
+
 </div>
 
 

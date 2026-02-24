@@ -1,4 +1,5 @@
-﻿using Koala.Portal.Core.CrmServices;
+﻿using Azure;
+using Koala.Portal.Core.CrmServices;
 using Koala.Portal.Core.Models;
 using Koala.Portal.Core.Services;
 using Koala.Portal.Core.ViewModels.PortalViewModels;
@@ -115,15 +116,127 @@ namespace Koala.Portal.WebUI.Controllers
         [Authorize(Policy = "Project.Create")]
         public async Task<IActionResult> AddProjectLine(string projectId)
         {
-             
+
             return View();
         }
         [HttpPost]
         [Authorize(Policy = "Project.Create")]
-        public async Task<IActionResult> AddProjectLine(AddProjectLineViewModel projectId)
+        public async Task<IActionResult> AddProjectLine(AddProjectLineViewModel model)
         {
+            // Debug: Model null kontrolü
+            Console.WriteLine($"=== AddProjectLine çağrıldı ===");
+            Console.WriteLine($"Model null mi?: {model == null}");
 
-            return View();
+            if (model == null)
+            {
+                return Json(new { isSuccess = false, message = "Model null geldi! JSON formatını kontrol edin." });
+            }
+
+            Console.WriteLine($"ProjectId: {model.ProjectId}");
+            Console.WriteLine($"Title: {model.Title}");
+            Console.WriteLine($"Priority: {model.Priority}");
+            Console.WriteLine($"RowOrdwer: {model.RowOrder}");
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return Json(new { isSuccess = false, message = "Geçersiz veri! Hatalar: " + string.Join(", ", errors) });
+            }
+
+            var pUser = User;
+            var user = await userManager.GetUserAsync(pUser);
+            model.CreateUser = user.Id;
+            model.CreateTime = DateTime.Now;
+
+            var res = await lineService.AddAsync(model);
+
+            if (res.IsSuccess)
+            {
+                return Json(res);
+            }
+
+            return Json(new { isSuccess = false, message = res.Message ?? "Faz eklenirken bir hata oluştu!" });
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "Project.Create")]
+        public async Task<IActionResult> UpdateProjectLine([FromBody] UpdateProjectLineViewModel model)
+        {
+            if (model == null)
+            {
+                return Json(new { isSuccess = false, message = "Model null geldi!" });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return Json(new { isSuccess = false, message = "Geçersiz veri! Hatalar: " + string.Join(", ", errors) });
+            }
+
+            var pUser = User;
+            var user = await userManager.GetUserAsync(pUser);
+            model.UpdateUser = user.Id;
+            model.UpdateTime = DateTime.Now;
+
+            var res = await lineService.UpdateAsync(model, model.Id);
+
+            if (res.IsSuccess)
+            {
+                return Json(new { isSuccess = true, message = res.Message });
+            }
+
+            return Json(new { isSuccess = false, message = res.Message ?? "Faz güncellenirken bir hata oluştu!" });
+        }
+
+        // Faz detayını getir (düzenleme için)
+        [HttpGet]
+        [Authorize(Policy = "Project.View")]
+        public async Task<IActionResult> GetProjectLine(string id)
+        {
+            var res = await lineService.GetProjectLineDetailAsync(id);
+            if (res.IsSuccess)
+            {
+                return Json(new { isSuccess = true, data = res.Data });
+            }
+            return Json(new { isSuccess = false, message = res.Message ?? "Faz bilgileri alınamadı!" });
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "Project.Create")]
+        public async Task<IActionResult> DeleteProjectLine(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return Json(new { isSuccess = false, message = "ID bilgisi gerekli!" });
+            }
+
+            var res = await lineService.DeleteAsync(id);
+
+            if (res.IsSuccess)
+            {
+                return Json(new { isSuccess = true, message = "Faz başarıyla silindi!" });
+            }
+
+            return Json(new { isSuccess = false, message = res.Message ?? "Faz silinirken bir hata oluştu!" });
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "Project.Create")]
+        public async Task<IActionResult> ChangeProjectLineStatus([FromBody] ProjectLineChangeStateStatusViewModel model)
+        {
+            if (model == null)
+            {
+                return Json(new { isSuccess = false, message = "Model null geldi!" });
+            }
+
+            var res = await lineService.ChangeStateStatusAsync(model);
+
+            if (res.IsSuccess)
+            {
+                return Json(new { isSuccess = true, message = "Faz durumu başarıyla değiştirildi!" });
+            }
+
+            return Json(new { isSuccess = false, message = res.Message ?? "Faz durumu değiştirilirken bir hata oluştu!" });
         }
     }
 }
