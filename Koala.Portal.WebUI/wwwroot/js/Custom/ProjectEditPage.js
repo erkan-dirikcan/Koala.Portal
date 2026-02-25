@@ -27,18 +27,21 @@ var ProjectEditPage = function () {
 
             if (firmId) {
                 // Load firm contacts via AJAX
-                $.get('/CrmFirm/GetFirmContacts', { firmId: firmId }).done(function (result) {
+                $.get('/Project/GetFirmContacts', { firmId: firmId }).done(function (result) {
                     $contactSelect.empty().append('<option value="">Seçiniz</option>');
                     if (result && result.length > 0) {
                         $.each(result, function (i, item) {
                             $contactSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
                         });
                     }
+                    // Refresh select2
+                    $contactSelect.trigger('change');
                 }).fail(function () {
                     toastr.error('Firma yetkilileri yüklenirken hata oluştu!', 'Hata');
                 });
             } else {
                 $contactSelect.empty().append('<option value="">Seçiniz</option>');
+                $contactSelect.trigger('change');
             }
         });
     };

@@ -8,15 +8,15 @@
     ViewData["ActivePage"] = "Projects";
 
     // Get filter values from TempData or use defaults
-    var statusFilter = TempData["StatusFilter"]?.ToString() ?? "";
-    var managerFilter = TempData["ManagerFilter"]?.ToString() ?? "";
-    var firmFilter = TempData["FirmFilter"]?.ToString() ?? "";
-    var startDate = TempData["StartDate"]?.ToString() ?? "";
-    var endDate = TempData["EndDate"]?.ToString() ?? "";
-    var searchTerm = TempData["SearchTerm"]?.ToString() ?? "";
+    var statusFilter = ViewData["StatusFilter"]?.ToString() ?? "";
+    var managerFilter = ViewData["ManagerFilter"]?.ToString() ?? "";
+    var firmFilter = ViewData["FirmFilter"]?.ToString() ?? "";
+    var startDate = ViewData["StartDate"]?.ToString() ?? "";
+    var endDate = ViewData["EndDate"]?.ToString() ?? "";
+    var searchTerm = ViewData["SearchTerm"]?.ToString() ?? "";
 
-    var users = (List<SelectListItem>)TempData["Users"]!;
-    var firms = (List<SelectListItem>)TempData["Firms"]!;
+    var users = (List<SelectListItem>)ViewData["Users"]!;
+    var firms = (List<SelectListItem>)ViewData["Firms"]!;
 }
 
 <div class="d-flex flex-column-fluid">

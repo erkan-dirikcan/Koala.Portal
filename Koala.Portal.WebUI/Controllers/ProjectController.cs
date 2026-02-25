@@ -86,23 +86,25 @@ namespace Koala.Portal.WebUI.Controllers
         public async Task<IActionResult> Index(string? statusFilter, string? managerFilter, string? firmFilter, string? startDate, string? endDate, string? searchTerm)
         {
             // Store filter values for form persistence
-            TempData["StatusFilter"] = statusFilter ?? "";
-            TempData["ManagerFilter"] = managerFilter ?? "";
-            TempData["FirmFilter"] = firmFilter ?? "";
-            TempData["StartDate"] = startDate ?? "";
-            TempData["EndDate"] = endDate ?? "";
-            TempData["SearchTerm"] = searchTerm ?? "";
+            ViewData["StatusFilter"] = statusFilter ?? "";
+            ViewData["ManagerFilter"] = managerFilter ?? "";
+            ViewData["FirmFilter"] = firmFilter ?? "";
+            ViewData["StartDate"] = startDate ?? "";
+            ViewData["EndDate"] = endDate ?? "";
+            ViewData["SearchTerm"] = searchTerm ?? "";
 
             // Load select lists
             var users = await selectListService.GetUserSelectList("");
-            TempData["Users"] = users.Data;
+
+
+            ViewData["Users"] = users.Data;
             var firms = await selectListService.GetFirmSelectList();
-            TempData["Firms"] = firms.Data;
+            ViewData["Firms"] = firms.Data;
 
             var res = await service.GetProjectListAsync();
             if (!res.IsSuccess)
             {
-                TempData["Error"] = res;
+                ViewData["Error"] = res;
                 return View("Error");
             }
 
@@ -360,9 +362,21 @@ namespace Koala.Portal.WebUI.Controllers
             }
 
             var firms = await selectListService.GetFirmSelectList();
-            TempData["Firms"] = firms.Data;
+            ViewData["Firms"] = firms.Data;
             var users = await selectListService.GetUserSelectList("");
-            TempData["Users"] = users.Data;
+            ViewData["Users"] = users.Data;
+
+            // Load firm contacts (Firma Proje Yöneticisi)
+            List<SelectListItem> firmPersons = new List<SelectListItem>();
+            if (!string.IsNullOrEmpty(project.Data.FirmId))
+            {
+                var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(project.Data.FirmId);
+                if (contactsResponse.IsSuccess && contactsResponse.Data != null)
+                {
+                    firmPersons = contactsResponse.Data;
+                }
+            }
+            ViewData["FirmPersons"] = firmPersons;
 
             var updateModel = new UpdateProjectViewModel
             {
@@ -386,9 +400,22 @@ namespace Koala.Portal.WebUI.Controllers
             if (!ModelState.IsValid)
             {
                 var firms = await selectListService.GetFirmSelectList();
-                TempData["Firms"] = firms.Data;
+                ViewData["Firms"] = firms.Data;
                 var users = await selectListService.GetUserSelectList("");
-                TempData["Users"] = users.Data;
+                ViewData["Users"] = users.Data;
+
+                // Load firm contacts for selected firm
+                List<SelectListItem> firmPersons = new List<SelectListItem>();
+                if (!string.IsNullOrEmpty(model.FirmId))
+                {
+                    var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(model.FirmId);
+                    if (contactsResponse.IsSuccess && contactsResponse.Data != null)
+                    {
+                        firmPersons = contactsResponse.Data;
+                    }
+                }
+                ViewData["FirmPersons"] = firmPersons;
+
                 return View(model);
             }
 
@@ -401,9 +428,22 @@ namespace Koala.Portal.WebUI.Controllers
             {
                 TempData["Error"] = res;
                 var firms = await selectListService.GetFirmSelectList();
-                TempData["Firms"] = firms.Data;
+                ViewData["Firms"] = firms.Data;
                 var users = await selectListService.GetUserSelectList("");
-                TempData["Users"] = users.Data;
+                ViewData["Users"] = users.Data;
+
+                // Load firm contacts for selected firm
+                List<SelectListItem> firmPersons = new List<SelectListItem>();
+                if (!string.IsNullOrEmpty(model.FirmId))
+                {
+                    var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(model.FirmId);
+                    if (contactsResponse.IsSuccess && contactsResponse.Data != null)
+                    {
+                        firmPersons = contactsResponse.Data;
+                    }
+                }
+                ViewData["FirmPersons"] = firmPersons;
+
                 return View(model);
             }
 
@@ -429,6 +469,23 @@ namespace Koala.Portal.WebUI.Controllers
             }
 
             return Json(new { isSuccess = false, message = res.Message ?? "Proje silinirken bir hata oluştu!" });
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetFirmContacts(string firmId)
+        {
+            if (string.IsNullOrEmpty(firmId))
+            {
+                return Json(new List<SelectListItem>());
+            }
+
+            var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(firmId);
+            if (contactsResponse.IsSuccess && contactsResponse.Data != null)
+            {
+                return Json(contactsResponse.Data);
+            }
+
+            return Json(new List<SelectListItem>());
         }
 
         #endregion
