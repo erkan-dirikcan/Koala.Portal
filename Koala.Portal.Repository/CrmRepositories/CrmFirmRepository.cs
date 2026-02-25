@@ -35,6 +35,14 @@ namespace Koala.Portal.Repository.CrmRepositories
             return _dbSet.Include(x=>x.PO_Phone_Number).Include(x=>x.MT_Contact).FirstOrDefault(x => x.FirmCode == code);
         }
 
+        public async Task<List<MT_Firm>> GetAllAsync()
+        {
+            return await _dbSet.Include(x => x.PO_Phone_Number)
+                                  .Include(x => x.MT_Contact)
+                                  .Where(x => x.InUse == true)
+                                  .ToListAsync();
+        }
+
         //public IEnumerable<MT_Firm> GetFirmInfoWithPhone(string phone)
         //{
         //    //var phones = _context.PO_Phone_Number.Include(x => x.RelatedContactNavigation)

@@ -98,7 +98,7 @@ namespace Koala.Portal.WebUI.Controllers
 
 
             ViewData["Users"] = users.Data;
-            var firms = await selectListService.GetFirmSelectList();
+            var firms = await crmSelectListService.GetFirmSelectList();
             ViewData["Firms"] = firms.Data;
 
             var res = await service.GetProjectListAsync();
@@ -154,7 +154,7 @@ namespace Koala.Portal.WebUI.Controllers
         [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> CreateProject(string firmId = "")
         {
-            var firms = await selectListService.GetFirmSelectList();
+            var firms = await crmSelectListService.GetFirmSelectList();
             TempData["Firms"] = firms.Data;
             var users = await selectListService.GetUserSelectList( "");
             TempData["Users"] = users.Data;
@@ -166,7 +166,7 @@ namespace Koala.Portal.WebUI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var firms = await selectListService.GetFirmSelectList();
+                var firms = await crmSelectListService.GetFirmSelectList();
                 TempData["Firms"] = firms.Data;
                 var users = await selectListService.GetUserSelectList("");
                 TempData["Users"] = users.Data;
@@ -361,7 +361,7 @@ namespace Koala.Portal.WebUI.Controllers
                 return RedirectToAction("Index", "Project");
             }
 
-            var firms = await selectListService.GetFirmSelectList();
+            var firms = await crmSelectListService.GetFirmSelectList();
             ViewData["Firms"] = firms.Data;
             var users = await selectListService.GetUserSelectList("");
             ViewData["Users"] = users.Data;
@@ -387,7 +387,7 @@ namespace Koala.Portal.WebUI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var firms = await selectListService.GetFirmSelectList();
+                var firms = await crmSelectListService.GetFirmSelectList();
                 ViewData["Firms"] = firms.Data;
                 var users = await selectListService.GetUserSelectList("");
                 ViewData["Users"] = users.Data;
@@ -402,7 +402,7 @@ namespace Koala.Portal.WebUI.Controllers
             if (!res.IsSuccess)
             {
                 TempData["Error"] = res;
-                var firms = await selectListService.GetFirmSelectList();
+                var firms = await crmSelectListService.GetFirmSelectList();
                 ViewData["Firms"] = firms.Data;
                 var users = await selectListService.GetUserSelectList("");
                 ViewData["Users"] = users.Data;
