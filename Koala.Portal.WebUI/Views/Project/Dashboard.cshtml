@@ -160,7 +160,10 @@
                                             }
                                         </div>
                                         <div class="timeline-badge">
-                                            <i class="flaticon-interface text-@@(daysLeft <= 3 ? "danger" : daysLeft <= 7 ? "warning" : "primary") icon-md"></i>
+                                            @{
+                                                var iconColor = daysLeft <= 3 ? "danger" : daysLeft <= 7 ? "warning" : "primary";
+                                            }
+                                            <i class="flaticon-interface text-@iconColor icon-md"></i>
                                         </div>
                                         <div class="timeline-content">
                                             <a href="/Project/Detail/@project.Id" class="font-weight-bolder text-dark-75 text-hover-primary">@project.ProjectName</a>

@@ -70,13 +70,23 @@
                                                     <label class="form-label">Durum</label>
                                                     <select name="statusFilter" class="form-control">
                                                         <option value="">Tümü</option>
-                                                        <option value="Creating" @(statusFilter == "Creating" ? "selected" : "")>Oluşturuluyor</option>
-                                                        <option value="Created" @(statusFilter == "Created" ? "selected" : "")>Oluşturuldu</option>
-                                                        <option value="Started" @(statusFilter == "Started" ? "selected" : "")>Başladı</option>
-                                                        <option value="Testing" @(statusFilter == "Testing" ? "selected" : "")>Test Aşamasında</option>
-                                                        <option value="Finished" @(statusFilter == "Finished" ? "selected" : "")>Tamamlandı</option>
-                                                        <option value="Canceled" @(statusFilter == "Canceled" ? "selected" : "")>İptal Edildi</option>
-                                                        <option value="Failed" @(statusFilter == "Failed" ? "selected" : "")>Başarısız</option>
+                                                        @{
+                                                            var statusOptions = new Dictionary<string, string>
+                                                            {
+                                                                { "Creating", "Oluşturuluyor" },
+                                                                { "Created", "Oluşturuldu" },
+                                                                { "Started", "Başladı" },
+                                                                { "Testing", "Test Aşamasında" },
+                                                                { "Finished", "Tamamlandı" },
+                                                                { "Canceled", "İptal Edildi" },
+                                                                { "Failed", "Başarısız" }
+                                                            };
+                                                            foreach (var opt in statusOptions)
+                                                            {
+                                                                var isSelected = statusFilter == opt.Key ? " selected" : "";
+                                                                @:<option value="@opt.Key"@isSelected>@opt.Value</option>
+                                                            }
+                                                        }
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3 mb-2">
@@ -85,7 +95,8 @@
                                                         <option value="">Tümü</option>
                                                         @foreach (var user in users)
                                                         {
-                                                            <option value="@user.Value" @(managerFilter == user.Value ? "selected" : "")>@user.Text</option>
+                                                            var isUserSelected = managerFilter == user.Value ? " selected" : "";
+                                                            @:<option value="@user.Value"@isUserSelected>@user.Text</option>
                                                         }
                                                     </select>
                                                 </div>
@@ -95,7 +106,8 @@
                                                         <option value="">Tümü</option>
                                                         @foreach (var firm in firms)
                                                         {
-                                                            <option value="@firm.Value" @(firmFilter == firm.Value ? "selected" : "")>@firm.Text</option>
+                                                            var isFirmSelected = firmFilter == firm.Value ? " selected" : "";
+                                                            @:<option value="@firm.Value"@isFirmSelected>@firm.Text</option>
                                                         }
                                                     </select>
                                                 </div>
