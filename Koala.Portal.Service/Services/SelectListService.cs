@@ -1,4 +1,5 @@
-﻿using Koala.Portal.Core.Dtos;
+﻿using Koala.Portal.Core.CrmRepositories;
+using Koala.Portal.Core.Dtos;
 using Koala.Portal.Core.Repositories;
 using Koala.Portal.Core.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,7 +16,8 @@ namespace Koala.Portal.Service.Services
         IHelpDeskCategoryRepository helpDeskCategoryRepository,
         IHelpDeskProblemRepository helpDeskProblemRepository,
         IModuleRepository moduleRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        ICrmFirmRepository crmFirmRepository)
         : ISelectListService
     {
         private readonly IUserRepository _userRepository = userRepository;
@@ -78,13 +80,14 @@ namespace Koala.Portal.Service.Services
         {
             try
             {
-                var res = await firmRepository.Where(x => x.InUse == true).ToListAsync();
+                // Query CRM directly instead of local database
+                var crmFirms = await crmFirmRepository.GetAllAsync();
 
-                var items = res.Select(item => new SelectListItem
+                var items = crmFirms.Select(item => new SelectListItem
                 {
-                    Text = $"({item.Code}) - {item.Title}",
-                    Value = item.Id,
-                    Selected = string.Equals(selected, item.Id, StringComparison.CurrentCultureIgnoreCase)
+                    Text = $"({item.FirmCode}) - {item.FirmTitle}",
+                    Value = item.Oid.ToString(),
+                    Selected = string.Equals(selected, item.Oid.ToString(), StringComparison.CurrentCultureIgnoreCase)
                 }).ToList();
 
                 return Response<List<SelectListItem>>.SuccessData(200, "Firma Listesi Başarıyla Alındı", items);
@@ -98,18 +101,24 @@ namespace Koala.Portal.Service.Services
 
         public async Task<Response<List<SelectListItem>>> GetFirmContactSelectList(string firmId, string selected = "")
         {
+            // Query CRM directly instead of local database
             try
             {
-                var res = await firmContactRepository.GetAllAsync(firmId);
+                var crmFirms = await crmFirmRepository.GetAllAsync();
+                var firm = crmFirms.FirstOrDefault(x => x.Oid.ToString().Equals(firmId, StringComparison.OrdinalIgnoreCase));
+
                 var retVal = new List<SelectListItem>();
-                foreach (var item in res)
+                if (firm?.MT_Contact != null)
                 {
-                    retVal.Add(new SelectListItem
+                    foreach (var item in firm.MT_Contact.Where(c => c.InUse == true))
                     {
-                        Text = $"{item.Name} {item.LastName}",
-                        Value = item.Id,
-                        Selected = string.Equals(item.Id, selected, StringComparison.OrdinalIgnoreCase)
-                    });
+                        retVal.Add(new SelectListItem
+                        {
+                            Text = $"{item.FirstName} {item.LastName}".Trim(),
+                            Value = item.Oid.ToString(),
+                            Selected = string.Equals(item.Oid.ToString(), selected, StringComparison.OrdinalIgnoreCase)
+                        });
+                    }
                 }
                 return Response<List<SelectListItem>>.SuccessData(200, "Firma Yetkili Listesi Başarıyla Alındı", retVal);
             }

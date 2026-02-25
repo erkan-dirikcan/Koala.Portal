@@ -1,33 +1,51 @@
-﻿using Koala.Portal.Core.Services;
-using AutoMapper;
+using Koala.Portal.Core.CrmRepositories;
+using Koala.Portal.Core.CrmModels;
 using Koala.Portal.Core.Dtos;
+using Koala.Portal.Core.Services;
+using AutoMapper;
 using Koala.Portal.Core.Repositories;
 using Koala.Portal.Core.UnitOfWork;
 using Koala.Portal.Core.ViewModels.CrmViewModels;
-using Koala.Portal.Repository;
 
 namespace Koala.Portal.Service.Services
 {
     public class FirmContactService : IFirmContactService
     {
-        private readonly IFirmContactRepository _repository;
+        private readonly ICrmFirmRepository _crmRepository;
         private readonly IMapper _mapper;
-        private readonly IUnitOfWork<AppDbContext> _unitOfWork;
 
-        public FirmContactService(IFirmContactRepository repository, IMapper mapper, IUnitOfWork<AppDbContext> unitOfWork)
+        public FirmContactService(ICrmFirmRepository crmRepository, IMapper mapper)
         {
-            _repository = repository;
+            _crmRepository = crmRepository;
             _mapper = mapper;
-            _unitOfWork = unitOfWork;
         }
 
         public async Task<Response<List<CrmFirmContactListViewModel>>> GetAllAsync(string firmId)
         {
             try
             {
-                var res =await _repository.GetAllAsync(firmId);
-                var retVal = _mapper.Map<List<CrmFirmContactListViewModel>>(res);
-                return Response<List<CrmFirmContactListViewModel>>.SuccessData(200, "Firma yetkili listesi başarıyla alındı", retVal);
+                // For CRM, we need the firm OID, not the local ID
+                // Get contacts from CRM directly
+                var crmFirm = await _crmRepository.GetAllAsync();
+                var firm = crmFirm.FirstOrDefault(x => x.Oid.ToString().Equals(firmId, StringComparison.OrdinalIgnoreCase));
+
+                if (firm == null)
+                {
+                    return Response<List<CrmFirmContactListViewModel>>.FailData(404, "Firma CRM'de bulunamadı", "Firma bilgilerine ulaşılamadı", true);
+                }
+
+                var contacts = firm.MT_Contact?
+                    .Where(c => c.InUse == true)
+                    .Select(c => new CrmFirmContactListViewModel
+                    {
+                        Id = c.Oid.ToString(),
+                        Oid = c.Oid.ToString(),
+                        Firm = firm.Oid.ToString(),
+                        FullName = $"{c.FirstName} {c.LastName}".Trim()
+                    })
+                    .ToList() ?? new List<CrmFirmContactListViewModel>();
+
+                return Response<List<CrmFirmContactListViewModel>>.SuccessData(200, "Firma yetkili listesi CRM'den başarıyla alındı", contacts);
             }
             catch (Exception ex)
             {
@@ -39,9 +57,25 @@ namespace Koala.Portal.Service.Services
         {
             try
             {
-                var res = _repository.GetAllByOidAsync(firmOid);
-                var retVal = _mapper.Map<List<CrmFirmContactListViewModel>>(res);
-                return Response<List<CrmFirmContactListViewModel>>.SuccessData(200, "Firma yetkili listesi başarıyla alındı", retVal);
+                var firm = _crmRepository.GetFirmInfo(firmOid);
+
+                if (firm == null)
+                {
+                    return Response<List<CrmFirmContactListViewModel>>.FailData(404, "Firma CRM'de bulunamadı", "Firma bilgilerine ulaşılamadı", true);
+                }
+
+                var contacts = firm.MT_Contact?
+                    .Where(c => c.InUse == true)
+                    .Select(c => new CrmFirmContactListViewModel
+                    {
+                        Id = c.Oid.ToString(),
+                        Oid = c.Oid.ToString(),
+                        Firm = firm.Oid.ToString(),
+                        FullName = $"{c.FirstName} {c.LastName}".Trim()
+                    })
+                    .ToList() ?? new List<CrmFirmContactListViewModel>();
+
+                return Response<List<CrmFirmContactListViewModel>>.SuccessData(200, "Firma yetkili listesi CRM'den başarıyla alındı", contacts);
             }
             catch (Exception ex)
             {
@@ -49,65 +83,56 @@ namespace Koala.Portal.Service.Services
             }
         }
 
-        public async Task<Response<string>> GetOidAsync(string id)
+        public async Task<Response<string>> GetOidAsync(string oid)
         {
+            // For CRM, Oid is already the primary identifier
+            // Just validate that this contact exists in CRM
             try
             {
-                var res = await _repository.GetByIdAsync(id);
-                return res == null 
-                    ? Response<string>.FailData(404, "Firma yetkilisi bilgileri alınırken bir sorunla karşılaşıldı", "Firma yetkilisi bilgilerine ulaşılamdı", true) 
-                    : Response<string>.SuccessData(200, "Firma yetkilisi Oid bilgisi başarıyla alındı", res.Oid);
+                var firms = await _crmRepository.GetAllAsync();
+                var contact = firms.SelectMany(f => f.MT_Contact ?? new List<MT_Contact>())
+                    .FirstOrDefault(c => c.Oid.ToString().Equals(oid, StringComparison.OrdinalIgnoreCase));
+
+                return contact == null
+                    ? Response<string>.FailData(404, "İletişim kişisi CRM'de bulunamadı", "İletişim kişisi bilgilerine ulaşılamadı", true)
+                    : Response<string>.SuccessData(200, "İletişim kişisi CRM'de bulundu", contact.Oid.ToString());
             }
             catch (Exception ex)
             {
-                return Response<string>.FailData(400, "Firma Yetkilisi Oid bilgisi alınırken bir sorunla karşılaşıldı", ex.Message, false);
+                return Response<string>.FailData(400, "İletişim kişisi bilgileri alınırken bir sorunla karşılaşıldı", ex.Message, false);
             }
         }
 
         public async Task<Response<string>> GetIdAsync(string oid)
         {
-            try
-            {
-                var res = await _repository.GetByOidAsync(oid);
-                return res == null 
-                    ? Response<string>.FailData(404, "Firma yetkilisi bilgileri alınırken bir sorunla karşılaşıldı", "Firma yetkilisi bilgilerine ulaşılamdı", true) 
-                    : Response<string>.SuccessData(200, "Firma yetkilisi Id bilgisi başarıyla alındı", res.Id);
-            }
-            catch (Exception ex)
-            {
-                return Response<string>.FailData(400, "Firma Yetkilisi Id bilgisi alınırken bir sorunla karşılaşıldı", ex.Message, false);
-            }
+            // For CRM, Oid is the identifier we use
+            return await GetOidAsync(oid);
         }
 
-        public async Task<Response<CrmFirmContactDetailViewModel>> GetDetailAsync(string contactId)
+        public async Task<Response<CrmFirmContactDetailViewModel>> GetDetailAsync(string contactOid)
         {
-            try
-            {
-                var res = await _repository.GetByIdAsync(contactId);
-                var retVal = _mapper.Map<CrmFirmContactDetailViewModel>(res);
-                return res == null 
-                    ? Response<CrmFirmContactDetailViewModel>.FailData(404, "Firma yetkilisi bilgileri alınırken bir sorunla karşılaşıldı", "Firma yetkilisi bilgilerine ulaşılamdı", true) 
-                    : Response<CrmFirmContactDetailViewModel>.SuccessData(200, "Firma yetkilisi bilgisi başarıyla alındı", retVal);
-            }
-            catch (Exception ex)
-            {
-                return Response<CrmFirmContactDetailViewModel>.FailData(400, "Firma Yetkilisi bilgisi alınırken bir sorunla karşılaşıldı", ex.Message, false);
-            }
+            return await GetDetailByOidAsync(contactOid);
         }
 
         public async Task<Response<CrmFirmContactDetailViewModel>> GetDetailByOidAsync(string contactOid)
         {
             try
             {
-                var res = await _repository.GetByOidAsync(contactOid);
-                var retVal = _mapper.Map<CrmFirmContactDetailViewModel>(res);
-                return res == null 
-                    ? Response<CrmFirmContactDetailViewModel>.FailData(404, "Firma yetkilisi bilgileri alınırken bir sorunla karşılaşıldı", "Firma yetkilisi bilgilerine ulaşılamdı", true) 
-                    : Response<CrmFirmContactDetailViewModel>.SuccessData(200, "Firma yetkilisi bilgisi başarıyla alındı", retVal);
+                var firms = await _crmRepository.GetAllAsync();
+                var contact = firms.SelectMany(f => f.MT_Contact ?? new List<MT_Contact>())
+                    .FirstOrDefault(c => c.Oid.ToString().Equals(contactOid, StringComparison.OrdinalIgnoreCase));
+
+                if (contact == null)
+                {
+                    return Response<CrmFirmContactDetailViewModel>.FailData(404, "İletişim kişisi CRM'de bulunamadı", "İletişim kişisi bilgilerine ulaşılamadı", true);
+                }
+
+                var detail = _mapper.Map<CrmFirmContactDetailViewModel>(contact);
+                return Response<CrmFirmContactDetailViewModel>.SuccessData(200, "İletişim kişisi detayı CRM'den başarıyla alındı", detail);
             }
             catch (Exception ex)
             {
-                return Response<CrmFirmContactDetailViewModel>.FailData(400, "Firma Yetkilisi bilgisi alınırken bir sorunla karşılaşıldı", ex.Message, false);
+                return Response<CrmFirmContactDetailViewModel>.FailData(400, "İletişim kişisi detayı alınırken bir sorunla karşılaşıldı", ex.Message, false);
             }
         }
     }

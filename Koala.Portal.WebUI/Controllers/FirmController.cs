@@ -164,7 +164,8 @@ namespace Koala.Portal.WebUI.Controllers
         [HttpGet]
         public async Task<JsonResult> GetFirmContactsSelectList(string firmId, string selected = "")
         {
-            var contacts = await _selectListService.GetFirmContactSelectList(firmId, selected);
+            // Use CRM service to get firm contacts directly from CRM database
+            var contacts = await _crmSelectListService.GetFirmContactListWithOid(firmId, selected);
 
             return Json(contacts);
         }

@@ -25,8 +25,17 @@ namespace Koala.Portal.Service.Services
         }
         public async Task<Response<List<InfoCrmFirmViewModel>>> GetFirmList()
         {
-            var firms = await _repository.GetAllAsync();
-            return Response<List<InfoCrmFirmViewModel>>.SuccessData(200, "Firma Listesi Başarıyla Alındı", _mapper.Map<List<InfoCrmFirmViewModel>>(firms));
+            try
+            {
+                // Get all firms from CRM
+                var crmFirms = await _crmRepository.GetAllAsync();
+                var mappedFirms = _mapper.Map<List<InfoCrmFirmViewModel>>(crmFirms);
+                return Response<List<InfoCrmFirmViewModel>>.SuccessData(200, "Firma Listesi CRM'den Başarıyla Alındı", mappedFirms);
+            }
+            catch (Exception ex)
+            {
+                return Response<List<InfoCrmFirmViewModel>>.FailData(400, "Firma Listesi Alınırken Bir Sorunla Karşılaşıldı", ex.Message, false);
+            }
         }
         public async Task<Response> AddRangeAsync(List<CreateCrmFirmViewModel> firms)
         {
@@ -49,10 +58,18 @@ namespace Koala.Portal.Service.Services
         {
             try
             {
-                var firm = _repository.GetFirmInfoById(id);
-                return firm == null ?
-                    Response<InfoCrmFirmViewModel>.FailData(404, "Görüntülenmek istenilen firma bilgilerine ulaşılamadı, Lütfen senkronizasyon yapıp tekrar deneyin.", "Görüntülenmek istenilen firma bilgilerine ulaşılamadı, Lütfen senkronizasyon yapıp tekrar deneyin.", true) :
-                    Response<InfoCrmFirmViewModel>.SuccessData(200, "Firmaa Bilgisi Başarıyla Alındı", _mapper.Map<InfoCrmFirmViewModel>(firm));
+                // First get local firm to find its OID
+                var localFirm = _repository.GetFirmInfoById(id);
+                if (localFirm == null)
+                {
+                    return Response<InfoCrmFirmViewModel>.FailData(404, "Firma bulunamadı", "Firma bilgilerine ulaşılamadı.", true);
+                }
+
+                // Get fresh data from CRM using OID
+                var crmFirm = _crmRepository.GetFirmInfo(localFirm.Oid);
+                return crmFirm == null ?
+                    Response<InfoCrmFirmViewModel>.FailData(404, "CRM'de firma bilgisi bulunamadı", "CRM'de firma bilgilerine ulaşılamadı.", true) :
+                    Response<InfoCrmFirmViewModel>.SuccessData(200, "Firmaa Bilgisi CRM'den Başarıyla Alındı", _mapper.Map<InfoCrmFirmViewModel>(crmFirm));
             }
             catch (Exception ex)
             {
