@@ -20,29 +20,43 @@ var ProjectEditPage = function () {
             autoclose: true
         });
 
+        // Function to load firm contacts
+        var loadFirmContacts = function (firmId, selectedContactId) {
+            var $contactSelect = $('#FirmPersonId');
+
+            if (!firmId) {
+                $contactSelect.empty().append('<option value="">Seçiniz</option>').trigger('change');
+                return;
+            }
+
+            $.get("/Firm/GetFirmContactsSelectList?firmId=" + firmId).done(function (result) {
+                if (result.isSuccess && result.data) {
+                    $contactSelect.empty().append('<option value="">Seçiniz</option>');
+                    $.each(result.data, function (i, val) {
+                        var isSelected = (val.value === selectedContactId);
+                        var opt = new Option(val.text, val.value, isSelected, isSelected);
+                        $contactSelect.append(opt);
+                    });
+                    $contactSelect.trigger('change');
+                } else {
+                    toastr.error("Firma yetkilileri yüklenirken hata oluştu!", "Hata");
+                }
+            }).fail(function () {
+                toastr.error('Firma yetkilleri yüklenirken bir hata oluştu!', 'Hata');
+            });
+        };
+
+        // On page load, if firm is already selected, load its contacts
+        var initialFirmId = $('#FirmId').val();
+        var initialContactId = $('#FirmPersonId').val();
+        if (initialFirmId) {
+            loadFirmContacts(initialFirmId, initialContactId);
+        }
+
         // Firm change handler - load firm contacts
         $('#FirmId').on('change', function () {
             var firmId = $(this).val();
-            var $contactSelect = $('#FirmPersonId');
-
-            if (firmId) {
-                // Load firm contacts via AJAX
-                $.get('/Project/GetFirmContacts', { firmId: firmId }).done(function (result) {
-                    $contactSelect.empty().append('<option value="">Seçiniz</option>');
-                    if (result && result.length > 0) {
-                        $.each(result, function (i, item) {
-                            $contactSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
-                        });
-                    }
-                    // Refresh select2
-                    $contactSelect.trigger('change');
-                }).fail(function () {
-                    toastr.error('Firma yetkilileri yüklenirken hata oluştu!', 'Hata');
-                });
-            } else {
-                $contactSelect.empty().append('<option value="">Seçiniz</option>');
-                $contactSelect.trigger('change');
-            }
+            loadFirmContacts(firmId, null);
         });
     };
 

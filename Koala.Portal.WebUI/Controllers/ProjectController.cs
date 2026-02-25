@@ -366,18 +366,6 @@ namespace Koala.Portal.WebUI.Controllers
             var users = await selectListService.GetUserSelectList("");
             ViewData["Users"] = users.Data;
 
-            // Load firm contacts (Firma Proje Yöneticisi)
-            List<SelectListItem> firmPersons = new List<SelectListItem>();
-            if (!string.IsNullOrEmpty(project.Data.FirmId))
-            {
-                var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(project.Data.FirmId);
-                if (contactsResponse.IsSuccess && contactsResponse.Data != null)
-                {
-                    firmPersons = contactsResponse.Data;
-                }
-            }
-            ViewData["FirmPersons"] = firmPersons;
-
             var updateModel = new UpdateProjectViewModel
             {
                 Id = project.Data.Id,
@@ -403,19 +391,6 @@ namespace Koala.Portal.WebUI.Controllers
                 ViewData["Firms"] = firms.Data;
                 var users = await selectListService.GetUserSelectList("");
                 ViewData["Users"] = users.Data;
-
-                // Load firm contacts for selected firm
-                List<SelectListItem> firmPersons = new List<SelectListItem>();
-                if (!string.IsNullOrEmpty(model.FirmId))
-                {
-                    var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(model.FirmId);
-                    if (contactsResponse.IsSuccess && contactsResponse.Data != null)
-                    {
-                        firmPersons = contactsResponse.Data;
-                    }
-                }
-                ViewData["FirmPersons"] = firmPersons;
-
                 return View(model);
             }
 
@@ -431,19 +406,6 @@ namespace Koala.Portal.WebUI.Controllers
                 ViewData["Firms"] = firms.Data;
                 var users = await selectListService.GetUserSelectList("");
                 ViewData["Users"] = users.Data;
-
-                // Load firm contacts for selected firm
-                List<SelectListItem> firmPersons = new List<SelectListItem>();
-                if (!string.IsNullOrEmpty(model.FirmId))
-                {
-                    var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(model.FirmId);
-                    if (contactsResponse.IsSuccess && contactsResponse.Data != null)
-                    {
-                        firmPersons = contactsResponse.Data;
-                    }
-                }
-                ViewData["FirmPersons"] = firmPersons;
-
                 return View(model);
             }
 
@@ -469,23 +431,6 @@ namespace Koala.Portal.WebUI.Controllers
             }
 
             return Json(new { isSuccess = false, message = res.Message ?? "Proje silinirken bir hata oluştu!" });
-        }
-
-        [HttpGet]
-        public async Task<JsonResult> GetFirmContacts(string firmId)
-        {
-            if (string.IsNullOrEmpty(firmId))
-            {
-                return Json(new List<SelectListItem>());
-            }
-
-            var contactsResponse = await crmSelectListService.GetFirmContactListWithOid(firmId);
-            if (contactsResponse.IsSuccess && contactsResponse.Data != null)
-            {
-                return Json(contactsResponse.Data);
-            }
-
-            return Json(new List<SelectListItem>());
         }
 
         #endregion

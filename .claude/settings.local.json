@@ -14,7 +14,10 @@
       "Bash(git push:*)",
       "Bash(dotnet restore:*)",
       "Bash(dotnet build:*)",
-      "Bash(dotnet clean:*)"
+      "Bash(dotnet clean:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
