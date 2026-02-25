@@ -59,7 +59,7 @@ kullanıcı, firma kullanıcı
                                 <!--end::Contacts-->
                             </div>
                             <div class="my-lg-0 my-1">
-                                <a href="#" class="btn btn-sm btn-light-success font-weight-bolder text-uppercase mr-3">Dosya Ekle</a>
+                                <a href="#" id="open-add-project-file-modal" class="btn btn-sm btn-light-success font-weight-bolder text-uppercase">Dosya Ekle</a>
                             </div>
                         </div>
                         <!--end: Title-->
@@ -212,6 +212,8 @@ kullanıcı, firma kullanıcı
                                         <button type="button" class="btn btn-icon btn-success btn-sm btn-start-phase" data-toggle="tooltip" title="Faza Başla" data-id="@item.Id"><i class="flaticon2-play"></i></button>
                                         <button type="button" class="btn btn-icon btn-warning btn-sm btn-complete-phase" data-toggle="tooltip" title="Tamamla" data-id="@item.Id"><i class="flaticon2-check-mark"></i></button>
                                         <button type="button" class="btn btn-icon btn-primary btn-sm btn-edit-phase" data-toggle="tooltip" title="Düzenle"><i class="flaticon2-pen"></i></button>
+                                        <button type="button" class="btn btn-icon btn-info btn-sm btn-notes-phase" data-toggle="tooltip" title="Notlar" data-id="@item.Id" data-title="@item.Title"><i class="flaticon2-paper"></i></button>
+                                        <button type="button" class="btn btn-icon btn-primary btn-sm btn-works-phase" data-toggle="tooltip" title="İşler" data-id="@item.Id" data-title="@item.Title"><i class="flaticon-list-1"></i></button>
                                         <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-phase" data-toggle="tooltip" title="Sil" data-id="@item.Id"><i class="flaticon2-trash"></i></button>
                                     </td>
                                 </tr>
@@ -231,6 +233,56 @@ kullanıcı, firma kullanıcı
         <div class="row">
             @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
             @await Html.PartialAsync("_SupportModalsPartial")
+        </div>
+
+        <!-- Proje Dosyaları Kartı -->
+        <div class="card card-custom gutter-b">
+            <div class="card-header flex-wrap border-0 pt-6 pb-0">
+                <div class="card-title">
+                    <h3 class="card-label">
+                        Proje Dosyaları
+                        <span class="d-block text-muted pt-2 font-size-sm">@Model.project.ProjectName Proje Dosyaları</span>
+                    </h3>
+                </div>
+                <div class="card-toolbar">
+                    <a href="#" id="open-add-project-file-modal" class="btn btn-sm btn-primary font-weight-bolder text-uppercase">Dosya Yükle</a>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.project.ProjectFiles != null && Model.project.ProjectFiles.Any())
+                {
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Dosya Adı</th>
+                                <th>Açıklama</th>
+                                <th>Yükleme Tarihi</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var file in Model.project.ProjectFiles)
+                            {
+                                <tr data-id="@file.Id">
+                                    <td>@file.Name</td>
+                                    <td>@file.Description</td>
+                                    <td>@file.CreateTime.ToString("dd.MM.yyyy")</td>
+                                    <td>
+                                        <a href="/Project/DownloadProjectFile?fileId=@file.Id" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="İndir"><i class="flaticon-download"></i></a>
+                                        <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-file" data-toggle="tooltip" title="Sil" data-id="@file.Id"><i class="flaticon2-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <span class="text-muted">Henüz dosya yüklenmemiş.</span>
+                    </div>
+                }
+            </div>
         </div>
 
         <!-- Faz Ekle Modal -->
@@ -367,6 +419,317 @@ kullanıcı, firma kullanıcı
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
                         <button type="button" id="edit_project_line_save_bt" class="btn btn-success font-weight-bold">Güncelle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dosya Yükle Modal -->
+        <div class="modal fade" id="add-project-file-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Dosya Yükle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form" id="addProjectFileForm" enctype="multipart/form-data">
+                            <input type="hidden" id="file_ProjectId" name="ProjectId" value="@Model.project.Id" />
+                            <div class="form-group">
+                                <label for="file_Name">Dosya Adı</label>
+                                <input type="text" id="file_Name" name="Name" class="form-control" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="file_Description">Açıklama</label>
+                                <textarea id="file_Description" name="Description" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="file_File">Dosya</label>
+                                <input type="file" id="file_File" name="File" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.jpg,.jpeg,.png" />
+                                <small class="text-muted">PDF, Word, Excel, Resim veya Arşiv dosyaları</small>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                        <button type="button" id="add_project_file_save_bt" class="btn btn-success font-weight-bold">Yükle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Not Ekle Modal -->
+        <div class="modal fade" id="add-project-line-note-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Not Ekle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form" id="addProjectLineNoteForm">
+                            <input type="hidden" id="note_ProjectLineId" name="ProjectLineId" />
+                            <div class="form-group">
+                                <label for="note_Title">Başlık</label>
+                                <input type="text" id="note_Title" name="Title" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="note_ReportNote">Rapor Notu</label>
+                                <textarea id="note_ReportNote" name="ReportNote" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="note_Note">Not</label>
+                                <textarea id="note_Note" name="Note" class="form-control" rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="note_Date">Tarih</label>
+                                <div class="input-group date" id="note_Date_container" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" id="note_Date" name="Date" data-target="#note_Date_container" placeholder="Tarih Seçiniz" />
+                                    <div class="input-group-append" data-target="#note_Date_container" data-toggle="datetimepicker">
+                                        <span class="input-group-text"><i class="ki ki-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                        <button type="button" id="add_project_line_note_save_bt" class="btn btn-success font-weight-bold">Ekle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Not Düzenle Modal -->
+        <div class="modal fade" id="edit-project-line-note-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Not Düzenle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form" id="editProjectLineNoteForm">
+                            <input type="hidden" id="edit_note_Id" name="Id" />
+                            <input type="hidden" id="edit_note_ProjectLineId" name="ProjectLineId" />
+                            <div class="form-group">
+                                <label for="edit_note_Title">Başlık</label>
+                                <input type="text" id="edit_note_Title" name="Title" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_note_ReportNote">Rapor Notu</label>
+                                <textarea id="edit_note_ReportNote" name="ReportNote" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_note_Note">Not</label>
+                                <textarea id="edit_note_Note" name="Note" class="form-control" rows="4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_note_Date">Tarih</label>
+                                <div class="input-group date" id="edit_note_Date_container" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" id="edit_note_Date" name="Date" data-target="#edit_note_Date_container" placeholder="Tarih Seçiniz" />
+                                    <div class="input-group-append" data-target="#edit_note_Date_container" data-toggle="datetimepicker">
+                                        <span class="input-group-text"><i class="ki ki-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                        <button type="button" id="edit_project_line_note_save_bt" class="btn btn-success font-weight-bold">Güncelle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notlar Listesi Modal -->
+        <div class="modal fade" id="project-line-notes-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Faz Notları</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="notes_line_id" />
+                        <div class="mb-3">
+                            <button type="button" id="open-add-note-from-list" class="btn btn-sm btn-primary">Yeni Not Ekle</button>
+                        </div>
+                        <div id="notes-list-container">
+                            <div class="text-center py-5">
+                                <span class="text-muted">Yükleniyor...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- İş Ekle Modal -->
+        <div class="modal fade" id="add-project-line-work-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">İş Ekle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form" id="addProjectLineWorkForm">
+                            <input type="hidden" id="work_LineId" name="LineId" />
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">İş Adı</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <input type="text" id="work_Name" name="Name" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Açıklama</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <textarea id="work_Description" name="Description" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Rapor Açıklaması</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <textarea id="work_ReportDescription" name="ReportDescription" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Firma Yetkilisi</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <firm-contact-select id="work_LineFirmOfficialId" name="LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Öncelik</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <priority-enum-select selected-value="@PriorityEnum.Normal" id="work_Priority" name="Priority"></priority-enum-select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Sıra Numarası</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <input type="number" id="work_RowOrder" name="RowOrder" class="form-control" value="0" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Süre Düşsün mü?</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <div class="checkbox-list">
+                                        <label class="checkbox">
+                                            <input type="checkbox" id="work_LetTimeDeduct" name="LetTimeDeduct" value="true" />
+                                            <span></span>
+                                            Evet, servis süresinden düşsün
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                        <button type="button" id="add_project_line_work_save_bt" class="btn btn-success font-weight-bold">Ekle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- İş Düzenle Modal -->
+        <div class="modal fade" id="edit-project-line-work-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">İş Düzenle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form" id="editProjectLineWorkForm">
+                            <input type="hidden" id="edit_work_Id" name="Id" />
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">İş Adı</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <input type="text" id="edit_work_Name" name="Name" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Açıklama</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <textarea id="edit_work_Description" name="Description" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Firma Yetkilisi</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <firm-contact-select id="edit_work_LineFirmOfficialId" name="LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Öncelik</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <priority-enum-select selected-value="@PriorityEnum.Normal" id="edit_work_Priority" name="Priority"></priority-enum-select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Sıra Numarası</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <input type="number" id="edit_work_RowOrder" name="RowOrder" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label text-right col-lg-3 col-sm-12">Süre Düşsün mü?</label>
+                                <div class="col-lg-9 col-sm-12">
+                                    <div class="checkbox-list">
+                                        <label class="checkbox">
+                                            <input type="checkbox" id="edit_work_LetTimeDeduct" name="LetTimeDeduct" value="true" />
+                                            <span></span>
+                                            Evet, servis süresinden düşsün
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+                        <button type="button" id="edit_project_line_work_save_bt" class="btn btn-success font-weight-bold">Güncelle</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- İşler Listesi Modal -->
+        <div class="modal fade" id="project-line-works-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Faz İşleri</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i aria-hidden="true" class="ki ki-close"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="works_line_id" />
+                        <div class="mb-3">
+                            <button type="button" id="open-add-work-from-list" class="btn btn-sm btn-primary">Yeni İş Ekle</button>
+                        </div>
+                        <div id="works-list-container">
+                            <div class="text-center py-5">
+                                <span class="text-muted">Yükleniyor...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

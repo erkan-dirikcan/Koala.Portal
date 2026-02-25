@@ -99,6 +99,163 @@ var ProjectLineTable = function () {
             updateProjectLine();
         });
 
+        // Notlar butonu
+        $(document).on("click", ".btn-notes-phase", function (e) {
+            e.preventDefault();
+            var lineId = $(this).data("id");
+            var lineTitle = $(this).data("title");
+            openNotesModal(lineId, lineTitle);
+        });
+
+        // İşler butonu
+        $(document).on("click", ".btn-works-phase", function (e) {
+            e.preventDefault();
+            var lineId = $(this).data("id");
+            var lineTitle = $(this).data("title");
+            openWorksModal(lineId, lineTitle);
+        });
+
+        // Dosya Ekle butonu
+        $(document).on("click", "#open-add-project-file-modal", function (e) {
+            e.preventDefault();
+            $("#add-project-file-modal").modal('show');
+        });
+
+        // Dosya Kaydet butonu
+        $(document).on("click", "#add_project_file_save_bt", function (e) {
+            e.preventDefault();
+            saveProjectFile();
+        });
+
+        // Dosya Sil butonu
+        $(document).on("click", ".btn-delete-file", function (e) {
+            e.preventDefault();
+            var fileId = $(this).data("id");
+            deleteProjectFile(fileId);
+        });
+
+        // Not Ekle butonu (modal içinden)
+        $(document).on("click", "#open-add-note-from-list", function (e) {
+            e.preventDefault();
+            var lineId = $("#notes_line_id").val();
+            $("#project-line-notes-modal").modal('hide');
+            setTimeout(function () {
+                $("#note_ProjectLineId").val(lineId);
+                $("#add-project-line-note-modal").modal('show');
+            }, 300);
+        });
+
+        // Not Kaydet butonu
+        $(document).on("click", "#add_project_line_note_save_bt", function (e) {
+            e.preventDefault();
+            saveProjectLineNote();
+        });
+
+        // Not Düzenle butonu
+        $(document).on("click", "#edit_project_line_note_save_bt", function (e) {
+            e.preventDefault();
+            updateProjectLineNote();
+        });
+
+        // Not Sil butonu
+        $(document).on("click", ".btn-delete-note", function (e) {
+            e.preventDefault();
+            var noteId = $(this).data("id");
+            deleteProjectLineNote(noteId);
+        });
+
+        // İş Ekle butonu (modal içinden)
+        $(document).on("click", "#open-add-work-from-list", function (e) {
+            e.preventDefault();
+            var lineId = $("#works_line_id").val();
+            $("#project-line-works-modal").modal('hide');
+            setTimeout(function () {
+                $("#work_LineId").val(lineId);
+                $("#add-project-line-work-modal").modal('show');
+            }, 300);
+        });
+
+        // İş Kaydet butonu
+        $(document).on("click", "#add_project_line_work_save_bt", function (e) {
+            e.preventDefault();
+            saveProjectLineWork();
+        });
+
+        // İş Düzenle butonu
+        $(document).on("click", "#edit_project_line_work_save_bt", function (e) {
+            e.preventDefault();
+            updateProjectLineWork();
+        });
+
+        // İş Sil butonu
+        $(document).on("click", ".btn-delete-work", function (e) {
+            e.preventDefault();
+            var workId = $(this).data("id");
+            deleteProjectLineWork(workId);
+        });
+
+        // İş Durumu Değiştir butonları
+        $(document).on("click", ".btn-work-start", function (e) {
+            e.preventDefault();
+            var workId = $(this).data("id");
+            changeProjectLineWorkStatus(workId, 2); // InProgress
+        });
+
+        $(document).on("click", ".btn-work-complete", function (e) {
+            e.preventDefault();
+            var workId = $(this).data("id");
+            changeProjectLineWorkStatus(workId, 6); // Completed
+        });
+
+        // Modal initialization handlers
+        $('#add-project-line-note-modal').on('shown.bs.modal', function () {
+            $('#note_Date_container').datetimepicker({
+                locale: 'tr',
+                format: 'DD-MM-YYYY',
+                showMeridian: false,
+                autoclose: true
+            });
+        });
+
+        $('#edit-project-line-note-modal').on('shown.bs.modal', function () {
+            $('#edit_note_Date_container').datetimepicker({
+                locale: 'tr',
+                format: 'DD-MM-YYYY',
+                showMeridian: false,
+                autoclose: true
+            });
+        });
+
+        $('#add-project-line-work-modal').on('shown.bs.modal', function () {
+            $('#work_LineFirmOfficialId').select2({
+                placeholder: 'Firma Yetkilisi Seçiniz',
+                language: "tr",
+                dropdownParent: $('#add-project-line-work-modal'),
+                width: '100%'
+            });
+            $('#work_Priority').select2({
+                placeholder: 'Önceliği Seçiniz',
+                language: "tr",
+                dropdownParent: $('#add-project-line-work-modal'),
+                width: '100%'
+            });
+        });
+
+        $('#edit-project-line-work-modal').on('shown.bs.modal', function () {
+            $('#edit_work_LineFirmOfficialId').select2({
+                placeholder: 'Firma Yetkilisi Seçiniz',
+                language: "tr",
+                dropdownParent: $('#edit-project-line-work-modal'),
+                width: '100%'
+            });
+            $('#edit_work_Priority').select2({
+                placeholder: 'Önceliği Seçiniz',
+                language: "tr",
+                dropdownParent: $('#edit-project-line-work-modal'),
+                width: '100%'
+            });
+        });
+
         // Güncelleme modal'ı açıldığında
         $('#edit-project-line-modal').on('shown.bs.modal', function () {
             $('#edit_LineOfficialId').select2({
@@ -417,6 +574,378 @@ var ProjectLineTable = function () {
                     }, 1000);
                 } else {
                     toastr.error(response.message || "Faz durumu değiştirilirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            }
+        });
+    };
+
+    // ===== FILE FUNCTIONS =====
+
+    var saveProjectFile = function () {
+        var formData = new FormData();
+        formData.append("ProjectId", $("#file_ProjectId").val());
+        formData.append("Name", $("#file_Name").val());
+        formData.append("Description", $("#file_Description").val());
+
+        var fileInput = $("#file_File")[0];
+        if (fileInput.files.length > 0) {
+            formData.append("File", fileInput.files[0]);
+        } else {
+            toastr.warning("Lütfen bir dosya seçin!", "Uyarı");
+            return;
+        }
+
+        $("#add_project_file_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Yükleniyor...');
+
+        $.ajax({
+            url: "/Project/AddProjectFile",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "Dosya başarıyla yüklendi!", "Başarılı");
+                    $("#add-project-file-modal").modal('hide');
+                    setTimeout(function () { location.reload(); }, 1000);
+                } else {
+                    toastr.error(response.message || "Dosya yüklenirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            },
+            complete: function () {
+                $("#add_project_file_save_bt").prop("disabled", false).text("Yükle");
+            }
+        });
+    };
+
+    var deleteProjectFile = function (fileId) {
+        if (!confirm("Bu dosyayı silmek istediğinize emin misiniz?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "/Project/DeleteProjectFile",
+            type: "POST",
+            data: { fileId: fileId },
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "Dosya başarıyla silindi!", "Başarılı");
+                    setTimeout(function () { location.reload(); }, 1000);
+                } else {
+                    toastr.error(response.message || "Dosya silinirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            }
+        });
+    };
+
+    // ===== NOTE FUNCTIONS =====
+
+    var openNotesModal = function (lineId, lineTitle) {
+        $("#notes_line_id").val(lineId);
+        $("#project-line-notes-modal .modal-title").text("Faz Notları - " + lineTitle);
+        $("#project-line-notes-modal").modal('show');
+        loadNotes(lineId);
+    };
+
+    var loadNotes = function (lineId) {
+        $("#notes-list-container").html('<div class="text-center py-5"><span class="text-muted">Yükleniyor...</span></div>');
+
+        $.get("/Project/GetProjectLineNotes", { projectLineId: lineId }).done(function (response) {
+            if (response.isSuccess) {
+                renderNotesList(response.data);
+            } else {
+                $("#notes-list-container").html('<div class="text-center py-5"><span class="text-danger">Notlar yüklenirken hata oluştu!</span></div>');
+            }
+        }).fail(function () {
+            $("#notes-list-container").html('<div class="text-center py-5"><span class="text-danger">Notlar yüklenirken hata oluştu!</span></div>');
+        });
+    };
+
+    var renderNotesList = function (notes) {
+        if (!notes || notes.length === 0) {
+            $("#notes-list-container").html('<div class="text-center py-5"><span class="text-muted">Henüz not bulunmamaktadır.</span></div>');
+            return;
+        }
+
+        var html = '<div class="timeline timeline-5 mt-3">';
+        $.each(notes, function (index, note) {
+            html += '<div class="timeline-item align-items-start" data-note-id="' + note.id + '">' +
+                '<div class="timeline-label">' +
+                (note.date || '') +
+                '</div>' +
+                '<div class="timeline-badge">' +
+                '<i class="flaticon2-paper text-success"></i>' +
+                '</div>' +
+                '<div class="timeline-content d-flex justify-content-between">' +
+                '<div style="flex: 1;">' +
+                (note.title ? '<span class="font-weight-bold">' + note.title + '</span><br>' : '') +
+                '<span class="text-muted">' + (note.note || '') + '</span>' +
+                (note.reportNote ? '<br><small class="text-info">Rapor: ' + note.reportNote + '</small>' : '') +
+                '<br><small class="text-muted">Oluşturan: ' + (note.userFullName || '') + '</small>' +
+                '</div>' +
+                '<div class="ml-3">' +
+                '<button type="button" class="btn btn-icon btn-sm btn-warning btn-edit-note-from-list" data-id="' + note.id + '" title="Düzenle"><i class="flaticon2-pen"></i></button>' +
+                '<button type="button" class="btn btn-icon btn-sm btn-danger btn-delete-note" data-id="' + note.id + '" title="Sil"><i class="flaticon2-trash"></i></button>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        });
+        html += '</div>';
+        $("#notes-list-container").html(html);
+    };
+
+    var saveProjectLineNote = function () {
+        var model = {
+            projectLineId: $("#note_ProjectLineId").val(),
+            title: $("#note_Title").val(),
+            reportNote: $("#note_ReportNote").val(),
+            note: $("#note_Note").val(),
+            date: $("#note_Date").val() || null
+        };
+
+        $("#add_project_line_note_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Kaydediliyor...');
+
+        $.ajax({
+            url: "/Project/AddProjectLineNote",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(model),
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "Not başarıyla eklendi!", "Başarılı");
+                    $("#add-project-line-note-modal").modal('hide');
+                    // Reload notes list
+                    setTimeout(function () {
+                        loadNotes($("#note_ProjectLineId").val());
+                        $("#note_Title").val('');
+                        $("#note_ReportNote").val('');
+                        $("#note_Note").val('');
+                        $("#note_Date").val('');
+                    }, 500);
+                } else {
+                    toastr.error(response.message || "Not eklenirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            },
+            complete: function () {
+                $("#add_project_line_note_save_bt").prop("disabled", false).text("Ekle");
+            }
+        });
+    };
+
+    var updateProjectLineNote = function () {
+        var model = {
+            id: $("#edit_note_Id").val(),
+            projectLineId: $("#edit_note_ProjectLineId").val(),
+            title: $("#edit_note_Title").val(),
+            reportNote: $("#edit_note_ReportNote").val(),
+            note: $("#edit_note_Note").val(),
+            date: $("#edit_note_Date").val() || null
+        };
+
+        $("#edit_project_line_note_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Güncelleniyor...');
+
+        $.ajax({
+            url: "/Project/UpdateProjectLineNote",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(model),
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "Not başarıyla güncellendi!", "Başarılı");
+                    $("#edit-project-line-note-modal").modal('hide');
+                    setTimeout(function () {
+                        loadNotes($("#edit_note_ProjectLineId").val());
+                    }, 500);
+                } else {
+                    toastr.error(response.message || "Not güncellenirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            },
+            complete: function () {
+                $("#edit_project_line_note_save_bt").prop("disabled", false).text("Güncelle");
+            }
+        });
+    };
+
+    var deleteProjectLineNote = function (noteId) {
+        if (!confirm("Bu notu silmek istediğinize emin misiniz?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "/Project/DeleteProjectLineNote",
+            type: "POST",
+            data: { id: noteId },
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "Not başarıyla silindi!", "Başarılı");
+                    setTimeout(function () {
+                        loadNotes($("#notes_line_id").val());
+                    }, 500);
+                } else {
+                    toastr.error(response.message || "Not silinirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            }
+        });
+    };
+
+    // ===== WORK FUNCTIONS =====
+
+    var openWorksModal = function (lineId, lineTitle) {
+        $("#works_line_id").val(lineId);
+        $("#project-line-works-modal .modal-title").text("Faz İşleri - " + lineTitle);
+        $("#project-line-works-modal").modal('show');
+        loadWorks(lineId);
+    };
+
+    var loadWorks = function (lineId) {
+        $("#works-list-container").html('<div class="text-center py-5"><span class="text-muted">Yükleniyor...</span></div>');
+
+        // This would call a service to get works - for now using placeholder
+        // In real implementation, you'd need to add GetProjectLineWorks action
+        $("#works-list-container").html('<div class="text-center py-5"><span class="text-muted">İşler listesi yükleniyor...</span></div>');
+    };
+
+    var saveProjectLineWork = function () {
+        var model = {
+            lineId: $("#work_LineId").val(),
+            name: $("#work_Name").val(),
+            description: $("#work_Description").val(),
+            reportDescription: $("#work_ReportDescription").val(),
+            lineFirmOfficialId: $("#work_LineFirmOfficialId").val() || null,
+            priority: parseInt($("#work_Priority").val() || "3"),
+            rowOrder: parseInt($("#work_RowOrder").val() || "0"),
+            letTimeDeduct: $("#work_LetTimeDeduct").is(":checked")
+        };
+
+        if (!model.name || model.name.trim() === "") {
+            toastr.warning("İş Adı zorunludur!", "Uyarı");
+            return;
+        }
+
+        $("#add_project_line_work_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Ekleniyor...');
+
+        $.ajax({
+            url: "/Project/AddProjectLineWork",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(model),
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "İş başarıyla eklendi!", "Başarılı");
+                    $("#add-project-line-work-modal").modal('hide');
+                    setTimeout(function () { location.reload(); }, 1000);
+                } else {
+                    toastr.error(response.message || "İş eklenirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            },
+            complete: function () {
+                $("#add_project_line_work_save_bt").prop("disabled", false).text("Ekle");
+            }
+        });
+    };
+
+    var updateProjectLineWork = function () {
+        var model = {
+            id: $("#edit_work_Id").val(),
+            name: $("#edit_work_Name").val(),
+            description: $("#edit_work_Description").val(),
+            lineFirmOfficialId: $("#edit_work_LineFirmOfficialId").val() || null,
+            priority: parseInt($("#edit_work_Priority").val() || "3"),
+            rowOrder: parseInt($("#edit_work_RowOrder").val() || "0"),
+            letTimeDeduct: $("#edit_work_LetTimeDeduct").is(":checked")
+        };
+
+        $("#edit_project_line_work_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Güncelleniyor...');
+
+        $.ajax({
+            url: "/Project/UpdateProjectLineWork",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(model),
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "İş başarıyla güncellendi!", "Başarılı");
+                    $("#edit-project-line-work-modal").modal('hide');
+                    setTimeout(function () { location.reload(); }, 1000);
+                } else {
+                    toastr.error(response.message || "İş güncellenirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            },
+            complete: function () {
+                $("#edit_project_line_work_save_bt").prop("disabled", false).text("Güncelle");
+            }
+        });
+    };
+
+    var deleteProjectLineWork = function (workId) {
+        if (!confirm("Bu işi silmek istediğinize emin misiniz?")) {
+            return;
+        }
+
+        $.ajax({
+            url: "/Project/DeleteProjectLineWork",
+            type: "POST",
+            data: { id: workId },
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "İş başarıyla silindi!", "Başarılı");
+                    setTimeout(function () { location.reload(); }, 1000);
+                } else {
+                    toastr.error(response.message || "İş silinirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            }
+        });
+    };
+
+    var changeProjectLineWorkStatus = function (workId, status) {
+        var model = {
+            id: workId,
+            workStatus: status
+        };
+
+        $.ajax({
+            url: "/Project/ChangeProjectLineWorkStatus",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify(model),
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "İş durumu başarıyla değiştirildi!", "Başarılı");
+                    setTimeout(function () { location.reload(); }, 1000);
+                } else {
+                    toastr.error(response.message || "İş durumu değiştirilirken bir hata oluştu!", "Hata");
                 }
             },
             error: function () {

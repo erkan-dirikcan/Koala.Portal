@@ -89,18 +89,9 @@
                                         
                                         <td>@item.DueDate</td>
                                         <td>
-                                            <a asp-controller="Project" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="Güncelle" data-theme="dark"><i class="flaticon-edit"></i></a>
-                                            <a class="btn btn-icon btn-info btn-sm" data-toggle="tooltip" title="Dosya Ekle" data-theme="dark"><i class="flaticon-file-1"></i></a>
-                                            <a asp-controller="Project" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="Faz Güncelle" data-theme="dark"><i class="flaticon-list"></i></a>
-                                            @*           @if (item.IsActive)
-                                            {
-                                                <a asp-controller="Fixture" asp-action="FixtureChangeStatus" asp-route-id="@item.Id" asp-route-status="@false" class="btn btn-icon btn-danger btn-sm" data-toggle="tooltip" title="Pasife Çek" data-theme="dark"> <i class="flaticon2-cancel"></i></a>
-                                            }
-                                            else
-                                            {
-                                                <a asp-controller="Fixture" asp-action="FixtureChangeStatus" asp-route-id="@item.Id" asp-route-status="@true" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="Aktif Et" data-theme="dark"><i class="flaticon2-check-mark"></i></a>
-                                            } *@
-
+                                            <a asp-controller="Project" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-icon btn-info btn-sm" data-toggle="tooltip" title="Detay" data-theme="dark"><i class="flaticon-eye"></i></a>
+                                            <a asp-controller="Project" asp-action="UpdateProject" asp-route-id="@item.Id" class="btn btn-icon btn-warning btn-sm" data-toggle="tooltip" title="Düzenle" data-theme="dark"><i class="flaticon2-pen"></i></a>
+                                            <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-project" data-toggle="tooltip" title="Sil" data-id="@item.Id" data-name="@item.ProjectName" data-theme="dark"><i class="flaticon2-trash"></i></button>
                                         </td>
 
                                     </tr>
