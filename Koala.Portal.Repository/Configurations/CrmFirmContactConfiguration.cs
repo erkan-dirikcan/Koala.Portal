@@ -22,7 +22,7 @@ namespace Koala.Portal.Repository.Configurations
                 .OnDelete(DeleteBehavior.NoAction);
             //Sorumlusu Olduğu Fazlar
             builder.HasMany(x => x.PersonProjectLines)
-                .WithOne(x => x.LineFirmOffcial)
+                .WithOne(x => x.LineFirmOfficial)
                 .HasForeignKey(x => x.LineFirmOfficialId)
                 .OnDelete(DeleteBehavior.NoAction);
             

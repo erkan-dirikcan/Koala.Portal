@@ -144,7 +144,7 @@ namespace Koala.Portal.Service.Services
                     .Include(x => x.ProjectLines)
                         .ThenInclude(x => x.LineOffcial)
                     .Include(x => x.ProjectLines)
-                        .ThenInclude(x => x.LineFirmOffcial)
+                        .ThenInclude(x => x.LineFirmOfficial)
                     .Include(x => x.Firm)
                     .FirstOrDefaultAsync();
 

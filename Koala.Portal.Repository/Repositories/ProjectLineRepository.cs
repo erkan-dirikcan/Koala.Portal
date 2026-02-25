@@ -34,7 +34,7 @@ namespace Koala.Portal.Repository.Repositories
                 .Include(x => x.LineOffcial)
                 .Include(x => x.Project)
                 .Include(x => x.LineOffcial)
-                .Include(x => x.LineFirmOffcial)
+                .Include(x => x.LineFirmOfficial)
                 .Include(x => x.LineNotes)
                 .Include(x => x.LineWorks).ToListAsync();
         }
@@ -44,7 +44,7 @@ namespace Koala.Portal.Repository.Repositories
             return await _dbSet.Include(x => x.LineOffcial)
                 .Include(x => x.Project)
                 .Include(x => x.LineOffcial)
-                .Include(x => x.LineFirmOffcial)
+                .Include(x => x.LineFirmOfficial)
                 .Include(x => x.LineNotes)
                 .Include(x => x.LineWorks)
                 .FirstOrDefaultAsync(x => x.Id == id);

@@ -36,7 +36,7 @@ namespace Koala.Portal.Core.Models
 
         public virtual Project Project { get; set; }
         public virtual AppUser? LineOffcial { get; set; }
-        public virtual CrmFirmContact? LineFirmOffcial { get; set; }
+        public virtual CrmFirmContact? LineFirmOfficial { get; set; }
 
         public virtual ICollection<ProjectLineWork> LineWorks { get; set; }
         public virtual ICollection<ProjectLineNote> LineNotes { get; set; }
@@ -47,7 +47,7 @@ namespace Koala.Portal.Core.Models
         }
         public string GetFirmPersonFullName()
         {
-            return $"{LineFirmOffcial?.Name} {LineFirmOffcial?.LastName}";
+            return $"{LineFirmOfficial?.Name} {LineFirmOfficial?.LastName}";
         }       
         public string? GetStartDateStr()
         {

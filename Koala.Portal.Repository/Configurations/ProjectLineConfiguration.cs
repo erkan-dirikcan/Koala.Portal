@@ -20,7 +20,7 @@ namespace Koala.Portal.Repository.Configurations
                 .HasForeignKey(x => x.LineOfficialId)
                 .OnDelete(DeleteBehavior.NoAction);        
             //Firma Faz Sorumlusu
-            builder.HasOne(x => x.LineFirmOffcial)
+            builder.HasOne(x => x.LineFirmOfficial)
                 .WithMany(x => x.PersonProjectLines)
                 .HasForeignKey(x => x.LineFirmOfficialId);
             //İlişkili İşler
