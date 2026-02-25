@@ -5,6 +5,7 @@
     ViewData["ActivePage"] = "Projects";
     var users = ViewData["Users"] as List<SelectListItem> ?? new List<SelectListItem>();
     var firms = ViewData["Firms"] as List<SelectListItem> ?? new List<SelectListItem>();
+    var initialFirmPersonId = Model.FirmPersonId ?? "";
 }
 
 <div class="d-flex flex-column-fluid">
@@ -59,7 +60,8 @@
                                     </div>
                                     <label class="col-md-2 col-form-label">Firma Proje Yöneticisi</label>
                                     <div class="col-md-4">
-                                        <select class="form-control select2" asp-for="FirmPersonId" name="FirmPersonId" data-placeholder="Firma Yetkilisi Seçin" id="FirmPersonId" data-selected-value="@Model.FirmPersonId">
+                                        <input type="hidden" id="InitialFirmPersonId" value="@initialFirmPersonId" />
+                                        <select class="form-control select2" asp-for="FirmPersonId" name="FirmPersonId" data-placeholder="Firma Yetkilisi Seçin" id="FirmPersonId">
                                             <option value="">Seçiniz</option>
                                         </select>
                                         <span asp-validation-for="FirmPersonId" class="text-danger"></span>

@@ -15,7 +15,7 @@ var ProjectEditPage = function () {
 
         // Get initial values BEFORE initializing Select2
         var initialFirmId = $('#FirmId').val();
-        var initialContactId = $('#FirmPersonId').data('selected-value');
+        var initialContactId = $('#InitialFirmPersonId').val() || null;
 
         console.log("Page load - Initial FirmId:", initialFirmId, "Initial ContactId:", initialContactId);
 
