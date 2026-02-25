@@ -17,14 +17,14 @@ namespace Koala.Portal.Repository.SeedData
         {
             try
             {
-                // Find or create the Project module
-                var projectModule = await context.Module.FirstOrDefaultAsync(m => m.Name == "Project");
+                // Find or create the ProjectManagement module
+                var projectModule = await context.Module.FirstOrDefaultAsync(m => m.Name == "ProjectManagement");
                 if (projectModule == null)
                 {
                     projectModule = new Module
                     {
                         Id = Koala.Portal.Core.Helpers.Tools.CreateGuidStr(),
-                        Name = "Project",
+                        Name = "ProjectManagement",
                         DisplayName = "Proje Yönetimi",
                         Description = "Proje modülü yetkileri"
                     };
@@ -32,27 +32,27 @@ namespace Koala.Portal.Repository.SeedData
                     await context.SaveChangesAsync();
                 }
 
-                // Add Project.Edit permission if it doesn't exist
-                if (!await context.Claims.AnyAsync(c => c.Name == "Project.Edit"))
+                // Add ProjectManagement.Edit permission if it doesn't exist
+                if (!await context.Claims.AnyAsync(c => c.Name == "ProjectManagement.Edit"))
                 {
                     context.Claims.Add(new Claims
                     {
                         Id = Koala.Portal.Core.Helpers.Tools.CreateGuidStr(),
                         ModuleId = projectModule.Id,
-                        Name = "Project.Edit",
+                        Name = "ProjectManagement.Edit",
                         DisplayName = "Proje Düzenle",
                         Description = "Proje düzenleme yetkisi"
                     });
                 }
 
-                // Add Project.Delete permission if it doesn't exist
-                if (!await context.Claims.AnyAsync(c => c.Name == "Project.Delete"))
+                // Add ProjectManagement.Delete permission if it doesn't exist
+                if (!await context.Claims.AnyAsync(c => c.Name == "ProjectManagement.Delete"))
                 {
                     context.Claims.Add(new Claims
                     {
                         Id = Koala.Portal.Core.Helpers.Tools.CreateGuidStr(),
                         ModuleId = projectModule.Id,
-                        Name = "Project.Delete",
+                        Name = "ProjectManagement.Delete",
                         DisplayName = "Proje Sil",
                         Description = "Proje silme yetkisi"
                     });
@@ -84,18 +84,18 @@ namespace Koala.Portal.Repository.SeedData
                     var role = await roleManager.FindByNameAsync(roleName);
                     if (role == null) continue;
 
-                    // Add Project.Edit claim
+                    // Add ProjectManagement.Edit claim
                     var existingClaims = await roleManager.GetClaimsAsync(role);
-                    if (!existingClaims.Any(c => c.Type == "Permission" && c.Value == "Project.Edit"))
+                    if (!existingClaims.Any(c => c.Type == "Permission" && c.Value == "ProjectManagement.Edit"))
                     {
-                        await roleManager.AddClaimAsync(role, new System.Security.Claims.Claim("Permission", "Project.Edit"));
+                        await roleManager.AddClaimAsync(role, new System.Security.Claims.Claim("Permission", "ProjectManagement.Edit"));
                     }
 
-                    // Add Project.Delete claim
+                    // Add ProjectManagement.Delete claim
                     existingClaims = await roleManager.GetClaimsAsync(role);
-                    if (!existingClaims.Any(c => c.Type == "Permission" && c.Value == "Project.Delete"))
+                    if (!existingClaims.Any(c => c.Type == "Permission" && c.Value == "ProjectManagement.Delete"))
                     {
-                        await roleManager.AddClaimAsync(role, new System.Security.Claims.Claim("Permission", "Project.Delete"));
+                        await roleManager.AddClaimAsync(role, new System.Security.Claims.Claim("Permission", "ProjectManagement.Delete"));
                     }
                 }
             }

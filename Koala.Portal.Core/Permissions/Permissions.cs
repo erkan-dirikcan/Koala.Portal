@@ -36,14 +36,14 @@
         }
         public static class Project
         {
-            public const string View = "Project.View";
-            public const string Create = "Project.Create";
-            public const string Update = "Project.Update";
-            public const string Edit = "Project.Edit";
-            public const string Cancel = "Project.Cancel";
-            public const string Complete = "Project.Complete";
-            public const string Complate = "Project.Complate"; // Keep for backward compatibility
-            public const string Delete = "Project.Delete";
+            public const string View = "ProjectManagement.View";
+            public const string Create = "ProjectManagement.Create";
+            public const string Update = "ProjectManagement.Update";
+            public const string Edit = "ProjectManagement.Edit";
+            public const string Cancel = "ProjectManagement.Cancel";
+            public const string Complete = "ProjectManagement.Complete";
+            public const string Complate = "ProjectManagement.Complate"; // Keep for backward compatibility
+            public const string Delete = "ProjectManagement.Delete";
 
         }
         public static class CrmFirm
