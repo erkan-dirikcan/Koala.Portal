@@ -1,748 +1,726 @@
-﻿@using Koala.Portal.Core.Dtos
+@using Koala.Portal.Core.Dtos
 @using Koala.Portal.WebUI.TagHelpers
 @using Koala.Portal.Core.ViewModels.CrmViewModels
 @using Koala.Portal.Core.ViewModels.PortalViewModels
-kullanıcı, firma kullanıcı
 
-@model (ProjectDetailViewModel project, InfoCrmFirmViewModel firm, List<CrmSupportListViewModel> supports,List<CrmUserFullNameInfoViewModel> crmUsers,List<CrmUserDepartmentsViewModel> userDepartments,List<SelectListItem> localUsers)
+@model (ProjectDetailViewModel project, InfoCrmFirmViewModel firm, List<CrmSupportListViewModel> supports, List<CrmUserFullNameInfoViewModel> crmUsers, List<CrmUserDepartmentsViewModel> userDepartments, List<SelectListItem> localUsers)
 @{
     ViewData["Title"] = "Proje Detay";
     ViewData["ActivePage"] = "Project";
     TempData["IsProject"] = true;
-    // var priority = (List<SelectListItem>)TempData["Priority"]!;
     var phones = Model.firm.Phones.Select(x => $"({x.AreaCode}) {x.Number}").ToList();
+
+    // Calculate progress
+    var totalLines = Model.project.ProjectLines?.Count() ?? 0;
+    var completedLines = Model.project.ProjectLines?.Count(l => l.StateStatus == ProjectLineStatusEnum.Completed) ?? 0;
+    var progressPercent = totalLines > 0 ? (completedLines * 100 / totalLines) : 0;
 }
 
 <div class="d-flex flex-column-fluid">
     <!--begin::Container-->
     <div class="container-fluid">
-        <!--begin::Card-->
-        <div class="card card-custom gutter-b" >
+
+        <!--begin::Project Header Card-->
+        <div class="card card-custom gutter-b">
             <div class="card-body">
                 <div class="d-flex">
                     <div class="flex-grow-1">
-                        <!--begin: Title-->
                         <div class="d-flex align-items-center justify-content-between flex-wrap">
                             <div class="mr-3">
-                                <!--begin::Name-->
                                 <a href="#" class="d-flex align-items-center text-dark text-hover-primary font-size-h5 font-weight-bold mr-3">
                                     (@Model.project.Firm.Code) - @Model.project.Firm.Title
                                     <i class="flaticon2-correct text-success icon-md ml-2"></i>
                                 </a>
-                                <!--end::Name-->
-                                <!--begin::Contacts-->
                                 <div class="d-flex flex-wrap my-2">
-                                    <a href="#" class="text-muted text-hover-primary font-weight-bold mr-lg-8 mr-5 mb-lg-0 mb-2">
-                                        <span class="svg-icon svg-icon-md svg-icon-gray-500 mr-1">
-                                            <!--begin::Svg Icon | path:C:\wamp64\www\keenthemes\legacy\metronic\theme\html\demo1\dist/../src/media/svg/icons\Devices\iPhone-X.svg-->
-                                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                    <rect x="0" y="0" width="24" height="24" />
-                                                    <path d="M8,2.5 C7.30964406,2.5 6.75,3.05964406 6.75,3.75 L6.75,20.25 C6.75,20.9403559 7.30964406,21.5 8,21.5 L16,21.5 C16.6903559,21.5 17.25,20.9403559 17.25,20.25 L17.25,3.75 C17.25,3.05964406 16.6903559,2.5 16,2.5 L8,2.5 Z" fill="#000000" opacity="0.3" />
-                                                    <path d="M8,2.5 C7.30964406,2.5 6.75,3.05964406 6.75,3.75 L6.75,20.25 C6.75,20.9403559 7.30964406,21.5 8,21.5 L16,21.5 C16.6903559,21.5 17.25,20.9403559 17.25,20.25 L17.25,3.75 C17.25,3.05964406 16.6903559,2.5 16,2.5 L8,2.5 Z M8,1 L16,1 C17.5187831,1 18.75,2.23121694 18.75,3.75 L18.75,20.25 C18.75,21.7687831 17.5187831,23 16,23 L8,23 C6.48121694,23 5.25,21.7687831 5.25,20.25 L5.25,3.75 C5.25,2.23121694 6.48121694,1 8,1 Z M9.5,1.75 L14.5,1.75 C14.7761424,1.75 15,1.97385763 15,2.25 L15,3.25 C15,3.52614237 14.7761424,3.75 14.5,3.75 L9.5,3.75 C9.22385763,3.75 9,3.52614237 9,3.25 L9,2.25 C9,1.97385763 9.22385763,1.75 9.5,1.75 Z" fill="#000000" fill-rule="nonzero" />
-                                                </g>
-                                            </svg>
-                                        </span>
-                                        @foreach (var phone in phones)
-                                        {
-                                            var pFormt = "0" + phone.Replace(" ", "").Replace("(", "").Replace(")", "");
-                                            <a href="tel:@pFormt" class="">
-                                                @phone
-                                            </a>
-                                            <span>&nbsp;&nbsp;&nbsp; </span>
-                                        }
-                                        @*  @string.Join(", ", phones) *@
-                                    </a>
-
-
+                                    @foreach (var phone in phones)
+                                    {
+                                        var pFormt = "0" + phone.Replace(" ", "").Replace("(", "").Replace(")", "");
+                                        <a href="tel:@pFormt" class="text-muted text-hover-primary font-weight-bold mr-3">
+                                            <span class="svg-icon svg-icon-md svg-icon-gray-500 mr-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                        <rect x="0" y="0" width="24" height="24" />
+                                                        <path d="M8,2.5 C7.30964406,2.5 6.75,3.05964406 6.75,3.75 L6.75,20.25 C6.75,20.9403559 7.30964406,21.5 8,21.5 L16,21.5 C16.6903559,21.5 17.25,20.9403559 17.25,20.25 L17.25,3.75 C17.25,3.05964406 16.6903559,2.5 16,2.5 L8,2.5 Z" fill="#000000" opacity="0.3" />
+                                                    </g>
+                                                </svg>
+                                            </span>
+                                            @phone
+                                        </a>
+                                    }
                                 </div>
-                                <!--end::Contacts-->
                             </div>
                             <div class="my-lg-0 my-1">
+                                <a href="/Project" class="btn btn-sm btn-light-primary font-weight-bolder mr-2">Listeye Dön</a>
                                 <a href="#" id="open-add-project-file-modal" class="btn btn-sm btn-light-success font-weight-bolder text-uppercase">Dosya Ekle</a>
                             </div>
                         </div>
-                        <!--end: Title-->
                     </div>
-                    <!--end: Info-->
                 </div>
+
                 <div class="separator separator-solid my-7"></div>
-                <!--begin: Items-->
+
+                <!-- Statistics -->
                 <div class="d-flex align-items-center flex-wrap">
-                    <!--begin: Item-->
                     <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
-                        <span class="mr-4">
-                            <i class="flaticon-app icon-2x text-muted font-weight-bold"></i>
-                        </span>
+                        <span class="mr-4"><i class="flaticon-app icon-2x text-muted font-weight-bold"></i></span>
                         <div class="d-flex flex-column text-dark-75">
                             <span class="font-weight-bolder font-size-sm">Toplam Faz</span>
-                            <span class="font-weight-bolder font-size-h5">
-                                <span class="text-dark-50 font-weight-bold"></span>@(Model.project.ProjectLines?.Count() ?? 0)
-                            </span>
+                            <span class="font-weight-bolder font-size-h5">@(totalLines)</span>
                         </div>
                     </div>
-                    <!--end: Item-->
-                    <!--begin: Item-->
                     <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
-                        <span class="mr-4">
-                            <i class="flaticon-support icon-2x text-muted font-weight-bold"></i>
-                        </span>
+                        <span class="mr-4"><i class="flaticon-check-mark icon-2x text-success font-weight-bold"></i></span>
                         <div class="d-flex flex-column text-dark-75">
-                            <span class="font-weight-bolder font-size-sm">Toplam İş</span>
-                            <span class="font-weight-bolder font-size-h5">
-                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
-                                x.TicketStateOid == "bd6344e9-e338-47a3-b6c0-38d9385b80b4" ||
-                                x.TicketStateOid == "07d17e00-b999-4a39-8c01-4e0ceb1925fd" ||
-                                x.TicketStateOid == "a048ac84-9dde-4a2c-86aa-d3ef76506103" ||
-                                x.TicketStateOid == "e4bea484-e65c-4161-9b7e-95631a36928b")
-                            </span>
+                            <span class="font-weight-bolder font-size-sm">Tamamlanan</span>
+                            <span class="font-weight-bolder font-size-h5">@(completedLines)</span>
                         </div>
                     </div>
-                    <!--end: Item-->
-                    <!--begin: Item-->
                     <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
-                        <span class="mr-4">
-                            <i class="flaticon-file-2 icon-2x text-muted font-weight-bold"></i>
-                        </span>
-                        <div class="d-flex flex-column text-dark-75">
-                            <span class="font-weight-bolder font-size-sm">Toplam Destek Kaydı</span>
-                            <span class="font-weight-bolder font-size-h5">
-                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
-                                (x.TicketStateOid != "bd6344e9-e338-47a3-b6c0-38d9385b80b4" &&
-                                x.TicketStateOid != "07d17e00-b999-4a39-8c01-4e0ceb1925fd" &&
-                                x.TicketStateOid != "a048ac84-9dde-4a2c-86aa-d3ef76506103" &&
-                                x.TicketStateOid != "e4bea484-e65c-4161-9b7e-95631a36928b") &&
-                                x.TicketStateOid != "439e8fb4-b576-4650-83de-656ee3cfd3e7")
-                            </span>
+                        <span class="mr-4"><i class="flaticon-interface icon-2x text-info font-weight-bold"></i></span>
+                        <div class="d-flex flex-column text-dark-75 w-100">
+                            <span class="font-weight-bolder font-size-sm">İlerleme</span>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @progressPercent%" aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100">@progressPercent.ToString("0")%</div>
+                            </div>
                         </div>
                     </div>
-                    <!--end: Item-->
-                    <!--begin: Item-->
-                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
-                        <span class="mr-4">
-                            <i class="flaticon-file-2 icon-2x text-muted font-weight-bold"></i>
-                        </span>
-                        <div class="d-flex flex-column text-dark-75">
-                            <span class="font-weight-bolder font-size-sm">Toplam Dosya</span>
-                            <span class="font-weight-bolder font-size-h5">
-                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
-                                (x.TicketStateOid != "bd6344e9-e338-47a3-b6c0-38d9385b80b4" &&
-                                x.TicketStateOid != "07d17e00-b999-4a39-8c01-4e0ceb1925fd" &&
-                                x.TicketStateOid != "a048ac84-9dde-4a2c-86aa-d3ef76506103" &&
-                                x.TicketStateOid != "e4bea484-e65c-4161-9b7e-95631a36928b") &&
-                                x.TicketStateOid != "439e8fb4-b576-4650-83de-656ee3cfd3e7")
-                            </span>
-                        </div>
-                    </div>
-                    <!--end: Item-->
-                    <!--begin: Item-->
-                    <div class="d-flex align-items-center flex-lg-fill mr-5 my-1">
-                        <span class="mr-4">
-                            <i class="flaticon-file-2 icon-2x text-muted font-weight-bold"></i>
-                        </span>
-                        <div class="d-flex flex-column text-dark-75">
-                            <span class="font-weight-bolder font-size-sm">Toplam Faz Notu</span>
-                            <span class="font-weight-bolder font-size-h5">
-                                <span class="text-dark-50 font-weight-bold"></span>@Model.supports.Count(x =>
-                                (x.TicketStateOid != "bd6344e9-e338-47a3-b6c0-38d9385b80b4" &&
-                                x.TicketStateOid != "07d17e00-b999-4a39-8c01-4e0ceb1925fd" &&
-                                x.TicketStateOid != "a048ac84-9dde-4a2c-86aa-d3ef76506103" &&
-                                x.TicketStateOid != "e4bea484-e65c-4161-9b7e-95631a36928b") &&
-                                x.TicketStateOid != "439e8fb4-b576-4650-83de-656ee3cfd3e7")
-                            </span>
-                        </div>
-                    </div>
-                    <!--end: Item-->
                 </div>
-                <!--begin: Items-->
             </div>
         </div>
 
+        <!--begin::Tabs Card-->
         <div class="card card-custom gutter-b">
-            <div class="card-header flex-wrap border-0 pt-6 pb-0">
-                <div class="card-title">
-                    <h3 class="card-label">
-                        Proje Fazları
-                        <span class="d-block text-muted pt-2 font-size-sm">@Model.project.ProjectName Proje Fazları</span>
-                    </h3>
-
-                </div>
-                <div class="card-toolbar">
-                    <a href="#" id="open-add-project-line-modal" class="btn btn-sm btn-primary font-weight-bolder text-uppercase">Faz Ekle</a>
-                </div>
+            <div class="card-header border-0 pt-4 pb-0">
+                <ul class="nav nav-tabs nav-tabs-line nav-tabs-bold nav-tabs-line-3x" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#tab-overview" role="tab">
+                            <i class="flaticon2-graphic"></i>
+                            Özet
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#tab-lines" role="tab">
+                            <i class="flaticon-interface"></i>
+                            Fazlar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#tab-works" role="tab">
+                            <i class="flaticon-list-1"></i>
+                            İşler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#tab-notes" role="tab">
+                            <i class="flaticon2-paper"></i>
+                            Notlar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#tab-files" role="tab">
+                            <i class="flaticon2-file"></i>
+                            Dosyalar
+                        </a>
+                    </li>
+                </ul>
             </div>
+
             <div class="card-body">
-                <table class="table table-bordered table-hover" id="ProjectLineTable" style="margin-top: 13px !important">
-                    <thead>
-                        <tr>
-                            <th title="Title">Proje Adı</th>
-                            <th title="StateStatus">Durum</th>
-                            <th title="DueDate">Teslim Tarihi</th>
-                            <th title="StartDate">Başlangıç Tarihi</th>
-                            <th title="LineOfficial">Faz Yöneticisi</th>
-                            <th title="LineFirmOfficial">Firma Yetkilisi</th>
-                            <th title="Priority">Öncelik</th>
-                            <th title="RowOrder">Sıralama</th>
-                            <th title="Action">İşlemler</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.project.ProjectLines != null && Model.project.ProjectLines.Any())
-                        {
-                            @foreach (var item in Model.project.ProjectLines)
-                            {
-                                var statusBadge = item.StateStatus switch
-                                {
-                                    ProjectLineStatusEnum.NotStarted => "<span class='badge badge-secondary'>Başlamadı</span>",
-                                    ProjectLineStatusEnum.InProgress => "<span class='badge badge-info'>Devam Ediyor</span>",
-                                    ProjectLineStatusEnum.Completed => "<span class='badge badge-success'>Tamamlandı</span>",
-                                    ProjectLineStatusEnum.Cancellled => "<span class='badge badge-danger'>İptal Edildi</span>",
-                                    _ => "<span class='badge badge-secondary'>Belirsiz</span>"
-                                };
-                                <tr data-id="@item.Id" data-title="@item.Title" data-official-id="@item.LineOfficialId" data-firm-official-id="@item.LineFirmOfficialId" data-priority="@((int)item.Priority)" data-roworder="@item.RowOrder" data-description="@item.Description" data-duedate="@item.DueDate">
-                                    <td title="Title">@item.Title</td>
-                                    <td title="StateStatus">@Html.Raw(statusBadge)</td>
-                                    <td title="DueDate">@item.DueDate</td>
-                                    <td title="StartDate">@item.StartDate</td>
-                                    <td title="LineOfficial">@item.LineOfficial</td>
-                                    <td title="LineFirmOfficial">@item.LineFirmOfficial</td>
-                                    <td title="Priority">@item.Priority</td>
-                                    <td title="RowOrder">@item.RowOrder</td>
-                                    <td title="Action">
-                                        <button type="button" class="btn btn-icon btn-success btn-sm btn-start-phase" data-toggle="tooltip" title="Faza Başla" data-id="@item.Id"><i class="flaticon2-play"></i></button>
-                                        <button type="button" class="btn btn-icon btn-warning btn-sm btn-complete-phase" data-toggle="tooltip" title="Tamamla" data-id="@item.Id"><i class="flaticon2-check-mark"></i></button>
-                                        <button type="button" class="btn btn-icon btn-primary btn-sm btn-edit-phase" data-toggle="tooltip" title="Düzenle"><i class="flaticon2-pen"></i></button>
-                                        <button type="button" class="btn btn-icon btn-info btn-sm btn-notes-phase" data-toggle="tooltip" title="Notlar" data-id="@item.Id" data-title="@item.Title"><i class="flaticon2-paper"></i></button>
-                                        <button type="button" class="btn btn-icon btn-primary btn-sm btn-works-phase" data-toggle="tooltip" title="İşler" data-id="@item.Id" data-title="@item.Title"><i class="flaticon-list-1"></i></button>
-                                        <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-phase" data-toggle="tooltip" title="Sil" data-id="@item.Id"><i class="flaticon2-trash"></i></button>
-                                    </td>
+                <div class="tab-content">
+                    <!-- Tab: Overview -->
+                    <div class="tab-pane fade show active" id="tab-overview" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card card-stretch gutter-b">
+                                    <div class="card-header border-0">
+                                        <h3 class="card-title font-weight-bolder">Proje Bilgileri</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-borderless">
+                                            <tr>
+                                                <td style="width: 40%"><strong>Proje Kodu:</strong></td>
+                                                <td>@Model.project.ProjectCode</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Proje Adı:</strong></td>
+                                                <td>@Model.project.ProjectName</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Açıklama:</strong></td>
+                                                <td>@Model.project.Description</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Proje Yöneticisi:</strong></td>
+                                                <td>@Model.project.ProjectManager</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Firma Yetkilisi:</strong></td>
+                                                <td>@Model.project.FirmPerson</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Başlangıç Tarihi:</strong></td>
+                                                <td>@Model.project.StartDate</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Termin Tarihi:</strong></td>
+                                                <td>@Model.project.DueDate</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Durum:</strong></td>
+                                                <td>
+                                                    @{
+                                                        var statusBadge = Model.project.ProjectStatus switch
+                                                        {
+                                                            ProjectStatusEnum.Creating => "<span class='badge badge-secondary'>Oluşturuluyor</span>",
+                                                            ProjectStatusEnum.Created => "<span class='badge badge-primary'>Oluşturuldu</span>",
+                                                            ProjectStatusEnum.Started => "<span class='badge badge-info'>Başladı</span>",
+                                                            ProjectStatusEnum.Testing => "<span class='badge badge-warning'>Test Aşamasında</span>",
+                                                            ProjectStatusEnum.Finished => "<span class='badge badge-success'>Tamamlandı</span>",
+                                                            ProjectStatusEnum.Canceled => "<span class='badge badge-danger'>İptal Edildi</span>",
+                                                            _ => "<span class='badge badge-secondary'>Belirsiz</span>"
+                                                        };
+                                                    }
+                                                    @Html.Raw(statusBadge)
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card card-stretch gutter-b">
+                                    <div class="card-header border-0">
+                                        <h3 class="card-title font-weight-bolder">Firma Bilgileri</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <table class="table table-borderless">
+                                            <tr>
+                                                <td style="width: 40%"><strong>Firma Kodu:</strong></td>
+                                                <td>@Model.firm.Code</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Firma Adı:</strong></td>
+                                                <td>@Model.firm.Title</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Vergi Dairesi:</strong></td>
+                                                <td>@Model.firm.TaxOffice</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Vergi No:</strong></td>
+                                                <td>@Model.firm.TaxNo</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Adres:</strong></td>
+                                                <td>@Model.firm.Address</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>E-Posta:</strong></td>
+                                                <td><a href="mailto:@Model.firm.Email">@Model.firm.Email</a></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Fazlar -->
+                    <div class="tab-pane fade" id="tab-lines" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="font-weight-bolder">Proje Fazları</h3>
+                            <div>
+                                <select id="bulkStatusSelect" class="form-control d-inline-block mr-2" style="width: 200px;">
+                                    <option value="">Toplu İşlem Seç...</option>
+                                    <option value="1">Başlamadı</option>
+                                    <option value="2">Devam Ediyor</option>
+                                    <option value="5">Tamamlandı</option>
+                                    <option value="6">İptal Edildi</option>
+                                </select>
+                                <button type="button" id="bulkApplyStatus" class="btn btn-sm btn-primary">Uygula</button>
+                                <a href="#" id="open-add-project-line-modal" class="btn btn-sm btn-success font-weight-bolder ml-2">
+                                    <i class="flaticon2-plus"></i> Faz Ekle
+                                </a>
+                            </div>
+                        </div>
+
+                        <table class="table table-bordered table-hover" id="ProjectLineTable">
+                            <thead>
+                                <tr>
+                                    <th width="40"><input type="checkbox" id="selectAllLines" /></th>
+                                    <th>Faz Adı</th>
+                                    <th>Durum</th>
+                                    <th>Teslim Tarihi</th>
+                                    <th>Başlangıç Tarihi</th>
+                                    <th>Faz Yöneticisi</th>
+                                    <th>Firma Yetkilisi</th>
+                                    <th>Öncelik</th>
+                                    <th>Sıra</th>
+                                    <th>İşlemler</th>
                                 </tr>
-                            }
+                            </thead>
+                            <tbody>
+                                @if (Model.project.ProjectLines != null && Model.project.ProjectLines.Any())
+                                {
+                                    @foreach (var item in Model.project.ProjectLines)
+                                    {
+                                        var statusBadge = item.StateStatus switch
+                                        {
+                                            ProjectLineStatusEnum.NotStarted => "<span class='badge badge-secondary'>Başlamadı</span>",
+                                            ProjectLineStatusEnum.InProgress => "<span class='badge badge-info'>Devam Ediyor</span>",
+                                            ProjectLineStatusEnum.Completed => "<span class='badge badge-success'>Tamamlandı</span>",
+                                            ProjectLineStatusEnum.Cancellled => "<span class='badge badge-danger'>İptal Edildi</span>",
+                                            _ => "<span class='badge badge-secondary'>Belirsiz</span>"
+                                        };
+                                        <tr data-id="@item.Id" data-title="@item.Title" data-official-id="@item.LineOfficialId" data-firm-official-id="@item.LineFirmOfficialId" data-priority="@((int)item.Priority)" data-roworder="@item.RowOrder" data-description="@item.Description" data-duedate="@item.DueDate">
+                                            <td><input type="checkbox" class="line-checkbox" data-id="@item.Id" /></td>
+                                            <td>@item.Title</td>
+                                            <td>@Html.Raw(statusBadge)</td>
+                                            <td>@item.DueDate</td>
+                                            <td>@item.StartDate</td>
+                                            <td>@item.LineOfficial</td>
+                                            <td>@item.LineFirmOfficial</td>
+                                            <td>@item.Priority</td>
+                                            <td>@item.RowOrder</td>
+                                            <td>
+                                                <button type="button" class="btn btn-icon btn-success btn-sm btn-start-phase" data-toggle="tooltip" title="Faza Başla" data-id="@item.Id"><i class="flaticon2-play"></i></button>
+                                                <button type="button" class="btn btn-icon btn-warning btn-sm btn-complete-phase" data-toggle="tooltip" title="Tamamla" data-id="@item.Id"><i class="flaticon2-check-mark"></i></button>
+                                                <button type="button" class="btn btn-icon btn-primary btn-sm btn-edit-phase" data-toggle="tooltip" title="Düzenle"><i class="flaticon2-pen"></i></button>
+                                                <button type="button" class="btn btn-icon btn-info btn-sm btn-notes-phase" data-toggle="tooltip" title="Notlar" data-id="@item.Id" data-title="@item.Title"><i class="flaticon2-paper"></i></button>
+                                                <button type="button" class="btn btn-icon btn-purple btn-sm btn-works-phase" data-toggle="tooltip" title="İşler" data-id="@item.Id" data-title="@item.Title"><i class="flaticon-list-1"></i></button>
+                                                <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-phase" data-toggle="tooltip" title="Sil" data-id="@item.Id"><i class="flaticon2-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="10" class="text-center">Kayıtlı faz bulunmamaktadır.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tab: İşler -->
+                    <div class="tab-pane fade" id="tab-works" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="font-weight-bolder">Tüm İşler</h3>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="flaticon-info mr-2"></i>
+                            Bu bölüm tüm fazların işlerini bir arada gösterir. İş detaylarını görmek için ilgili faza tıklayın.
+                        </div>
+                        <div id="all-works-container">
+                            <div class="text-center py-5">
+                                <span class="text-muted">İş listesi yükleniyor...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Notlar -->
+                    <div class="tab-pane fade" id="tab-notes" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="font-weight-bolder">Tüm Notlar</h3>
+                        </div>
+                        <div id="all-notes-container">
+                            <div class="text-center py-5">
+                                <span class="text-muted">Not listesi yükleniyor...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Dosyalar -->
+                    <div class="tab-pane fade" id="tab-files" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="font-weight-bolder">Proje Dosyaları</h3>
+                            <a href="#" id="open-add-project-file-modal-tab" class="btn btn-sm btn-success font-weight-bolder">
+                                <i class="flaticon2-plus"></i> Dosya Yükle
+                            </a>
+                        </div>
+                        @if (Model.project.ProjectFiles != null && Model.project.ProjectFiles.Any())
+                        {
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Dosya Adı</th>
+                                        <th>Açıklama</th>
+                                        <th>Yükleme Tarihi</th>
+                                        <th>Yükleyen</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var file in Model.project.ProjectFiles)
+                                    {
+                                        <tr data-id="@file.Id">
+                                            <td><i class="flaticon-file text-primary mr-2"></i>@file.Name</td>
+                                            <td>@file.Description</td>
+                                            <td>@file.CreateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td>@file.CreateUser</td>
+                                            <td>
+                                                <a href="/Project/DownloadProjectFile?fileId=@file.Id" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="İndir"><i class="flaticon-download"></i></a>
+                                                <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-file" data-toggle="tooltip" title="Sil" data-id="@file.Id"><i class="flaticon2-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         }
                         else
                         {
-                            <tr>
-                                <td colspan="9" class="text-center">Kayıtlı faz bulunmamaktadır.</td>
-                            </tr>
+                            <div class="text-center py-5">
+                                <span class="text-muted">Henüz dosya yüklenmemiş.</span>
+                            </div>
                         }
-                    </tbody>
-                </table>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Support Tickets Section (at the bottom) -->
         <div class="row">
             @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
             @await Html.PartialAsync("_SupportModalsPartial")
         </div>
 
-        <!-- Proje Dosyaları Kartı -->
-        <div class="card card-custom gutter-b">
-            <div class="card-header flex-wrap border-0 pt-6 pb-0">
-                <div class="card-title">
-                    <h3 class="card-label">
-                        Proje Dosyaları
-                        <span class="d-block text-muted pt-2 font-size-sm">@Model.project.ProjectName Proje Dosyaları</span>
-                    </h3>
-                </div>
-                <div class="card-toolbar">
-                    <a href="#" id="open-add-project-file-modal" class="btn btn-sm btn-primary font-weight-bolder text-uppercase">Dosya Yükle</a>
-                </div>
-            </div>
-            <div class="card-body">
-                @if (Model.project.ProjectFiles != null && Model.project.ProjectFiles.Any())
-                {
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Dosya Adı</th>
-                                <th>Açıklama</th>
-                                <th>Yükleme Tarihi</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var file in Model.project.ProjectFiles)
-                            {
-                                <tr data-id="@file.Id">
-                                    <td>@file.Name</td>
-                                    <td>@file.Description</td>
-                                    <td>@file.CreateTime.ToString("dd.MM.yyyy")</td>
-                                    <td>
-                                        <a href="/Project/DownloadProjectFile?fileId=@file.Id" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="İndir"><i class="flaticon-download"></i></a>
-                                        <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-file" data-toggle="tooltip" title="Sil" data-id="@file.Id"><i class="flaticon2-trash"></i></button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <div class="text-center py-5">
-                        <span class="text-muted">Henüz dosya yüklenmemiş.</span>
-                    </div>
-                }
-            </div>
-        </div>
+    </div>
+</div>
 
-        <!-- Faz Ekle Modal -->
-        <div class="modal fade" id="add-project-line-modal" tabindex="-1" role="dialog" aria-labelledby="createSupportModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
+<!-- All Modals -->
+<!-- Faz Ekle Modal -->
+<div class="modal fade" id="add-project-line-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createSupportModalLabel"><span class="text-danger">(@Model.project.ProjectCode) - @Model.project.ProjectName</span> isimli projeye faz ekle</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <i aria-hidden="true" class="ki ki-close"></i>
-                </button>
+                <h5 class="modal-title">Faz Ekle - @Model.project.ProjectName</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
             </div>
             <div class="modal-body">
-
                 <form class="form" id="addProjectLineForm">
                     <input type="hidden" id="add_ProjectId" name="add_ProjectId" value="@Model.project.Id" />
                     <div class="form-group row">
-                        <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Adı</label>
-                        <div class=" col-lg-4 col-sm-12">
-                            <input type="text" id="add_LineTitle" name="add_LineTitle" class="form-control" />
-                        </div>
-                        <label class="col-form-label text-right col-lg-2 col-sm-12">Sıra Numarası</label>
-                        <div class=" col-lg-4 col-sm-12">
-                            <input type="text" class="form-control" id="add_LineRowNumber" name="add_LineRowNumber" />
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Yöneticisi</label>
-                        <div class=" col-lg-4 col-sm-12">
-                            <user-select id="add_LineOfficialId" name="add_LineOfficialId"></user-select>
-                           
-                        </div>
-                        <label class="col-form-label text-right col-lg-2 col-sm-12">Firma Yetkilisi</label>
-                        <div class=" col-lg-4 col-sm-12">
-                            <firm-contact-select  id="add_LineFirmOfficial" name="add_LineFirmOfficial" firm-id="@Model.firm.Id"></firm-contact-select>
-                           
-                        </div>
+                        <label class="col-form-label text-right col-lg-2">Faz Adı</label>
+                        <div class="col-lg-4"><input type="text" id="add_LineTitle" class="form-control" required /></div>
+                        <label class="col-form-label text-right col-lg-2">Sıra No</label>
+                        <div class="col-lg-4"><input type="number" id="add_LineRowNumber" class="form-control" /></div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-form-label text-right col-lg-2 col-sm-12">Öncelik</label>
-                        <div class=" col-lg-4 col-sm-12">
-                            <priority-enum-select selected-value="@PriorityEnum.Normal" id="add_LinePriority" name="add_LinePriority"></priority-enum-select>
-                        </div>
-                        <label class="col-form-label text-right col-lg-2 col-sm-12">Teslim Tarihi</label>
-                        <div class="col-lg-4 col-sm-12">
+                        <label class="col-form-label text-right col-lg-2">Faz Yöneticisi</label>
+                        <div class="col-lg-4"><user-select id="add_LineOfficialId"></user-select></div>
+                        <label class="col-form-label text-right col-lg-2">Firma Yetkilisi</label>
+                        <div class="col-lg-4"><firm-contact-select id="add_LineFirmOfficial" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2">Öncelik</label>
+                        <div class="col-lg-4"><priority-enum-select selected-value="@PriorityEnum.Normal" id="add_LinePriority"></priority-enum-select></div>
+                        <label class="col-form-label text-right col-lg-2">Teslim Tarihi</label>
+                        <div class="col-lg-4">
                             <div class="input-group date" id="add_DueDate" data-target-input="nearest">
-                                <input class="form-control form-control-lg form-control-solid" id="add_DueDate_tb" data-target="#add_DueDate" placeholder="Teslim Tarihi Seçiniz" />
+                                <input class="form-control" id="add_DueDate_tb" placeholder="Teslim Tarihi" />
                                 <div class="input-group-append" data-target="#add_DueDate" data-toggle="datetimepicker">
-                                    <span class="input-group-text">
-                                        <i class="ki ki-calendar"></i>
-                                    </span>
+                                    <span class="input-group-text"><i class="ki ki-calendar"></i></span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group mb-1">
-                        <label for="add_LineDescription">
-                            Faz Açıklaması
-                            <span class="text-danger"></span>
-                        </label>
-                        <textarea class="form-control" id="add_LineDescription" rows="3"></textarea>
+                    <div class="form-group">
+                        <label>Faz Açıklaması</label>
+                        <textarea id="add_LineDescription" class="form-control" rows="3"></textarea>
                     </div>
-
                 </form>
-
             </div>
-
             <div class="modal-footer">
-                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                <button type="button" id="add_project_line_save_bt" class="btn btn-success font-weight-bold">Faz Ekle</button>
+                <button type="button" class="btn btn-light-primary" data-dismiss="modal">İptal</button>
+                <button type="button" id="add_project_line_save_bt" class="btn btn-success">Faz Ekle</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Faz Düzenle Modal -->
+<div class="modal fade" id="edit-project-line-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Faz Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="editProjectLineForm">
+                    <input type="hidden" id="edit_Id" />
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2">Faz Adı</label>
+                        <div class="col-lg-4"><input type="text" id="edit_Title" class="form-control" /></div>
+                        <label class="col-form-label text-right col-lg-2">Sıra No</label>
+                        <div class="col-lg-4"><input type="number" id="edit_RowOrder" class="form-control" /></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2">Faz Yöneticisi</label>
+                        <div class="col-lg-4"><user-select id="edit_LineOfficialId"></user-select></div>
+                        <label class="col-form-label text-right col-lg-2">Firma Yetkilisi</label>
+                        <div class="col-lg-4"><firm-contact-select id="edit_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-2">Öncelik</label>
+                        <div class="col-lg-4"><priority-enum-select id="edit_Priority"></priority-enum-select></div>
+                        <label class="col-form-label text-right col-lg-2">Teslim Tarihi</label>
+                        <div class="col-lg-4">
+                            <div class="input-group date" id="edit_DueDate">
+                                <input class="form-control" id="edit_DueDate_tb" placeholder="Teslim Tarihi" />
+                                <div class="input-group-append" data-target="#edit_DueDate" data-toggle="datetimepicker">
+                                    <span class="input-group-text"><i class="ki ki-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Faz Açıklaması</label>
+                        <textarea id="edit_Description" class="form-control" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary" data-dismiss="modal">İptal</button>
+                <button type="button" id="edit_project_line_save_bt" class="btn btn-success">Güncelle</button>
+            </div>
+        </div>
     </div>
-
-        <!-- Faz Düzenle Modal -->
-        <div class="modal fade" id="edit-project-line-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Faz Düzenle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form" id="editProjectLineForm">
-                            <input type="hidden" id="edit_Id" name="edit_Id" />
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Adı</label>
-                                <div class="col-lg-4 col-sm-12">
-                                    <input type="text" id="edit_Title" name="edit_Title" class="form-control" />
-                                </div>
-                                <label class="col-form-label text-right col-lg-2 col-sm-12">Sıra Numarası</label>
-                                <div class="col-lg-4 col-sm-12">
-                                    <input type="number" class="form-control" id="edit_RowOrder" name="edit_RowOrder" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-2 col-sm-12">Faz Yöneticisi</label>
-                                <div class="col-lg-4 col-sm-12">
-                                    <user-select id="edit_LineOfficialId" name="edit_LineOfficialId"></user-select>
-                                </div>
-                                <label class="col-form-label text-right col-lg-2 col-sm-12">Firma Yetkilisi</label>
-                                <div class="col-lg-4 col-sm-12">
-                                    <firm-contact-select id="edit_LineFirmOfficialId" name="edit_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-2 col-sm-12">Öncelik</label>
-                                <div class="col-lg-4 col-sm-12">
-                                    <priority-enum-select selected-value="@PriorityEnum.Normal" id="edit_Priority" name="edit_Priority"></priority-enum-select>
-                                </div>
-                                <label class="col-form-label text-right col-lg-2 col-sm-12">Teslim Tarihi</label>
-                                <div class="col-lg-4 col-sm-12">
-                                    <div class="input-group date" id="edit_DueDate" data-target-input="nearest">
-                                        <input class="form-control form-control-lg form-control-solid" id="edit_DueDate_tb" data-target="#edit_DueDate" placeholder="Teslim Tarihi Seçiniz" />
-                                        <div class="input-group-append" data-target="#edit_DueDate" data-toggle="datetimepicker">
-                                            <span class="input-group-text">
-                                                <i class="ki ki-calendar"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group mb-1">
-                                <label for="edit_Description">Faz Açıklaması</label>
-                                <textarea class="form-control" id="edit_Description" rows="3"></textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                        <button type="button" id="edit_project_line_save_bt" class="btn btn-success font-weight-bold">Güncelle</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Dosya Yükle Modal -->
-        <div class="modal fade" id="add-project-file-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Dosya Yükle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form" id="addProjectFileForm" enctype="multipart/form-data">
-                            <input type="hidden" id="file_ProjectId" name="ProjectId" value="@Model.project.Id" />
-                            <div class="form-group">
-                                <label for="file_Name">Dosya Adı</label>
-                                <input type="text" id="file_Name" name="Name" class="form-control" required />
-                            </div>
-                            <div class="form-group">
-                                <label for="file_Description">Açıklama</label>
-                                <textarea id="file_Description" name="Description" class="form-control" rows="3"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="file_File">Dosya</label>
-                                <input type="file" id="file_File" name="File" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.jpg,.jpeg,.png" />
-                                <small class="text-muted">PDF, Word, Excel, Resim veya Arşiv dosyaları</small>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                        <button type="button" id="add_project_file_save_bt" class="btn btn-success font-weight-bold">Yükle</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Not Ekle Modal -->
-        <div class="modal fade" id="add-project-line-note-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Not Ekle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form" id="addProjectLineNoteForm">
-                            <input type="hidden" id="note_ProjectLineId" name="ProjectLineId" />
-                            <div class="form-group">
-                                <label for="note_Title">Başlık</label>
-                                <input type="text" id="note_Title" name="Title" class="form-control" />
-                            </div>
-                            <div class="form-group">
-                                <label for="note_ReportNote">Rapor Notu</label>
-                                <textarea id="note_ReportNote" name="ReportNote" class="form-control" rows="3"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="note_Note">Not</label>
-                                <textarea id="note_Note" name="Note" class="form-control" rows="4"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="note_Date">Tarih</label>
-                                <div class="input-group date" id="note_Date_container" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" id="note_Date" name="Date" data-target="#note_Date_container" placeholder="Tarih Seçiniz" />
-                                    <div class="input-group-append" data-target="#note_Date_container" data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="ki ki-calendar"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                        <button type="button" id="add_project_line_note_save_bt" class="btn btn-success font-weight-bold">Ekle</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Not Düzenle Modal -->
-        <div class="modal fade" id="edit-project-line-note-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Not Düzenle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form" id="editProjectLineNoteForm">
-                            <input type="hidden" id="edit_note_Id" name="Id" />
-                            <input type="hidden" id="edit_note_ProjectLineId" name="ProjectLineId" />
-                            <div class="form-group">
-                                <label for="edit_note_Title">Başlık</label>
-                                <input type="text" id="edit_note_Title" name="Title" class="form-control" />
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_note_ReportNote">Rapor Notu</label>
-                                <textarea id="edit_note_ReportNote" name="ReportNote" class="form-control" rows="3"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_note_Note">Not</label>
-                                <textarea id="edit_note_Note" name="Note" class="form-control" rows="4"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_note_Date">Tarih</label>
-                                <div class="input-group date" id="edit_note_Date_container" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" id="edit_note_Date" name="Date" data-target="#edit_note_Date_container" placeholder="Tarih Seçiniz" />
-                                    <div class="input-group-append" data-target="#edit_note_Date_container" data-toggle="datetimepicker">
-                                        <span class="input-group-text"><i class="ki ki-calendar"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                        <button type="button" id="edit_project_line_note_save_bt" class="btn btn-success font-weight-bold">Güncelle</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notlar Listesi Modal -->
-        <div class="modal fade" id="project-line-notes-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Faz Notları</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="notes_line_id" />
-                        <div class="mb-3">
-                            <button type="button" id="open-add-note-from-list" class="btn btn-sm btn-primary">Yeni Not Ekle</button>
-                        </div>
-                        <div id="notes-list-container">
-                            <div class="text-center py-5">
-                                <span class="text-muted">Yükleniyor...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- İş Ekle Modal -->
-        <div class="modal fade" id="add-project-line-work-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">İş Ekle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form" id="addProjectLineWorkForm">
-                            <input type="hidden" id="work_LineId" name="LineId" />
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">İş Adı</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <input type="text" id="work_Name" name="Name" class="form-control" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Açıklama</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <textarea id="work_Description" name="Description" class="form-control" rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Rapor Açıklaması</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <textarea id="work_ReportDescription" name="ReportDescription" class="form-control" rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Firma Yetkilisi</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <firm-contact-select id="work_LineFirmOfficialId" name="LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Öncelik</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <priority-enum-select selected-value="@PriorityEnum.Normal" id="work_Priority" name="Priority"></priority-enum-select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Sıra Numarası</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <input type="number" id="work_RowOrder" name="RowOrder" class="form-control" value="0" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Süre Düşsün mü?</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <div class="checkbox-list">
-                                        <label class="checkbox">
-                                            <input type="checkbox" id="work_LetTimeDeduct" name="LetTimeDeduct" value="true" />
-                                            <span></span>
-                                            Evet, servis süresinden düşsün
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                        <button type="button" id="add_project_line_work_save_bt" class="btn btn-success font-weight-bold">Ekle</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- İş Düzenle Modal -->
-        <div class="modal fade" id="edit-project-line-work-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">İş Düzenle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form class="form" id="editProjectLineWorkForm">
-                            <input type="hidden" id="edit_work_Id" name="Id" />
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">İş Adı</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <input type="text" id="edit_work_Name" name="Name" class="form-control" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Açıklama</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <textarea id="edit_work_Description" name="Description" class="form-control" rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Firma Yetkilisi</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <firm-contact-select id="edit_work_LineFirmOfficialId" name="LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Öncelik</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <priority-enum-select selected-value="@PriorityEnum.Normal" id="edit_work_Priority" name="Priority"></priority-enum-select>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Sıra Numarası</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <input type="number" id="edit_work_RowOrder" name="RowOrder" class="form-control" />
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-form-label text-right col-lg-3 col-sm-12">Süre Düşsün mü?</label>
-                                <div class="col-lg-9 col-sm-12">
-                                    <div class="checkbox-list">
-                                        <label class="checkbox">
-                                            <input type="checkbox" id="edit_work_LetTimeDeduct" name="LetTimeDeduct" value="true" />
-                                            <span></span>
-                                            Evet, servis süresinden düşsün
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
-                        <button type="button" id="edit_project_line_work_save_bt" class="btn btn-success font-weight-bold">Güncelle</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- İşler Listesi Modal -->
-        <div class="modal fade" id="project-line-works-modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Faz İşleri</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i aria-hidden="true" class="ki ki-close"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="works_line_id" />
-                        <div class="mb-3">
-                            <button type="button" id="open-add-work-from-list" class="btn btn-sm btn-primary">Yeni İş Ekle</button>
-                        </div>
-                        <div id="works-list-container">
-                            <div class="text-center py-5">
-                                <span class="text-muted">Yükleniyor...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    @* <div class="row">
-    @await Html.PartialAsync("_SupportListPartial", (Model.supports, Model.crmUsers, Model.userDepartments))
-    @await Html.PartialAsync("_SupportModalsPartial")
-    </div> *@
-
 </div>
 
+<!-- File Upload Modal -->
+<div class="modal fade" id="add-project-file-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dosya Yükle</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="addProjectFileForm" enctype="multipart/form-data">
+                    <input type="hidden" id="file_ProjectId" name="ProjectId" value="@Model.project.Id" />
+                    <div class="form-group">
+                        <label>Dosya Adı</label>
+                        <input type="text" id="file_Name" name="Name" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Açıklama</label>
+                        <textarea id="file_Description" name="Description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Dosya</label>
+                        <input type="file" id="file_File" name="File" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.jpg,.jpeg,.png" />
+                        <small class="text-muted">PDF, Word, Excel, Resim veya Arşiv</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary" data-dismiss="modal">İptal</button>
+                <button type="button" id="add_project_file_save_bt" class="btn btn-success">Yükle</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Note Add Modal -->
+<div class="modal fade" id="add-project-line-note-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Not Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="addProjectLineNoteForm">
+                    <input type="hidden" id="note_ProjectLineId" />
+                    <div class="form-group"><label>Başlık</label><input type="text" id="note_Title" class="form-control" /></div>
+                    <div class="form-group"><label>Rapor Notu</label><textarea id="note_ReportNote" class="form-control" rows="2"></textarea></div>
+                    <div class="form-group"><label>Not</label><textarea id="note_Note" class="form-control" rows="4"></textarea></div>
+                    <div class="form-group">
+                        <label>Tarih</label>
+                        <div class="input-group date" id="note_Date_container">
+                            <input type="text" id="note_Date" class="form-control datetimepicker-input" placeholder="Tarih" />
+                            <div class="input-group-append" data-target="#note_Date_container" data-toggle="datetimepicker">
+                                <span class="input-group-text"><i class="ki ki-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary" data-dismiss="modal">İptal</button>
+                <button type="button" id="add_project_line_note_save_bt" class="btn btn-success">Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Note Edit Modal -->
+<div class="modal fade" id="edit-project-line-note-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Not Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="editProjectLineNoteForm">
+                    <input type="hidden" id="edit_note_Id" />
+                    <input type="hidden" id="edit_note_ProjectLineId" />
+                    <div class="form-group"><label>Başlık</label><input type="text" id="edit_note_Title" class="form-control" /></div>
+                    <div class="form-group"><label>Rapor Notu</label><textarea id="edit_note_ReportNote" class="form-control" rows="2"></textarea></div>
+                    <div class="form-group"><label>Not</label><textarea id="edit_note_Note" class="form-control" rows="4"></textarea></div>
+                    <div class="form-group">
+                        <label>Tarih</label>
+                        <div class="input-group date" id="edit_note_Date_container">
+                            <input type="text" id="edit_note_Date" class="form-control datetimepicker-input" placeholder="Tarih" />
+                            <div class="input-group-append" data-target="#edit_note_Date_container" data-toggle="datetimepicker">
+                                <span class="input-group-text"><i class="ki ki-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary" data-dismiss="modal">İptal</button>
+                <button type="button" id="edit_project_line_note_save_bt" class="btn btn-success">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notes List Modal -->
+<div class="modal fade" id="project-line-notes-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Faz Notları</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="notes_line_id" />
+                <button type="button" id="open-add-note-from-list" class="btn btn-sm btn-primary mb-3">Yeni Not Ekle</button>
+                <div id="notes-list-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Work Add Modal -->
+<div class="modal fade" id="add-project-line-work-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">İş Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="addProjectLineWorkForm">
+                    <input type="hidden" id="work_LineId" />
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">İş Adı</label>
+                        <div class="col-lg-9"><input type="text" id="work_Name" class="form-control" /></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Açıklama</label>
+                        <div class="col-lg-9"><textarea id="work_Description" class="form-control" rows="2"></textarea></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Rapor Açıklaması</label>
+                        <div class="col-lg-9"><textarea id="work_ReportDescription" class="form-control" rows="2"></textarea></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Firma Yetkilisi</label>
+                        <div class="col-lg-9"><firm-contact-select id="work_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Öncelik</label>
+                        <div class="col-lg-9"><priority-enum-select id="work_Priority"></priority-enum-select></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Sıra No</label>
+                        <div class="col-lg-9"><input type="number" id="work_RowOrder" class="form-control" value="0" /></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Süre Düşsün mü?</label>
+                        <div class="col-lg-9">
+                            <label class="checkbox"><input type="checkbox" id="work_LetTimeDeduct" value="true" /><span></span> Evet</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary" data-dismiss="modal">İptal</button>
+                <button type="button" id="add_project_line_work_save_bt" class="btn btn-success">Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Work Edit Modal -->
+<div class="modal fade" id="edit-project-line-work-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">İş Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="editProjectLineWorkForm">
+                    <input type="hidden" id="edit_work_Id" />
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">İş Adı</label>
+                        <div class="col-lg-9"><input type="text" id="edit_work_Name" class="form-control" /></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Açıklama</label>
+                        <div class="col-lg-9"><textarea id="edit_work_Description" class="form-control" rows="2"></textarea></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Firma Yetkilisi</label>
+                        <div class="col-lg-9"><firm-contact-select id="edit_work_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Öncelik</label>
+                        <div class="col-lg-9"><priority-enum-select id="edit_work_Priority"></priority-enum-select></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Sıra No</label>
+                        <div class="col-lg-9"><input type="number" id="edit_work_RowOrder" class="form-control" /></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Süre Düşsün mü?</label>
+                        <div class="col-lg-9">
+                            <label class="checkbox"><input type="checkbox" id="edit_work_LetTimeDeduct" value="true" /><span></span> Evet</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light-primary" data-dismiss="modal">İptal</button>
+                <button type="button" id="edit_project_line_work_save_bt" class="btn btn-success">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Works List Modal -->
+<div class="modal fade" id="project-line-works-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Faz İşleri</h5>
+                <button type="button" class="close" data-dismiss="modal"><i class="ki ki-close"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="works_line_id" />
+                <button type="button" id="open-add-work-from-list" class="btn btn-sm btn-primary mb-3">Yeni İş Ekle</button>
+                <div id="works-list-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {

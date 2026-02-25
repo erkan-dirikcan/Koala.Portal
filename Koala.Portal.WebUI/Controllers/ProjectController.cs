@@ -34,10 +34,10 @@ namespace Koala.Portal.WebUI.Controllers
         ITransactionService transactionService)
         : Controller
     {
-       
+        // ===== Dashboard =====
         [HttpGet]
         [Authorize(Policy = "Project.View")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Dashboard()
         {
             var res = await service.GetProjectListAsync();
             if (!res.IsSuccess)
@@ -45,7 +45,113 @@ namespace Koala.Portal.WebUI.Controllers
                 TempData["Error"] = res;
                 return View("Error");
             }
-            return View(res.Data);
+
+            var projects = res.Data;
+
+            // Calculate statistics
+            var dashboardData = new
+            {
+                TotalProjects = projects.Count,
+                ActiveProjects = projects.Count(p => p.ProjectStatus == ProjectStatusEnum.Started || p.ProjectStatus == ProjectStatusEnum.Testing),
+                CompletedProjects = projects.Count(p => p.ProjectStatus == ProjectStatusEnum.Finished),
+                CanceledProjects = projects.Count(p => p.ProjectStatus == ProjectStatusEnum.Canceled || p.ProjectStatus == ProjectStatusEnum.Failed),
+                ProjectsByStatus = projects.GroupBy(p => p.ProjectStatus)
+                    .Select(g => new { Status = g.Key.ToString(), Count = g.Count() })
+                    .ToList(),
+                ProjectsByManager = projects.Where(p => !string.IsNullOrEmpty(p.ProjectManager))
+                    .GroupBy(p => p.ProjectManager)
+                    .Select(g => new { Manager = g.Key, Count = g.Count() })
+                    .OrderByDescending(g => g.Count)
+                    .Take(10)
+                    .ToList(),
+                UpcomingDeadlines = projects
+                    .Where(p => !string.IsNullOrEmpty(p.DueDate) && DateTime.TryParse(p.DueDate, out var due) && due > DateTime.Now)
+                    .OrderBy(p => DateTime.Parse(p.DueDate))
+                    .Take(5)
+                    .ToList(),
+                RecentProjects = projects
+                    .OrderByDescending(p => p.StartDate)
+                    .Take(5)
+                    .ToList()
+            };
+
+            return View(dashboardData);
+        }
+
+        // ===== Index with Filters =====
+        [HttpGet]
+        [Authorize(Policy = "Project.View")]
+        public async Task<IActionResult> Index(string? statusFilter, string? managerFilter, string? firmFilter, string? startDate, string? endDate, string? searchTerm)
+        {
+            // Store filter values for form persistence
+            TempData["StatusFilter"] = statusFilter ?? "";
+            TempData["ManagerFilter"] = managerFilter ?? "";
+            TempData["FirmFilter"] = firmFilter ?? "";
+            TempData["StartDate"] = startDate ?? "";
+            TempData["EndDate"] = endDate ?? "";
+            TempData["SearchTerm"] = searchTerm ?? "";
+
+            // Load select lists
+            var users = await selectListService.GetUserSelectList("");
+            TempData["Users"] = users.Data;
+            var firms = await selectListService.GetFirmSelectList();
+            TempData["Firms"] = firms.Data;
+
+            var res = await service.GetProjectListAsync();
+            if (!res.IsSuccess)
+            {
+                TempData["Error"] = res;
+                return View("Error");
+            }
+
+            var projects = res.Data;
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                if (Enum.TryParse<ProjectStatusEnum>(statusFilter, true, out var statusEnum))
+                {
+                    projects = projects.Where(p => p.ProjectStatus == statusEnum).ToList();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(managerFilter))
+            {
+                projects = projects.Where(p => p.ProjectManagerId == managerFilter).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(firmFilter))
+            {
+                projects = projects.Where(p => p.FirmId == firmFilter).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                projects = projects.Where(p =>
+                    (p.ProjectName != null && p.ProjectName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (p.ProjectCode != null && p.ProjectCode.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(startDate) && DateTime.TryParse(startDate, out var start))
+            {
+                projects = projects.Where(p =>
+                {
+                    var projectStart = !string.IsNullOrEmpty(p.StartDate) && DateTime.TryParse(p.StartDate, out var ps) ? ps : (DateTime?)null;
+                    return projectStart.HasValue && projectStart >= start;
+                }).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(endDate) && DateTime.TryParse(endDate, out var end))
+            {
+                projects = projects.Where(p =>
+                {
+                    var projectDue = !string.IsNullOrEmpty(p.DueDate) && DateTime.TryParse(p.DueDate, out var pd) ? pd : (DateTime?)null;
+                    return projectDue.HasValue && projectDue <= end;
+                }).ToList();
+            }
+
+            return View(projects);
         }
 
 
@@ -601,6 +707,63 @@ namespace Koala.Portal.WebUI.Controllers
             var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
             var fileName = file.Data.Name;
             return File(fileBytes, "application/octet-stream", fileName);
+        }
+
+        #endregion
+
+        #region Bulk Operations
+
+        [HttpPost]
+        [Authorize(Policy = "Project.Edit")]
+        public async Task<IActionResult> BulkChangeProjectLineStatus(List<string> lineIds, int status)
+        {
+            if (lineIds == null || !lineIds.Any())
+            {
+                return Json(new { isSuccess = false, message = "Seçili faz bulunamadı!" });
+            }
+
+            if (status < 1 || status > 6)
+            {
+                return Json(new { isSuccess = false, message = "Geçersiz durum değeri!" });
+            }
+
+            var statusEnum = (ProjectLineStatusEnum)status;
+            var successCount = 0;
+            var errorCount = 0;
+            var errors = new List<string>();
+
+            foreach (var lineId in lineIds)
+            {
+                var model = new ProjectLineChangeStateStatusViewModel
+                {
+                    Id = lineId,
+                    Status = statusEnum
+                };
+
+                var res = await lineService.ChangeStateStatusAsync(model);
+                if (res.IsSuccess)
+                {
+                    successCount++;
+                }
+                else
+                {
+                    errorCount++;
+                    errors.Add($"Line {lineId}: {res.Message}");
+                }
+            }
+
+            if (successCount == lineIds.Count)
+            {
+                return Json(new { isSuccess = true, message = $"{successCount} faz durumu başarıyla değiştirildi!" });
+            }
+            else if (successCount > 0)
+            {
+                return Json(new { isSuccess = true, message = $"{successCount} faz güncellendi, {errorCount} faz hatalı." });
+            }
+            else
+            {
+                return Json(new { isSuccess = false, message = "Durum değiştirilemedi: " + string.Join("; ", errors) });
+            }
         }
 
         #endregion

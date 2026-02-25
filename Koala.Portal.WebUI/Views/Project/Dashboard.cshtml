@@ -1,0 +1,237 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Koala.Portal.Core.Models
+@model dynamic
+@{
+    ViewData["Title"] = "Proje Dashboard";
+    ViewData["ActivePage"] = "ProjectDashboard";
+}
+
+<div class="d-flex flex-column-fluid">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card card-custom">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h2 class="font-weight-bolder text-dark">Proje Yönetimi Dashboard</h2>
+                                <span class="text-muted">Tüm projelerinizin istatistikleri ve özeti</span>
+                            </div>
+                            <a href="/Project" class="btn btn-primary">
+                                <i class="flaticon2-list-1"></i> Proje Listesi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="card card-stretch card-bordered">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-50 symbol-light-primary mr-3">
+                                <span class="symbol-label">
+                                    <i class="flaticon-app icon-2x text-primary"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-muted font-weight-bold d-block">Toplam Proje</span>
+                                <span class="font-weight-bolder font-size-h4">@Model.TotalProjects</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card card-stretch card-bordered">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-50 symbol-light-success mr-3">
+                                <span class="symbol-label">
+                                    <i class="flaticon2-refresh icon-2x text-success"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-muted font-weight-bold d-block">Aktif Projeler</span>
+                                <span class="font-weight-bolder font-size-h4">@Model.ActiveProjects</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card card-stretch card-bordered">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-50 symbol-light-info mr-3">
+                                <span class="symbol-label">
+                                    <i class="flaticon2-check-mark icon-2x text-info"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-muted font-weight-bold d-block">Tamamlanan</span>
+                                <span class="font-weight-bolder font-size-h4">@Model.CompletedProjects</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card card-stretch card-bordered">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="symbol symbol-50 symbol-light-danger mr-3">
+                                <span class="symbol-label">
+                                    <i class="flaticon2-cancel icon-2x text-danger"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-muted font-weight-bold d-block">İptal/ Başarısız</span>
+                                <span class="font-weight-bolder font-size-h4">@Model.CanceledProjects</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="card card-custom card-stretch gutter-b">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title font-weight-bolder">Projeler - Durum Dağılımı</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="statusChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card card-custom card-stretch gutter-b">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title font-weight-bolder">Projeler - Yönetici Dağılımı (Top 10)</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="managerChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Deadlines & Recent Projects -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card card-custom card-stretch gutter-b">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title font-weight-bolder">
+                            <i class="flaticon-calendar-with-a-clock-time text-danger"></i>
+                            Yaklaşan Terminler
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.UpcomingDeadlines != null && ((System.Collections.IEnumerable)Model.UpcomingDeadlines).Cast<object>().Any())
+                        {
+                            <div class="timeline timeline-5">
+                                @foreach (var project in Model.UpcomingDeadlines)
+                                {
+                                    <div class="timeline-item align-items-start">
+                                        <div class="timeline-label">
+                                            @{
+                                                var dueDate = System.DateTime.Parse(project.DueDate);
+                                                var daysLeft = (dueDate - System.DateTime.Now).Days;
+                                            }
+                                            @if (daysLeft <= 3)
+                                            {
+                                                <span class="label label-light-danger label-inline font-weight-bold">@daysLeft gün</span>
+                                            }
+                                            else if (daysLeft <= 7)
+                                            {
+                                                <span class="label label-light-warning label-inline font-weight-bold">@daysLeft gün</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="label label-light-info label-inline font-weight-bold">@daysLeft gün</span>
+                                            }
+                                        </div>
+                                        <div class="timeline-badge">
+                                            <i class="flaticon-interface text-@@(daysLeft <= 3 ? "danger" : daysLeft <= 7 ? "warning" : "primary") icon-md"></i>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <a href="/Project/Detail/@project.Id" class="font-weight-bolder text-dark-75 text-hover-primary">@project.ProjectName</a>
+                                            <span class="text-muted d-block">@project.DueDate</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <span class="text-muted">Yaklaşan termin bulunmamaktadır.</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card card-custom card-stretch gutter-b">
+                    <div class="card-header border-0 pt-5">
+                        <h3 class="card-title font-weight-bolder">
+                            <i class="flaticon2-add-square text-success"></i>
+                            Son Eklenen Projeler
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.RecentProjects != null && ((System.Collections.IEnumerable)Model.RecentProjects).Cast<object>().Any())
+                        {
+                            <table class="table table-borderless table-sm">
+                                @foreach (var project in Model.RecentProjects)
+                                {
+                                    var statusBadge = project.ProjectStatus switch
+                                    {
+                                        ProjectStatusEnum.Started => "<span class='badge badge-info'>Başladı</span>",
+                                        ProjectStatusEnum.Testing => "<span class='badge badge-warning'>Test</span>",
+                                        ProjectStatusEnum.Finished => "<span class='badge badge-success'>Bitti</span>",
+                                        ProjectStatusEnum.Created => "<span class='badge badge-primary'>Oluşturuldu</span>",
+                                        _ => "<span class='badge badge-secondary'>Diğer</span>"
+                                    };
+                                    <tr>
+                                        <td class="pl-0">
+                                            <a href="/Project/Detail/@project.Id" class="text-dark-75 font-weight-bolder text-hover-primary">@project.ProjectName</a>
+                                        </td>
+                                        <td>@Html.Raw(statusBadge)</td>
+                                        <td class="text-right">@project.StartDate</td>
+                                    </tr>
+                                }
+                            </table>
+                        }
+                        else
+                            {
+                            <div class="text-center py-5">
+                                <span class="text-muted">Henüz proje bulunmamaktadır.</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        // Pass data to JavaScript
+        window.projectDashboardData = {
+            projectsByStatus: @Html.Raw(Json.Serialize(Model.ProjectsByStatus)),
+            projectsByManager: @Html.Raw(Json.Serialize(Model.ProjectsByManager))
+        };
+    </script>
+    <script src="~/js/Custom/ProjectDashboard.js"></script>
+}

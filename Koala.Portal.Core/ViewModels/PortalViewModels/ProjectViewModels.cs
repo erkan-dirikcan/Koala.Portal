@@ -196,4 +196,17 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         public DateTime UpdateTime { get; set; }
         public ProjectStatusEnum ProjectStatus { get; set; }
     }
+
+    /// <summary>
+    /// Project List Filters ViewModel - for filtering projects in Index page
+    /// </summary>
+    public class ProjectListFiltersViewModel
+    {
+        public string? StatusFilter { get; set; }
+        public string? ManagerFilter { get; set; }
+        public string? FirmFilter { get; set; }
+        public string? StartDate { get; set; }
+        public string? EndDate { get; set; }
+        public string? SearchTerm { get; set; }
+    }
 }

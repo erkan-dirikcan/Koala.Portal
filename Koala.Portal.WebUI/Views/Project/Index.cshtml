@@ -1,10 +1,22 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Koala.Portal.Core.Dtos
 @model List<Koala.Portal.Core.ViewModels.PortalViewModels.ProjectListViewModel>
 @{
     ViewData["Title"] = "Proje Listesi";
     var infoMessage = TempData["InfoMessage"] == null ? "" : TempData["InfoMessage"].ToString();
     var errorMessage = TempData["ErrorMessage"] == null ? "" : TempData["ErrorMessage"].ToString();
     ViewData["ActivePage"] = "Projects";
+
+    // Get filter values from TempData or use defaults
+    var statusFilter = TempData["StatusFilter"]?.ToString() ?? "";
+    var managerFilter = TempData["ManagerFilter"]?.ToString() ?? "";
+    var firmFilter = TempData["FirmFilter"]?.ToString() ?? "";
+    var startDate = TempData["StartDate"]?.ToString() ?? "";
+    var endDate = TempData["EndDate"]?.ToString() ?? "";
+    var searchTerm = TempData["SearchTerm"]?.ToString() ?? "";
+
+    var users = (List<SelectListItem>)TempData["Users"]!;
+    var firms = (List<SelectListItem>)TempData["Firms"]!;
 }
 
 <div class="d-flex flex-column-fluid">
@@ -41,6 +53,82 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- Filter Panel -->
+                        <div class="accordion accordion-solid accordion-toggle-arrow" id="filterAccordion">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title collapsed" data-toggle="collapse" data-target="#filterContent">
+                                        <i class="flaticon2-filter"></i>
+                                        Filtreler
+                                    </div>
+                                </div>
+                                <div id="filterContent" class="collapse show" data-parent="#filterAccordion">
+                                    <div class="card-body">
+                                        <form asp-action="Index" asp-controller="Project" method="get" id="filterForm">
+                                            <div class="row">
+                                                <div class="col-md-3 mb-2">
+                                                    <label class="form-label">Durum</label>
+                                                    <select name="statusFilter" class="form-control">
+                                                        <option value="">Tümü</option>
+                                                        <option value="Creating" @(statusFilter == "Creating" ? "selected" : "")>Oluşturuluyor</option>
+                                                        <option value="Created" @(statusFilter == "Created" ? "selected" : "")>Oluşturuldu</option>
+                                                        <option value="Started" @(statusFilter == "Started" ? "selected" : "")>Başladı</option>
+                                                        <option value="Testing" @(statusFilter == "Testing" ? "selected" : "")>Test Aşamasında</option>
+                                                        <option value="Finished" @(statusFilter == "Finished" ? "selected" : "")>Tamamlandı</option>
+                                                        <option value="Canceled" @(statusFilter == "Canceled" ? "selected" : "")>İptal Edildi</option>
+                                                        <option value="Failed" @(statusFilter == "Failed" ? "selected" : "")>Başarısız</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <label class="form-label">Proje Yöneticisi</label>
+                                                    <select name="managerFilter" class="form-control">
+                                                        <option value="">Tümü</option>
+                                                        @foreach (var user in users)
+                                                        {
+                                                            <option value="@user.Value" @(managerFilter == user.Value ? "selected" : "")>@user.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <label class="form-label">Firma</label>
+                                                    <select name="firmFilter" class="form-control">
+                                                        <option value="">Tümü</option>
+                                                        @foreach (var firm in firms)
+                                                        {
+                                                            <option value="@firm.Value" @(firmFilter == firm.Value ? "selected" : "")>@firm.Text</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <label class="form-label">Arama</label>
+                                                    <input type="text" name="searchTerm" class="form-control" placeholder="Proje Adı veya Kodu" value="@searchTerm" />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3 mb-2">
+                                                    <label class="form-label">Başlangıç Tarihi</label>
+                                                    <input type="date" name="startDate" class="form-control" value="@startDate" />
+                                                </div>
+                                                <div class="col-md-3 mb-2">
+                                                    <label class="form-label">Bitiş Tarihi</label>
+                                                    <input type="date" name="endDate" class="form-control" value="@endDate" />
+                                                </div>
+                                                <div class="col-md-6 mb-2 d-flex align-items-end">
+                                                    <button type="submit" class="btn btn-primary mr-2">
+                                                        <i class="flaticon2-search"></i> Filtrele
+                                                    </button>
+                                                    <a href="/Project" class="btn btn-secondary">
+                                                        <i class="flaticon2-refresh"></i> Sıfırla
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Filter Panel -->
+
                         @if (!string.IsNullOrEmpty(infoMessage))
                         {
 

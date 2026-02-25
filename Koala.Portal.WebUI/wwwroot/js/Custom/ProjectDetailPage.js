@@ -284,6 +284,92 @@ var ProjectLineTable = function () {
             });
         });
 
+        // ===== Phase 2: Tab and Bulk Operations =====
+
+        // Tab switching - load content when tab is shown
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href");
+            if (target === "#tab-works") {
+                loadAllWorks();
+            } else if (target === "#tab-notes") {
+                loadAllNotes();
+            }
+        });
+
+        // File upload modal trigger from Files tab
+        $(document).on("click", "#open-add-project-file-modal-tab", function (e) {
+            e.preventDefault();
+            $("#add-project-file-modal").modal('show');
+        });
+
+        // Select all checkbox
+        $(document).on("change", "#selectAllLines", function () {
+            $(".line-checkbox").prop('checked', $(this).prop('checked'));
+        });
+
+        // Deselect select all if any individual checkbox is unchecked
+        $(document).on("change", ".line-checkbox", function () {
+            if ($(this).prop('checked') === false) {
+                $("#selectAllLines").prop('checked', false);
+            }
+            // Check if all are checked
+            var allChecked = $(".line-checkbox").length === $(".line-checkbox:checked").length;
+            $("#selectAllLines").prop('checked', allChecked);
+        });
+
+        // Bulk status change
+        $(document).on("click", "#bulkApplyStatus", function (e) {
+            e.preventDefault();
+            var selectedIds = $(".line-checkbox:checked").map(function () {
+                return $(this).data("id");
+            }).get();
+
+            if (selectedIds.length === 0) {
+                toastr.warning("Lütfen en az bir faz seçin!", "Uyarı");
+                return;
+            }
+
+            var status = $("#bulkStatusSelect").val();
+            if (!status) {
+                toastr.warning("Lütfen bir durum seçin!", "Uyarı");
+                return;
+            }
+
+            var statusText = $("#bulkStatusSelect option:selected").text();
+            if (!confirm("Seçili " + selectedIds.length + " fazın durumunu '" + statusText + "' olarak değiştirmek istediğinize emin misiniz?")) {
+                return;
+            }
+
+            bulkChangeProjectLineStatus(selectedIds, parseInt(status));
+        });
+
+        $('#edit-project-line-modal').on('shown.bs.modal', function () {
+            $('#edit_LineOfficialId').select2({
+                placeholder: 'Faz Yöneticisi Seçiniz',
+                language: "tr",
+                dropdownParent: $('#edit-project-line-modal'),
+                width: '100%'
+            });
+            $('#edit_LineFirmOfficialId').select2({
+                placeholder: 'Firma Yetkilisi Seçiniz',
+                language: "tr",
+                dropdownParent: $('#edit-project-line-modal'),
+                width: '100%'
+            });
+            $('#edit_Priority').select2({
+                placeholder: 'Önceliği Seçiniz',
+                language: "tr",
+                dropdownParent: $('#edit-project-line-modal'),
+                width: '100%'
+            });
+            $('#edit_DueDate').datetimepicker({
+                locale: 'tr',
+                format: 'DD-MM-YYYY',
+                showMeridian: false,
+                autoclose: true
+            });
+        });
+
         var table = $('#ProjectLineTable');
 
         // begin first table
@@ -952,6 +1038,148 @@ var ProjectLineTable = function () {
                 toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
             }
         });
+    };
+
+    // ===== Phase 2: Additional Functions =====
+
+    // Bulk status change function
+    var bulkChangeProjectLineStatus = function (lineIds, status) {
+        $.ajax({
+            url: "/Project/BulkChangeProjectLineStatus",
+            type: "POST",
+            data: { lineIds: lineIds, status: status },
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success(response.message || "Faz durumu başarıyla değiştirildi!", "Başarılı");
+                    setTimeout(function () { location.reload(); }, 1000);
+                } else {
+                    toastr.error(response.message || "Faz durumu değiştirilirken bir hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            }
+        });
+    };
+
+    // Load all works from all lines
+    var loadAllWorks = function () {
+        $("#all-works-container").html('<div class="text-center py-5"><span class="text-muted">Yükleniyor...</span></div>');
+
+        // Get all line IDs from the table
+        var lineIds = [];
+        $("#ProjectLineTable tbody tr").each(function () {
+            var lineId = $(this).data("id");
+            if (lineId) {
+                lineIds.push(lineId);
+            }
+        });
+
+        if (lineIds.length === 0) {
+            $("#all-works-container").html('<div class="text-center py-5"><span class="text-muted">Faz bulunmamaktadır.</span></div>');
+            return;
+        }
+
+        // Load works for each line (simplified - in real implementation, you'd have a consolidated API)
+        var html = '<div class="accordion accordion-solid accordion-toggle-arrow" id="works-accordion">';
+        var count = 0;
+
+        $("#ProjectLineTable tbody tr").each(function () {
+            var lineId = $(this).data("id");
+            var lineTitle = $(this).find("td").eq(1).text();
+            var lineStatus = $(this).find("td").eq(2).html();
+
+            html += '<div class="card">' +
+                '<div class="card-header">' +
+                '<div class="card-title collapsed" data-toggle="collapse" data-target="#works-' + lineId + '">' +
+                '<i class="flaticon-list-1"></i> ' + lineTitle + ' <span class="ml-2">' + lineStatus + '</span>' +
+                '</div>' +
+                '</div>' +
+                '<div id="works-' + lineId + '" class="collapse" data-parent="#works-accordion">' +
+                '<div class="card-body">' +
+                '<div class="text-center py-3"><button type="button" class="btn btn-sm btn-primary btn-load-works" data-id="' + lineId + '">İşleri Yükle</button></div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+            count++;
+        });
+
+        html += '</div>';
+        $("#all-works-container").html(html);
+    };
+
+    // Load works for a specific line in the all-works tab
+    $(document).on("click", ".btn-load-works", function () {
+        var lineId = $(this).data("id");
+        var $container = $(this).closest(".card-body");
+
+        $container.html('<div class="text-center py-3"><span class="spinner-border"></span></div>');
+
+        $.get("/Project/GetProjectLineWorkList", { projectLineId: lineId }).done(function (response) {
+            if (response.isSuccess && response.data && response.data.length > 0) {
+                var html = '<table class="table table-bordered table-sm"><thead><tr><th>İş Adı</th><th>Durum</th><th>Öncelik</th><th>Sıra</th><th>İşlemler</th></tr></thead><tbody>';
+                $.each(response.data, function (i, work) {
+                    var workStatusBadge = work.stateStatus === 6 ? '<span class="badge badge-success">Tamamlandı</span>' :
+                                           work.stateStatus === 2 ? '<span class="badge badge-info">Devam Ediyor</span>' :
+                                           '<span class="badge badge-secondary">Başlamadı</span>';
+
+                    html += '<tr><td>' + work.name + '</td><td>' + workStatusBadge + '</td><td>' + work.priority + '</td><td>' + work.rowOrder + '</td>' +
+                        '<td><button type="button" class="btn btn-icon btn-sm btn-warning btn-edit-work-from-all" data-id="' + work.id + '"><i class="flaticon2-pen"></i></button></td></tr>';
+                });
+                html += '</tbody></table>';
+                $container.html(html);
+            } else {
+                $container.html('<div class="text-center py-3"><span class="text-muted">Bu faz için iş bulunmamaktadır.</span></div>');
+            }
+        }).fail(function () {
+            $container.html('<div class="text-center py-3"><span class="text-danger">İşler yüklenirken hata oluştu!</span></div>');
+        });
+    });
+
+    // Load all notes from all lines
+    var loadAllNotes = function () {
+        $("#all-notes-container").html('<div class="text-center py-5"><span class="text-muted">Yükleniyor...</span></div>');
+
+        var html = '<div class="timeline timeline-5 mt-3">';
+        var count = 0;
+
+        $("#ProjectLineTable tbody tr").each(function () {
+            var lineId = $(this).data("id");
+            var lineTitle = $(this).find("td").eq(1).text();
+
+            // Load notes for this line
+            $.get("/Project/GetProjectLineNotes", { projectLineId: lineId }).done(function (response) {
+                if (response.isSuccess && response.data && response.data.length > 0) {
+                    $.each(response.data, function (i, note) {
+                        html += '<div class="timeline-item align-items-start">' +
+                            '<div class="timeline-label">' + (note.date || '') + '</div>' +
+                            '<div class="timeline-badge"><i class="flaticon2-paper text-success"></i></div>' +
+                            '<div class="timeline-content d-flex justify-content-between">' +
+                            '<div style="flex: 1;">' +
+                            '<span class="font-weight-bold">' + (note.title || 'Not') + '</span>' +
+                            '<br><small class="text-muted">Faz: ' + lineTitle + '</small>' +
+                            '<br><span class="text-muted">' + (note.note || '') + '</span>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>';
+                    });
+                }
+
+                count++;
+                // Check if all lines processed
+                if (count === $("#ProjectLineTable tbody tr").length) {
+                    html += '</div>';
+                    $("#all-notes-container").html(html);
+                }
+            }).fail(function () {
+                $("#all-notes-container").html('<div class="text-center py-5"><span class="text-danger">Notlar yüklenirken hata oluştu!</span></div>');
+            });
+        });
+
+        // If no lines, show empty message
+        if ($("#ProjectLineTable tbody tr").length === 0) {
+            $("#all-notes-container").html('<div class="text-center py-5"><span class="text-muted">Faz bulunmamaktadır.</span></div>');
+        }
     };
 
     return {
