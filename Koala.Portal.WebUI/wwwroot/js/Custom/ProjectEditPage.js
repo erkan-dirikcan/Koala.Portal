@@ -31,13 +31,24 @@ var ProjectEditPage = function () {
 
             $.get("/Firm/GetFirmContactsSelectList?firmId=" + firmId).done(function (result) {
                 if (result.isSuccess && result.data) {
+                    // Clear existing options and add default
                     $contactSelect.empty().append('<option value="">Seçiniz</option>');
+
+                    // Add all options
                     $.each(result.data, function (i, val) {
-                        var isSelected = (val.value === selectedContactId);
-                        var opt = new Option(val.text, val.value, isSelected, isSelected);
+                        var opt = new Option(val.text, val.value, false, false);
                         $contactSelect.append(opt);
                     });
+
+                    // Set the selected value after all options are added
+                    if (selectedContactId) {
+                        $contactSelect.val(selectedContactId);
+                    }
+
+                    // Trigger change to update Select2
                     $contactSelect.trigger('change');
+
+                    console.log("Firm contacts loaded. Selected:", selectedContactId);
                 } else {
                     toastr.error("Firma yetkilileri yüklenirken hata oluştu!", "Hata");
                 }
@@ -49,6 +60,8 @@ var ProjectEditPage = function () {
         // On page load, if firm is already selected, load its contacts
         var initialFirmId = $('#FirmId').val();
         var initialContactId = $('#FirmPersonId').val();
+        console.log("Initial FirmId:", initialFirmId, "Initial ContactId:", initialContactId);
+
         if (initialFirmId) {
             loadFirmContacts(initialFirmId, initialContactId);
         }
@@ -56,6 +69,7 @@ var ProjectEditPage = function () {
         // Firm change handler - load firm contacts
         $('#FirmId').on('change', function () {
             var firmId = $(this).val();
+            // Clear contact selection when firm changes
             loadFirmContacts(firmId, null);
         });
     };
