@@ -95,7 +95,7 @@
                         </a>
                     </li>
                 }
-                @if (AuthorizationService.AuthorizeAsync(User, "Project.View").Result.Succeeded)
+                @if (AuthorizationService.AuthorizeAsync(User, "ProjectManagement.View").Result.Succeeded)
                 {
                     <li class="menu-item  @ManageNavPages.ProjectsNavClass(ViewContext)" aria-haspopup="true">
                         <a href="~/Project" class="menu-link">

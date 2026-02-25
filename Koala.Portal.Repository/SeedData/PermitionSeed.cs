@@ -31,9 +31,7 @@ namespace Koala.Portal.Repository.SeedData
                 await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.View));
                 await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.Create));
                 await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.Update));
-                await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.Edit));
                 await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.Cancel));
-                await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.Complete));
                 await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.Complate));
                 await roleManager.AddClaimAsync(yonetici, new Claim("Permission", Permissions.Project.Delete));
 
@@ -96,9 +94,7 @@ namespace Koala.Portal.Repository.SeedData
                 await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.View));
                 await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.Create));
                 await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.Update));
-                await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.Edit));
                 await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.Cancel));
-                await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.Complete));
                 await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.Complate));
                 await roleManager.AddClaimAsync(logoRole, new Claim("Permission", Permissions.Project.Delete));
 
@@ -150,9 +146,7 @@ namespace Koala.Portal.Repository.SeedData
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.View));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Create));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Update));
-                await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Edit));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Cancel));
-                await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Complete));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Complate));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Delete));
 
@@ -160,9 +154,7 @@ namespace Koala.Portal.Repository.SeedData
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.View));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Create));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Update));
-                await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Edit));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Cancel));
-                await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Complete));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Complate));
                 await roleManager.AddClaimAsync(teknikRole, new Claim("Permission", Permissions.Project.Delete));
 
@@ -212,9 +204,7 @@ namespace Koala.Portal.Repository.SeedData
                 await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.View));
                 await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.Create));
                 await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.Update));
-                await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.Edit));
                 await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.Cancel));
-                await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.Complete));
                 await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.Complate));
                 await roleManager.AddClaimAsync(Yazılım, new Claim("Permission", Permissions.Project.Delete));
 

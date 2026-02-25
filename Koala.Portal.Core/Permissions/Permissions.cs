@@ -39,12 +39,9 @@
             public const string View = "ProjectManagement.View";
             public const string Create = "ProjectManagement.Create";
             public const string Update = "ProjectManagement.Update";
-            public const string Edit = "ProjectManagement.Edit";
             public const string Cancel = "ProjectManagement.Cancel";
-            public const string Complete = "ProjectManagement.Complete";
-            public const string Complate = "ProjectManagement.Complate"; // Keep for backward compatibility
+            public const string Complate = "ProjectManagement.Complate";
             public const string Delete = "ProjectManagement.Delete";
-
         }
         public static class CrmFirm
         {
