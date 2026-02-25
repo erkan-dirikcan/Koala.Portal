@@ -1,0 +1,165 @@
+@model Koala.Portal.Core.ViewModels.PortalViewModels.ProjectCompletionReportViewModel
+@using Koala.Portal.Core.Dtos
+
+<!-- Project Info -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">@Model.ProjectCode - @Model.ProjectName</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Firma:</strong> @Model.Firm
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Proje Yöneticisi:</strong> @Model.ProjectManager
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Durum:</strong> <span class="badge @GetStatusBadgeClass(Model.ProjectStatus)">@Model.StatusDisplay</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Termin:</strong> @Model.DueDate?.ToString("dd.MM.yyyy")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">@Model.TotalLines</h3>
+                <p class="text-muted mb-0">Toplam Faz</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">@Model.CompletedLines</h3>
+                <p class="text-muted mb-0">Tamamlanan</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-warning">@Model.InProgressLines</h3>
+                <p class="text-muted mb-0">Devam Eden</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-info">@Model.CompletionPercentage.ToString("0.0")%</h3>
+                <p class="text-muted mb-0">Tamamlanma Oranı</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Section -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Faz Durumu</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="completionChart"></canvas>
+                <script>
+                    window.completionData = {
+                        completed: @Model.CompletedLines,
+                        inProgress: @Model.InProgressLines,
+                        notStarted: @Model.NotStartedLines
+                    };
+                </script>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">İş Özeti</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td>Toplam İş:</td>
+                        <td class="text-end"><strong>@Model.TotalWorks</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Tamamlanan:</td>
+                        <td class="text-end text-success"><strong>@Model.CompletedWorks</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Devam Eden:</td>
+                        <td class="text-end text-warning"><strong>@Model.InProgressWorks</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Work Summary -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Saat Özeti</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td>Taahüt Edilen Saat:</td>
+                        <td class="text-end"><strong>@Model.ServiceHour</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Tahmini Harcanan Saat:</td>
+                        <td class="text-end"><strong>@Model.EstimatedHour</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Tarih Bilgileri</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td>Başlangıç Tarihi:</td>
+                        <td class="text-end"><strong>@Model.StartDate?.ToString("dd.MM.yyyy")</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Termin Tarihi:</td>
+                        <td class="text-end"><strong>@Model.DueDate?.ToString("dd.MM.yyyy")</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(ProjectStatusEnum status)
+    {
+        return status switch
+        {
+            ProjectStatusEnum.Created => "bg-secondary",
+            ProjectStatusEnum.Started => "bg-primary",
+            ProjectStatusEnum.Testing => "bg-warning text-dark",
+            ProjectStatusEnum.Finished => "bg-success",
+            ProjectStatusEnum.Canceled => "bg-danger",
+            ProjectStatusEnum.Failed => "bg-dark",
+            _ => "bg-secondary"
+        };
+    }
+}

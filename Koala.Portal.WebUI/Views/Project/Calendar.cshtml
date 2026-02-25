@@ -1,0 +1,133 @@
+@model List<Koala.Portal.Core.ViewModels.PortalViewModels.CalendarEventViewModel>
+
+@{
+    ViewData["Title"] = "Proje Takvimi";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt"></i> Proje Takvimi
+                    </h4>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary" onclick="changeView('dayGridMonth')">
+                            <i class="fas fa-calendar"></i> Ay
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changeView('timeGridWeek')">
+                            <i class="fas fa-calendar-week"></i> Hafta
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="changeView('listWeek')">
+                            <i class="fas fa-list"></i> Liste
+                        </button>
+                        <a href="@Url.Action("Index", "Project")" class="btn btn-outline-primary">
+                            <i class="fas fa-th-list"></i> Liste Görünümü
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Durum Renkleri:</h6>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <span><span class="badge" style="background-color: #6c757d;">Oluşturuldu</span></span>
+                        <span><span class="badge" style="background-color: #0d6efd;">Başladı</span></span>
+                        <span><span class="badge" style="background-color: #ffc107; color: black;">Test Ediliyor</span></span>
+                        <span><span class="badge" style="background-color: #198754;">Tamamlandı</span></span>
+                        <span><span class="badge" style="background-color: #dc3545;">İptal Edildi</span></span>
+                        <span><span class="badge" style="background-color: #212529;">Başarısız</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        #calendar {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .fc-event {
+            cursor: pointer;
+        }
+        .fc-daygrid-event {
+            white-space: normal;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const events = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(e => new {
+                id = e.Id,
+                title = e.Title,
+                start = e.Start?.ToString("yyyy-MM-dd"),
+                end = e.End?.ToString("yyyy-MM-dd"),
+                url = e.Url,
+                backgroundColor = e.Color,
+                borderColor = e.Color
+            })));
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                locale: 'tr',
+                buttonText: {
+                    today: 'Bugün',
+                    month: 'Ay',
+                    week: 'Hafta',
+                    list: 'Liste'
+                },
+                events: events,
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                },
+                eventDidMount: function(info) {
+                    // Add tooltip
+                    const title = info.event.title;
+                    const start = info.event.start ? new Date(info.event.start).toLocaleDateString('tr-TR') : '';
+                    const end = info.event.end ? new Date(info.event.end).toLocaleDateString('tr-TR') : '';
+
+                    info.el.setAttribute('title', `${title}\n${start} - ${end}`);
+                },
+                height: 'auto'
+            });
+
+            calendar.render();
+
+            // Expose to global scope for button clicks
+            window.changeCalendarView = function(view) {
+                calendar.changeView(view);
+            };
+        });
+
+        function changeView(view) {
+            if (window.changeCalendarView) {
+                window.changeCalendarView(view);
+            }
+        }
+    </script>
+}

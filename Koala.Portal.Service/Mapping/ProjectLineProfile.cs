@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Koala.Portal.Core.DTOs;
 using Koala.Portal.Core.Models;
 using Koala.Portal.Core.ViewModels.PortalViewModels;
 
@@ -28,6 +29,14 @@ namespace Koala.Portal.Service.Mapping
             CreateMap<ProjectLine, AddProjectLineViewModel>();
             CreateMap<ProjectLine, ProjectLineChangeStateStatusViewModel>();
             CreateMap<ProjectLine, ProjectLineComplateViewModel>();
+
+            // DTO Mappings for API
+            CreateMap<ProjectLine, ProjectLineDto>()
+                .ForMember(dest => dest.LineOfficialName, opts => opts.MapFrom(x => x.LineOffcial != null ? x.LineOffcial.Name + " " + x.LineOffcial.Lastname : null))
+                .ForMember(dest => dest.LineFirmOfficialName, opts => opts.MapFrom(x => x.LineFirmOfficial != null ? x.LineFirmOfficial.Name + " " + x.LineFirmOfficial.LastName : null))
+                .ForMember(dest => dest.RowOrder, opts => opts.MapFrom(x => x.RowOrdwer));
+            CreateMap<CreateProjectLineDto, AddProjectLineViewModel>();
+            CreateMap<UpdateProjectLineDto, UpdateProjectLineViewModel>();
         }
     }
 }

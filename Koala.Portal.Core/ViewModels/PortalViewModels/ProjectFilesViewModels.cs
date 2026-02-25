@@ -16,9 +16,11 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         public string? Description { get; set; }
         public string UrlSlug { get; set; }
         public IFormFile? File { get; set; }
+        public string? CreateUser { get; set; }
+        public DateTime CreateTime { get; set; }
     }
     public class RemoveProjectFilesViewModel
-    {        
+    {
         public string Id { get; set; }
     }
 }

@@ -45,6 +45,9 @@ namespace Koala.Portal.WebUI.Extentions
             services.AddAutoMapper(typeof(VacationRequestProfile));
             services.AddAutoMapper(typeof(VacationTypesProfile));
 
+            // Phase 3: Advanced Features
+            services.AddAutoMapper(typeof(AppNotificationProfile));
+
             //services.AddAutoMapper(typeof());
             //services.AddAutoMapper(typeof());
             //services.AddAutoMapper(typeof());

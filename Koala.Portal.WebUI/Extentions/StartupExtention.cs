@@ -128,6 +128,11 @@ namespace Koala.Portal.WebUI.Extentions
             services.AddScoped<IVacationHistoryService, VacationHistoryService>();
             services.AddScoped<IVacationTypesService, VacationTypesService>();
             services.AddScoped<IVacationRequestService, VacationRequestService>();
+
+            // Phase 3: Advanced Features
+            services.AddScoped<IExportService, ExportService>();
+            services.AddScoped<INotificationService, NotificationService>();
+
             //services.AddScoped<, >();
             //services.AddScoped<, >();
         }
@@ -184,6 +189,9 @@ namespace Koala.Portal.WebUI.Extentions
             services.AddScoped<IVacationHistoryRepository, VacationHistoryRepository>();
             services.AddScoped<IVacationTypesRepository, VacationTypesRepository>();
             services.AddScoped<IVacationRequestRepository, VacationRequestRepository>();
+
+            // Phase 3: Advanced Features
+            services.AddScoped<INotificationRepository, NotificationRepository>();
 
             //services.AddScoped<, >();
             //services.AddScoped<, >();

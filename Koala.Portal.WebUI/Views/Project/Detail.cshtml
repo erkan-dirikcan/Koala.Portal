@@ -203,20 +203,12 @@
                                                 <td>@Model.firm.Title</td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Vergi Dairesi:</strong></td>
-                                                <td>@Model.firm.TaxOffice</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Vergi No:</strong></td>
-                                                <td>@Model.firm.TaxNo</td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Adres:</strong></td>
-                                                <td>@Model.firm.Address</td>
+                                                <td><strong>Telefon:</strong></td>
+                                                <td>@Model.firm.Phone</td>
                                             </tr>
                                             <tr>
                                                 <td><strong>E-Posta:</strong></td>
-                                                <td><a href="mailto:@Model.firm.Email">@Model.firm.Email</a></td>
+                                                <td><a href="mailto:@Model.firm.EmailAddress1">@Model.firm.EmailAddress1</a></td>
                                             </tr>
                                         </table>
                                     </div>
@@ -264,7 +256,7 @@
                                 {
                                     @foreach (var item in Model.project.ProjectLines)
                                     {
-                                        var statusBadge = item.StateStatus switch
+                                        var lineStatusBadge = item.StateStatus switch
                                         {
                                             ProjectLineStatusEnum.NotStarted => "<span class='badge badge-secondary'>Başlamadı</span>",
                                             ProjectLineStatusEnum.InProgress => "<span class='badge badge-info'>Devam Ediyor</span>",
@@ -275,7 +267,7 @@
                                         <tr data-id="@item.Id" data-title="@item.Title" data-official-id="@item.LineOfficialId" data-firm-official-id="@item.LineFirmOfficialId" data-priority="@((int)item.Priority)" data-roworder="@item.RowOrder" data-description="@item.Description" data-duedate="@item.DueDate">
                                             <td><input type="checkbox" class="line-checkbox" data-id="@item.Id" /></td>
                                             <td>@item.Title</td>
-                                            <td>@Html.Raw(statusBadge)</td>
+                                            <td>@Html.Raw(lineStatusBadge)</td>
                                             <td>@item.DueDate</td>
                                             <td>@item.StartDate</td>
                                             <td>@item.LineOfficial</td>
@@ -346,8 +338,6 @@
                                     <tr>
                                         <th>Dosya Adı</th>
                                         <th>Açıklama</th>
-                                        <th>Yükleme Tarihi</th>
-                                        <th>Yükleyen</th>
                                         <th>İşlemler</th>
                                     </tr>
                                 </thead>
@@ -357,8 +347,6 @@
                                         <tr data-id="@file.Id">
                                             <td><i class="flaticon-file text-primary mr-2"></i>@file.Name</td>
                                             <td>@file.Description</td>
-                                            <td>@file.CreateTime.ToString("dd.MM.yyyy HH:mm")</td>
-                                            <td>@file.CreateUser</td>
                                             <td>
                                                 <a href="/Project/DownloadProjectFile?fileId=@file.Id" class="btn btn-icon btn-success btn-sm" data-toggle="tooltip" title="İndir"><i class="flaticon-download"></i></a>
                                                 <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-file" data-toggle="tooltip" title="Sil" data-id="@file.Id"><i class="flaticon2-trash"></i></button>

@@ -1,0 +1,212 @@
+@model Koala.Portal.Core.ViewModels.PortalViewModels.TimelineViewModel
+@using Koala.Portal.Core.Dtos
+
+@{
+    ViewData["Title"] = "Proje Timeline";
+    var projectCode = Model.ProjectCode;
+    var projectName = Model.ProjectName;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="card-title mb-0">
+                            <i class="fas fa-stream"></i> Timeline: @projectCode - @projectName
+                        </h4>
+                        <small class="text-muted">
+                            @(Model.ProjectStartDate?.ToString("dd.MM.yyyy")) - @(Model.ProjectDueDate?.ToString("dd.MM.yyyy"))
+                        </small>
+                    </div>
+                    <div class="btn-group">
+                        <a href="@Url.Action("Detail", "Project", new { id = Model.ProjectId })" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Geri Dön
+                        </a>
+                        <a href="@Url.Action("ExportToPdf", "Project", new { id = Model.ProjectId })" class="btn btn-outline-primary">
+                            <i class="fas fa-file-pdf"></i> PDF Dışa Aktar
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Gantt Chart Container -->
+                    <div id="gantt-container" style="height: 500px; overflow-x: auto;"></div>
+
+                    <!-- Legend -->
+                    <div class="mt-3">
+                        <h6>Durum Renkleri:</h6>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <span><span class="badge bg-secondary">Başlamadı</span></span>
+                            <span><span class="badge bg-primary">Devam Ediyor</span></span>
+                            <span><span class="badge bg-warning">Başkasını Bekliyor</span></span>
+                            <span><span class="badge bg-info">Ertelendi</span></span>
+                            <span><span class="badge bg-success">Tamamlandı</span></span>
+                            <span><span class="badge bg-danger">İptal Edildi</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task List Below -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Faz Detayları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sıra</th>
+                                    <th>Faz Adı</th>
+                                    <th>Sorumlu</th>
+                                    <th>Başlangıç</th>
+                                    <th>Bitiş</th>
+                                    <th>Durum</th>
+                                    <th>İlerleme</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var task in Model.Tasks.OrderBy(t => t.RowOrder))
+                                {
+                                    <tr>
+                                        <td>@task.RowOrder</td>
+                                        <td>@task.Title</td>
+                                        <td>@task.AssignedTo</td>
+                                        <td>@task.StartDate?.ToString("dd.MM.yyyy")</td>
+                                        <td>@task.DueDate?.ToString("dd.MM.yyyy")</td>
+                                        <td>
+                                            <span class="badge @GetStatusBadgeClass(task.Status)">
+                                                @task.StatusDisplay
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar" role="progressbar" style="width: @task.Progress%"
+                                                     aria-valuenow="@task.Progress" aria-valuemin="0" aria-valuemax="100">
+                                                    @task.Progress.ToString("0")%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .gantt-task-bar {
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .gantt-task-bar:hover {
+            transform: scaleY(1.1);
+        }
+        .gantt-row {
+            height: 40px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .gantt-timeline {
+            position: relative;
+            min-height: 400px;
+        }
+        .gantt-header {
+            display: flex;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tasks = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Tasks));
+            const container = document.getElementById('gantt-container');
+
+            // Simple Gantt Chart Visualization
+            let html = '<div class="gantt-timeline">';
+
+            if (tasks && tasks.length > 0) {
+                // Find date range
+                const startDate = new Date(Math.min(...tasks.filter(t => t.startDate).map(t => new Date(t.startDate))));
+                const endDate = new Date(Math.max(...tasks.filter(t => t.dueDate).map(t => new Date(t.dueDate))));
+                const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+                // Render tasks
+                tasks.forEach(task => {
+                    const taskStart = task.startDate ? new Date(task.startDate) : startDate;
+                    const taskEnd = task.dueDate ? new Date(task.dueDate) : endDate;
+                    const offsetDays = Math.ceil((taskStart - startDate) / (1000 * 60 * 60 * 24));
+                    const durationDays = Math.max(1, Math.ceil((taskEnd - taskStart) / (1000 * 60 * 60 * 24)) + 1);
+
+                    const leftPercent = (offsetDays / totalDays) * 100;
+                    const widthPercent = (durationDays / totalDays) * 100;
+
+                    html += `
+                        <div class="gantt-row">
+                            <div style="position: absolute; left: ${leftPercent}%; width: ${widthPercent}%; top: 5px;">
+                                <div class="gantt-task-bar" style="background-color: ${getTaskColor(task.status)}">
+                                    ${task.title}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p class="text-center text-muted py-5">Bu projede henüz faz bulunmuyor.</p>';
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        });
+
+        function getTaskColor(status) {
+            const colors = {
+                'Başlamadı': '#6c757d',
+                'Devam Ediyor': '#0d6efd',
+                'Tamamlandı': '#198754',
+                'Başkasını Bekliyor': '#ffc107',
+                'Ertelendi': '#17a2b8',
+                'İptal Edildi': '#dc3545'
+            };
+            return colors[status] || '#6c757d';
+        }
+    </script>
+}
+
+@functions {
+    private string GetStatusBadgeClass(ProjectLineStatusEnum status)
+    {
+        return status switch
+        {
+            ProjectLineStatusEnum.NotStarted => "bg-secondary",
+            ProjectLineStatusEnum.InProgress => "bg-primary",
+            ProjectLineStatusEnum.Completed => "bg-success",
+            ProjectLineStatusEnum.WaitingForSomeoneElse => "bg-warning text-dark",
+            ProjectLineStatusEnum.Deferred => "bg-info text-dark",
+            ProjectLineStatusEnum.Cancellled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

@@ -1,0 +1,60 @@
+@model List<Koala.Portal.Core.ViewModels.PortalViewModels.TeamWorkloadReportViewModel>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h5>Ekip İş Yükü Raporu</h5>
+        <p class="text-muted">Takım üyelerinin proje ve iş dağılımı</p>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var member in Model)
+    {
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">@member.UserName</h6>
+                    <small class="text-muted">@member.UserEmail</small>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h4 class="text-primary mb-0">@member.AssignedLines</h4>
+                            <small class="text-muted">Atanan Faz</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="text-success mb-0">@member.CompletedLines</h4>
+                            <small class="text-muted">Tamamlanan</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="text-warning mb-0">@member.OverdueLines</h4>
+                            <small class="text-muted">Gecikmiş</small>
+                        </div>
+                    </div>
+                    @if (member.ProjectNames.Any())
+                    {
+                        <hr>
+                        <small class="text-muted">Projeler:</small>
+                        <div class="mt-2">
+                            @foreach (var projectName in member.ProjectNames.Take(3))
+                            {
+                                <span class="badge bg-light text-dark me-1">@projectName</span>
+                            }
+                            @if (member.ProjectNames.Count > 3)
+                            {
+                                <span class="badge bg-secondary">+@(member.ProjectNames.Count - 3)</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Henüz proje ataması yapılmamış.
+    </div>
+}

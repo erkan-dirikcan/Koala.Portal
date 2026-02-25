@@ -1,0 +1,118 @@
+@model Koala.Portal.Core.ViewModels.PortalViewModels.FirmProjectSummaryViewModel
+@using Koala.Portal.Core.Dtos
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h5>@Model.FirmName - Proje Özeti</h5>
+        <p class="text-muted">Firma Kodu: @Model.FirmCode</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">@Model.TotalProjects</h3>
+                <p class="text-muted mb-0">Toplam Proje</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">@Model.ActiveProjects</h3>
+                <p class="text-muted mb-0">Aktif Projeler</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-info">@Model.CompletedProjects</h3>
+                <p class="text-muted mb-0">Tamamlanan</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-warning">@Model.TotalServiceHours</h3>
+                <p class="text-muted mb-0">Toplam Saat</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Projects List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Projeler</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Proje Kodu</th>
+                                <th>Proje Adı</th>
+                                <th>Durum</th>
+                                <th>Başlangıç</th>
+                                <th>Termin</th>
+                                <th>Saat</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var project in Model.Projects)
+                            {
+                                <tr>
+                                    <td>@project.ProjectCode</td>
+                                    <td>@project.ProjectName</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(project.Status)">
+                                            @project.Status.ToString()
+                                        </span>
+                                    </td>
+                                    <td>@project.StartDate?.ToString("dd.MM.yyyy")</td>
+                                    <td>@project.DueDate?.ToString("dd.MM.yyyy")</td>
+                                    <td>@project.ServiceHour</td>
+                                    <td>
+                                        <a href="/Project/Detail/@project.ProjectId" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Projects.Any())
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Bu firmaya ait proje bulunamadı.
+    </div>
+}
+
+@functions {
+    private string GetStatusBadgeClass(ProjectStatusEnum status)
+    {
+        return status switch
+        {
+            ProjectStatusEnum.Created => "bg-secondary",
+            ProjectStatusEnum.Started => "bg-primary",
+            ProjectStatusEnum.Testing => "bg-warning text-dark",
+            ProjectStatusEnum.Finished => "bg-success",
+            ProjectStatusEnum.Canceled => "bg-danger",
+            ProjectStatusEnum.Failed => "bg-dark",
+            _ => "bg-secondary"
+        };
+    }
+}

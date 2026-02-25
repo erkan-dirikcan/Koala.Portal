@@ -36,6 +36,7 @@ namespace Koala.Portal.Repository
         public DbSet<HelpDeskSolution> HelpDeskSolition { get; set; }
 
 
+        public DbSet<AppNotification> AppNotification { get; set; }
 
         public DbSet<Module> Module { get; set; }
         public DbSet<Project> Project { get; set; }

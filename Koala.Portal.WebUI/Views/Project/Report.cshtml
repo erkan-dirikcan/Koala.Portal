@@ -1,0 +1,100 @@
+@using Koala.Portal.Core.Dtos
+@using Koala.Portal.Core.ViewModels.PortalViewModels
+@model dynamic
+
+@{
+    ViewData["Title"] = "Proje Raporu";
+
+    string reportType = Context.Request.Query["reportType"];
+    if (string.IsNullOrEmpty(reportType))
+    {
+        reportType = "completion";
+    }
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-chart-bar"></i> Proje Raporu
+                    </h4>
+                    <div class="btn-group">
+                        @if (Model is ProjectCompletionReportViewModel completionReport)
+                        {
+                            <a href="@Url.Action("ExportToPdf", "Project", new { id = completionReport.ProjectId })" class="btn btn-outline-primary">
+                                <i class="fas fa-file-pdf"></i> PDF İndir
+                            </a>
+                            <a href="@Url.Action("ExportToExcel", "Project", new { reportType = "completion", id = completionReport.ProjectId })" class="btn btn-outline-success">
+                                <i class="fas fa-file-excel"></i> Excel İndir
+                            </a>
+                        }
+                        <a href="@Url.Action("Index", "Project")" class="btn btn-outline-secondary">
+                            <i class="fas fa-th-list"></i> Proje Listesi
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Completion Report -->
+                    @if (Model is ProjectCompletionReportViewModel completion)
+                    {
+                        await Html.RenderPartialAsync("_CompletionReport", completion);
+                    }
+                    <!-- Workload Report -->
+                    else if (Model is List<TeamWorkloadReportViewModel> workload)
+                    {
+                        await Html.RenderPartialAsync("_WorkloadReport", workload);
+                    }
+                    <!-- Firm Report -->
+                    else if (Model is FirmProjectSummaryViewModel firm)
+                    {
+                        await Html.RenderPartialAsync("_FirmReport", firm);
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Render charts based on report type
+        document.addEventListener('DOMContentLoaded', function () {
+            const reportType = '@reportType';
+
+            if (reportType === 'completion' && @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model is ProjectCompletionReportViewModel))) {
+                renderCompletionChart();
+            }
+        });
+
+        function renderCompletionChart() {
+            const ctx = document.getElementById('completionChart');
+            if (ctx && window.completionData) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tamamlandı', 'Devam Ediyor', 'Başlamadı'],
+                        datasets: [{
+                            data: [
+                                window.completionData.completed,
+                                window.completionData.inProgress,
+                                window.completionData.notStarted
+                            ],
+                            backgroundColor: ['#198754', '#0d6efd', '#6c757d']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}
