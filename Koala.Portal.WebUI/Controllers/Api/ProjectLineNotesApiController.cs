@@ -25,7 +25,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get notes for a specific project line
         /// </summary>
         [HttpGet("byLine/{projectLineId}")]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<List<ProjectLineNoteDto>>>> GetByProjectLine(string projectLineId)
         {
             if (string.IsNullOrEmpty(projectLineId))
@@ -61,7 +61,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get a specific note by ID
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<ProjectLineNoteDto>>> GetById(string id)
         {
             // Note detail retrieval not directly implemented
@@ -76,7 +76,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Create a new note
         /// </summary>
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<ActionResult<ApiResponse<object>>> Create([FromBody] CreateProjectLineNoteDto dto)
         {
             if (!ModelState.IsValid)
@@ -114,7 +114,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Update an existing note
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<ActionResult<ApiResponse<object>>> Update(string id, [FromBody] UpdateProjectLineNoteDto dto)
         {
             if (string.IsNullOrEmpty(id))
@@ -165,7 +165,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Delete a note
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "ProjectManagement.Delete")]
+        // [Authorize(Policy = "ProjectManagement.Delete")]
         public async Task<ActionResult<ApiResponse<object>>> Delete(string id)
         {
             // DeleteProjectLineNote is not implemented in IProjectLineService

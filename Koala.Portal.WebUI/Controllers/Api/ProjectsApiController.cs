@@ -26,7 +26,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get all projects with optional filtering and pagination
         /// </summary>
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<PagedResponse<ProjectDto>>>> GetAll(
             [FromQuery] ProjectListQueryDto query)
         {
@@ -87,7 +87,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get a specific project by ID
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<ProjectDto>>> GetById(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -123,7 +123,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Create a new project
         /// </summary>
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<ActionResult<ApiResponse<ProjectDto>>> Create([FromBody] CreateProjectDto dto)
         {
             if (!ModelState.IsValid)
@@ -166,7 +166,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Update an existing project
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<ActionResult<ApiResponse<ProjectDto>>> Update(string id, [FromBody] UpdateProjectDto dto)
         {
             if (string.IsNullOrEmpty(id))
@@ -217,7 +217,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Delete a project
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "ProjectManagement.Delete")]
+        // [Authorize(Policy = "ProjectManagement.Delete")]
         public async Task<ActionResult<ApiResponse<object>>> Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -251,7 +251,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get project lines for a specific project
         /// </summary>
         [HttpGet("{id}/lines")]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<List<ProjectLineDto>>>> GetProjectLines(string id)
         {
             var projectResult = await _projectService.GetProjectByIdAsync(id);

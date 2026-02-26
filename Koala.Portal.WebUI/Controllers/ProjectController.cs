@@ -38,7 +38,7 @@ namespace Koala.Portal.WebUI.Controllers
     {
         // ===== Dashboard =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> Dashboard()
         {
             var res = await service.GetProjectListAsync();
@@ -82,7 +82,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // ===== Index with Filters =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> Index(string? statusFilter, string? managerFilter, string? firmFilter, string? startDate, string? endDate, string? searchTerm)
         {
             // Store filter values for form persistence
@@ -151,7 +151,7 @@ namespace Koala.Portal.WebUI.Controllers
 
 
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> CreateProject(string firmId = "")
         {
             var firms = await crmSelectListService.GetFirmSelectList();
@@ -161,7 +161,7 @@ namespace Koala.Portal.WebUI.Controllers
             return View();
         }
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> CreateProject(AddProjectViewModel model)
         {
             if (!ModelState.IsValid)
@@ -216,14 +216,14 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> AddProjectLine(string projectId)
         {
 
             return View();
         }
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> AddProjectLine(AddProjectLineViewModel model)
         {
             // Debug: Model null kontrolü
@@ -262,7 +262,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> UpdateProjectLine([FromBody] UpdateProjectLineViewModel model)
         {
             if (model == null)
@@ -293,7 +293,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // Faz detayını getir (düzenleme için)
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> GetProjectLine(string id)
         {
             var res = await lineService.GetProjectLineDetailAsync(id);
@@ -305,7 +305,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> DeleteProjectLine(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -324,7 +324,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> ChangeProjectLineStatus([FromBody] ProjectLineChangeStateStatusViewModel model)
         {
             if (model == null)
@@ -345,7 +345,7 @@ namespace Koala.Portal.WebUI.Controllers
         #region Project CRUD
 
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<IActionResult> UpdateProject(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -382,7 +382,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<IActionResult> UpdateProject(UpdateProjectViewModel model)
         {
             if (!ModelState.IsValid)
@@ -414,7 +414,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Delete")]
+        // [Authorize(Policy = "ProjectManagement.Delete")]
         public async Task<IActionResult> DeleteProject(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -438,7 +438,7 @@ namespace Koala.Portal.WebUI.Controllers
         #region ProjectLineNote CRUD
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> AddProjectLineNote([FromBody] AddProjectLineNoteViewModel model)
         {
             if (model == null)
@@ -468,7 +468,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<IActionResult> UpdateProjectLineNote([FromBody] UpdateProjectLineNoteViewModel model)
         {
             if (model == null)
@@ -497,7 +497,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Delete")]
+        // [Authorize(Policy = "ProjectManagement.Delete")]
         public async Task<IActionResult> DeleteProjectLineNote(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -525,7 +525,7 @@ namespace Koala.Portal.WebUI.Controllers
         #region ProjectLineWork CRUD
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> AddProjectLineWork([FromBody] AddProjectLineWorkViewModel model)
         {
             if (model == null)
@@ -553,7 +553,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<IActionResult> UpdateProjectLineWork([FromBody] UpdateProjectLineWorkViewModel model)
         {
             if (model == null)
@@ -581,7 +581,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Delete")]
+        // [Authorize(Policy = "ProjectManagement.Delete")]
         public async Task<IActionResult> DeleteProjectLineWork(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -605,7 +605,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> ChangeProjectLineWorkStatus([FromBody] ProjectLineWorkChangeStateViewModel model)
         {
             if (model == null)
@@ -631,7 +631,7 @@ namespace Koala.Portal.WebUI.Controllers
         #region ProjectFile CRUD
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<IActionResult> AddProjectFile(AddProjectFilesViewModel model)
         {
             if (!ModelState.IsValid)
@@ -654,7 +654,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Delete")]
+        // [Authorize(Policy = "ProjectManagement.Delete")]
         public async Task<IActionResult> DeleteProjectFile(string fileId)
         {
             if (string.IsNullOrEmpty(fileId))
@@ -697,7 +697,7 @@ namespace Koala.Portal.WebUI.Controllers
         #region Bulk Operations
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<IActionResult> BulkChangeProjectLineStatus(List<string> lineIds, int status)
         {
             if (lineIds == null || !lineIds.Any())
@@ -755,7 +755,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // ===== Timeline View =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> Timeline(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -822,7 +822,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // ===== Calendar View =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> Calendar()
         {
             var projectsResult = await service.GetProjectListAsync();
@@ -857,7 +857,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // ===== Reports =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> Report(string id, string reportType)
         {
             if (string.IsNullOrEmpty(reportType))
@@ -958,7 +958,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // ===== Export Actions =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> ExportToPdf(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -977,7 +977,7 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> ExportToExcel(string reportType, string? id = null)
         {
             var filters = new ProjectListFiltersViewModel();
@@ -1053,7 +1053,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // ===== API Actions for Timeline Data =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> GetTimelineData(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -1117,7 +1117,7 @@ namespace Koala.Portal.WebUI.Controllers
 
         // ===== API Actions for Calendar Data =====
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<IActionResult> GetCalendarData()
         {
             var projectsResult = await service.GetProjectListAsync();

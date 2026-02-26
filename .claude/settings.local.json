@@ -19,7 +19,9 @@
       "Bash(grep:*)",
       "Bash(git rm:*)",
       "Bash(dotnet ef migrations remove:*)",
-      "Bash(dotnet ef migrations add:*)"
+      "Bash(dotnet ef migrations add:*)",
+      "Bash(dotnet ef database update:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

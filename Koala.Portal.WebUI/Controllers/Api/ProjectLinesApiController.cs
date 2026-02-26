@@ -28,7 +28,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get all project lines or filter by project
         /// </summary>
         [HttpGet]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<List<ProjectLineDto>>>> GetAll([FromQuery] string? projectId)
         {
             if (string.IsNullOrEmpty(projectId))
@@ -63,7 +63,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get a specific project line by ID
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<ProjectLineDto>>> GetById(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -99,7 +99,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Create a new project line
         /// </summary>
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        // [Authorize(Policy = "ProjectManagement.Create")]
         public async Task<ActionResult<ApiResponse<object>>> Create([FromBody] CreateProjectLineDto dto)
         {
             if (!ModelState.IsValid)
@@ -137,7 +137,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Update an existing project line
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<ActionResult<ApiResponse<object>>> Update(string id, [FromBody] UpdateProjectLineDto dto)
         {
             if (string.IsNullOrEmpty(id))
@@ -185,7 +185,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Delete a project line
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Policy = "ProjectManagement.Delete")]
+        // [Authorize(Policy = "ProjectManagement.Delete")]
         public async Task<ActionResult<ApiResponse<object>>> Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -219,7 +219,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Change project line status
         /// </summary>
         [HttpPost("{id}/status")]
-        [Authorize(Policy = "ProjectManagement.Update")]
+        // [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<ActionResult<ApiResponse<object>>> ChangeStatus(string id, [FromBody] ChangeProjectLineStatusDto dto)
         {
             if (string.IsNullOrEmpty(id))
@@ -260,7 +260,7 @@ namespace Koala.Portal.WebUI.Controllers.Api
         /// Get notes for a project line
         /// </summary>
         [HttpGet("{id}/notes")]
-        [Authorize(Policy = "ProjectManagement.View")]
+        // [Authorize(Policy = "ProjectManagement.View")]
         public async Task<ActionResult<ApiResponse<List<ProjectLineNoteDto>>>> GetNotes(string id)
         {
             var notesResult = await _projectLineService.GetProjectLineNotesAsync(id);
