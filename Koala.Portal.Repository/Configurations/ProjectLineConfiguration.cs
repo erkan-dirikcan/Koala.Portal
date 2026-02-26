@@ -18,11 +18,12 @@ namespace Koala.Portal.Repository.Configurations
             builder.HasOne(x => x.LineOffcial)
                 .WithMany(x => x.ManagedProjectLine)
                 .HasForeignKey(x => x.LineOfficialId)
-                .OnDelete(DeleteBehavior.NoAction);        
-            //Firma Faz Sorumlusu
-            builder.HasOne(x => x.LineFirmOfficial)
-                .WithMany(x => x.PersonProjectLines)
-                .HasForeignKey(x => x.LineFirmOfficialId);
+                .OnDelete(DeleteBehavior.NoAction);
+
+            //Firma Faz Sorumlusu - LineFirmOfficialId now stores CRM OID directly, no FK constraint
+            // The navigation property LineFirmOfficial is kept for compatibility but won't be loaded from local DB
+            builder.Ignore(x => x.LineFirmOfficial);
+
             //İlişkili İşler
             builder.HasMany(x => x.LineWorks)
                 .WithOne(x => x.Line)

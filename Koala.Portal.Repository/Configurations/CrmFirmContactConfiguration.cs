@@ -20,20 +20,11 @@ namespace Koala.Portal.Repository.Configurations
                 .WithOne(x => x.FirmPerson)
                 .HasForeignKey(x => x.FirmPersonId)
                 .OnDelete(DeleteBehavior.NoAction);
-            //Sorumlusu Olduğu Fazlar
-            builder.HasMany(x => x.PersonProjectLines)
-                .WithOne(x => x.LineFirmOfficial)
-                .HasForeignKey(x => x.LineFirmOfficialId)
-                .OnDelete(DeleteBehavior.NoAction);
-            
-            //Teslim Edilen İşler
-            builder.HasMany(x=>x.PersonDeliveredProjectLineWorks)
-                .WithOne(x => x.DeliveredPerson)
-                .OnDelete(DeleteBehavior.NoAction);
 
-            //builder.
-
-
+            //Sorumlusu Olduğu Fazlar - Now ignored, LineFirmOfficialId stores CRM OID directly
+            builder.Ignore(x => x.PersonProjectLines);
+            builder.Ignore(x => x.PersonProjectLineWorks);
+            builder.Ignore(x => x.PersonDeliveredProjectLineWorks);
 
             //Telefon Numaraları
             builder.HasMany(x => x.Phones)

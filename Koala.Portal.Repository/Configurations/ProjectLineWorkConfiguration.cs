@@ -15,16 +15,15 @@ namespace Koala.Portal.Repository.Configurations
                 .WithMany(x => x.LineWorks)
                 .HasForeignKey(x => x.LineId)
                 .OnDelete(DeleteBehavior.NoAction);
-            //Teslim Edilen Personel
-            builder.HasOne(x=>x.DeliveredPerson)
-                .WithMany(x => x.PersonDeliveredProjectLineWorks)
-                .HasForeignKey(x => x.DeliveredPersonOid)
-                .OnDelete(DeleteBehavior.NoAction);
-            //Firma iş Sorumlusu
-            builder.HasOne(x=>x.WorkFirmOffcial)
-                .WithMany(x => x.PersonProjectLineWorks)
-                .HasForeignKey(x => x.LineFirmOfficialId)
-                .OnDelete(DeleteBehavior.NoAction);
+
+            //Teslim Edilen Personel - DeliveredPersonOid now stores CRM OID directly, no FK constraint
+            // The navigation property DeliveredPerson is kept for compatibility but won't be loaded from local DB
+            builder.Ignore(x => x.DeliveredPerson);
+
+            //Firma iş Sorumlusu - LineFirmOfficialId now stores CRM OID directly, no FK constraint
+            // The navigation property WorkFirmOffcial is kept for compatibility but won't be loaded from local DB
+            builder.Ignore(x => x.WorkFirmOffcial);
+
             //Sadece bir destek kaydı olacağı için burası iptal edildi
             ////İlişkili Destek Kayıtları
             //builder.HasMany(x=>x.ReleatedSupport)
