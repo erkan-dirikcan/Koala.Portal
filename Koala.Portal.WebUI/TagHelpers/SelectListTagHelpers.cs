@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Encodings.Web;
+using Koala.Portal.Core.CrmServices;
 using Koala.Portal.Core.Services;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -37,11 +38,11 @@ namespace Koala.Portal.WebUI.TagHelpers
     }
     public class FirmContactSelectTagHelper:TagHelper
     {
-        private readonly IFirmContactService _firmContactService;
+        private readonly ICrmSelectListService _crmSelectListService;
 
-        public FirmContactSelectTagHelper(IFirmContactService firmContactService)
+        public FirmContactSelectTagHelper(ICrmSelectListService crmSelectListService)
         {
-            _firmContactService = firmContactService;
+            _crmSelectListService = crmSelectListService;
         }
 
         public string SelectedId { get; set; }
@@ -52,7 +53,7 @@ namespace Koala.Portal.WebUI.TagHelpers
             output.AddClass("form-control", HtmlEncoder.Default);
             var sb = new StringBuilder();
             var selected = "selected=\"selected\"";
-            var contacts = _firmContactService.GetAllAsync(FirmId).Result;
+            var contacts = _crmSelectListService.GetFirmContactListWithOid(FirmId, SelectedId).Result;
             if (!contacts.IsSuccess)
             {
                 output.Content.SetHtmlContent(sb.ToString());
@@ -60,7 +61,7 @@ namespace Koala.Portal.WebUI.TagHelpers
             }
             foreach (var item in contacts.Data)
             {
-                sb.Append($"<option value=\"{item.Id}\" {(string.Equals(item.Id, SelectedId, StringComparison.OrdinalIgnoreCase) ? selected : string.Empty)}>{item.FullName}</option>");
+                sb.Append($"<option value=\"{item.Value}\" {(item.Selected ? selected : string.Empty)}>{item.Text}</option>");
             }
             output.Content.SetHtmlContent(sb.ToString());
         }

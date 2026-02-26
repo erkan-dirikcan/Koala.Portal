@@ -398,7 +398,7 @@
                         <label class="col-form-label text-right col-lg-2">Faz Yöneticisi</label>
                         <div class="col-lg-4"><user-select id="add_LineOfficialId"></user-select></div>
                         <label class="col-form-label text-right col-lg-2">Firma Yetkilisi</label>
-                        <div class="col-lg-4"><firm-contact-select id="add_LineFirmOfficial" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                        <div class="col-lg-4"><firm-contact-select id="add_LineFirmOfficial" firm-id="@Model.firm.Oid"></firm-contact-select></div>
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-2">Öncelik</label>
@@ -448,7 +448,7 @@
                         <label class="col-form-label text-right col-lg-2">Faz Yöneticisi</label>
                         <div class="col-lg-4"><user-select id="edit_LineOfficialId"></user-select></div>
                         <label class="col-form-label text-right col-lg-2">Firma Yetkilisi</label>
-                        <div class="col-lg-4"><firm-contact-select id="edit_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                        <div class="col-lg-4"><firm-contact-select id="edit_LineFirmOfficialId" firm-id="@Model.firm.Oid"></firm-contact-select></div>
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-2">Öncelik</label>
@@ -620,7 +620,7 @@
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-3">Firma Yetkilisi</label>
-                        <div class="col-lg-9"><firm-contact-select id="work_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                        <div class="col-lg-9"><firm-contact-select id="work_LineFirmOfficialId" firm-id="@Model.firm.Oid"></firm-contact-select></div>
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-3">Öncelik</label>
@@ -667,7 +667,7 @@
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-3">Firma Yetkilisi</label>
-                        <div class="col-lg-9"><firm-contact-select id="edit_work_LineFirmOfficialId" firm-id="@Model.firm.Id"></firm-contact-select></div>
+                        <div class="col-lg-9"><firm-contact-select id="edit_work_LineFirmOfficialId" firm-id="@Model.firm.Oid"></firm-contact-select></div>
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-3">Öncelik</label>
