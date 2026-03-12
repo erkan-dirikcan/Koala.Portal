@@ -1,4 +1,4 @@
-﻿
+
 <div class="modal fade" id="support-detail-modal" tabindex="-1" role="dialog" aria-labelledby="support-detail-modal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
@@ -558,6 +558,9 @@
             </div>
             <div class="modal-body">
                 <form class="form">
+                    <input type="hidden" id="crt_sup_projectcode_hdn" />
+                    <input type="hidden" id="crt_sup_lineid_hdn" />
+                    <input type="hidden" id="crt_sup_lineworkid_hdn" />
                     <div class="form-group row">
                         <div class="col-4">
                             <label class="font-size-sm col-form-label font-weight-bolder text-right col-12 pb-0 pt-0">Logo Destek Sözleşmesi</label>
@@ -669,7 +672,7 @@
                     </div>
                     <div class="form-group row">
                         <label class="col-form-label text-right col-lg-2 col-sm-12">Öncelik</label>
-                        <div class=" col-lg-4 col-sm-12">de
+                        <div class=" col-lg-4 col-sm-12">
                             <select class="form-control" id="crt_sup_priority_sb">
                             </select>
                         </div>

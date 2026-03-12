@@ -8,6 +8,7 @@ namespace Koala.Portal.Core.Repositories
         IQueryable<ProjectLineWork?> Where(Expression<Func<ProjectLineWork, bool>> predicate);
         Task AddAsync(ProjectLineWork projectLine);
         void Update(ProjectLineWork entity);
+        void Delete(ProjectLineWork entity);
         Task<ProjectLineWork?> GetByIdAsyc(string id);
     }
 }

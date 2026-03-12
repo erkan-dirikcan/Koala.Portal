@@ -95,24 +95,24 @@
                         </a>
                     </li>
                 }
-                @if (AuthorizationService.AuthorizeAsync(User, "ProjectManagement.View").Result.Succeeded)
-                {
-                    <li class="menu-item  @ManageNavPages.ProjectsNavClass(ViewContext)" aria-haspopup="true">
-                        <a href="~/Project" class="menu-link">
-                            <span class="svg-icon svg-icon-primary svg-icon-2x">
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                        <rect x="0" y="0" width="24" height="24" />
-                                        <path d="M5,3 L6,3 C6.55228475,3 7,3.44771525 7,4 L7,20 C7,20.5522847 6.55228475,21 6,21 L5,21 C4.44771525,21 4,20.5522847 4,20 L4,4 C4,3.44771525 4.44771525,3 5,3 Z M10,3 L11,3 C11.5522847,3 12,3.44771525 12,4 L12,20 C12,20.5522847 11.5522847,21 11,21 L10,21 C9.44771525,21 9,20.5522847 9,20 L9,4 C9,3.44771525 9.44771525,3 10,3 Z" fill="#000000" />
-                                        <rect fill="#000000" opacity="0.3" transform="translate(17.825568, 11.945519) rotate(-19.000000) translate(-17.825568, -11.945519) " x="16.3255682" y="2.94551858" width="3" height="18" rx="1" />
-                                    </g>
-                                </svg>
-                            </span>
+                @*  @if (AuthorizationService.AuthorizeAsync(User, "ProjectManagement.View").Result.Succeeded)
+                { *@
+                <li class="menu-item  @ManageNavPages.ProjectsNavClass(ViewContext)" aria-haspopup="true">
+                    <a href="~/Project" class="menu-link">
+                        <span class="svg-icon svg-icon-primary svg-icon-2x">
+                            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <rect x="0" y="0" width="24" height="24" />
+                                    <path d="M5,3 L6,3 C6.55228475,3 7,3.44771525 7,4 L7,20 C7,20.5522847 6.55228475,21 6,21 L5,21 C4.44771525,21 4,20.5522847 4,20 L4,4 C4,3.44771525 4.44771525,3 5,3 Z M10,3 L11,3 C11.5522847,3 12,3.44771525 12,4 L12,20 C12,20.5522847 11.5522847,21 11,21 L10,21 C9.44771525,21 9,20.5522847 9,20 L9,4 C9,3.44771525 9.44771525,3 10,3 Z" fill="#000000" />
+                                    <rect fill="#000000" opacity="0.3" transform="translate(17.825568, 11.945519) rotate(-19.000000) translate(-17.825568, -11.945519) " x="16.3255682" y="2.94551858" width="3" height="18" rx="1" />
+                                </g>
+                            </svg>
+                        </span>
 
-                            <span class="menu-text">Projeler</span>
-                        </a>
-                    </li>
-                }
+                        <span class="menu-text">Projeler</span>
+                    </a>
+                </li>
+                @* } *@
                 @if (AuthorizationService.AuthorizeAsync(User, "AppLicationManagement.View").Result.Succeeded)
                 {
                     <li class="menu-item menu-item-submenu @ManageNavPages.ApplicationNavClass(ViewContext)" aria-haspopup="true" data-menu-toggle="hover">
@@ -479,6 +479,54 @@
                         </div>
                     </li>
                 }
+
+                @if (AuthorizationService.AuthorizeAsync(User, "Reports.View").Result.Succeeded)
+                {
+                    <li class="menu-item menu-item-submenu @ManageNavPages.ReportNavClass(ViewContext)" aria-haspopup="true" data-menu-toggle="hover">
+                        <a href="javascript:;" class="menu-link menu-toggle">
+                            <span class="svg-icon svg-icon-primary svg-icon-2x">
+                                <!--begin::Svg Icon | path:C:\wamp64\www\keenthemes\legacy\metronic\theme\html\demo1\dist/../src/media/svg/icons\Shopping\Chart-bar1.svg-->
+                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <rect x="0" y="0" width="24" height="24" />
+                                        <rect fill="#000000" opacity="0.3" x="12" y="4" width="3" height="13" rx="1.5" />
+                                        <rect fill="#000000" opacity="0.3" x="7" y="9" width="3" height="8" rx="1.5" />
+                                        <path d="M5,19 L20,19 C20.5522847,19 21,19.4477153 21,20 C21,20.5522847 20.5522847,21 20,21 L4,21 C3.44771525,21 3,20.5522847 3,20 L3,4 C3,3.44771525 3.44771525,3 4,3 C4.55228475,3 5,3.44771525 5,4 L5,19 Z" fill="#000000" fill-rule="nonzero" />
+                                        <rect fill="#000000" opacity="0.3" x="17" y="11" width="3" height="6" rx="1.5" />
+                                    </g>
+                                </svg><!--end::Svg Icon-->
+                            </span>
+                            <span class="menu-text">Raporlar</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="menu-submenu">
+                            <i class="menu-arrow"></i>
+                            <ul class="menu-subnav">
+
+                                <li class="menu-item menu-item-parent" aria-haspopup="true">
+                                    <span class="menu-link">
+                                        <span class="menu-text">Raporlar</span>
+                                    </span>
+                                </li>
+                                @if (AuthorizationService.AuthorizeAsync(User, "Reports.TicketReports").Result.Succeeded)
+                                {
+                                    <li class="menu-item menu-item-submenu @ManageNavPages.TicketReportsNavClass(ViewContext)" aria-haspopup="true" data-menu-toggle="hover">
+                                        <a asp-controller="Report" asp-action="TicketReport" class="menu-link menu-toggle">
+                                            <i class="menu-bullet menu-bullet-line">
+                                                <span></span>
+                                            </i>
+                                            <span class="menu-text">Destek Kayıtları</span>
+                                            <span class="menu-label">
+                                            </span>
+                                        </a>
+                                    </li>
+                                }
+
+                            </ul>
+                        </div>
+                    </li>
+                }
+
             </ul>
 
         </div>

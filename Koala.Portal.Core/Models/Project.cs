@@ -1,4 +1,4 @@
-﻿using Koala.Portal.Core.Dtos;
+using Koala.Portal.Core.Dtos;
 using Koala.Portal.Core.Helpers;
 
 namespace Koala.Portal.Core.Models
@@ -11,7 +11,7 @@ namespace Koala.Portal.Core.Models
             ProjectLines=new HashSet<ProjectLine>();
         }
 
-        public string Id { get; set; } = Tools.CreateGuidStr().ToString();
+        public string Id { get; set; } = Tools.CreateGuidStr();
         /// <summary>
         /// Proje Kodu
         /// </summary>
@@ -71,23 +71,20 @@ namespace Koala.Portal.Core.Models
 
 
         public virtual AppUser? ProjectManager { get; set; }
-        public virtual CrmFirm Firm { get; set; }
-        public virtual CrmFirmContact? FirmPerson { get; set; }
-
         public virtual ICollection<ProjectFiles> ProjectFiles { get; set; }
         public virtual ICollection<ProjectLine> ProjectLines { get; set; }
 
         public string GetManagerFullName()
         {
-            return $"{ProjectManager?.Name} {ProjectManager?.Lastname}";
+            return ProjectManager != null ? $"{ProjectManager.Name} {ProjectManager.Lastname}" : "";
         }
         public string GetFirmPersonFullName()
         {
-            return $"{FirmPerson?.Name} {FirmPerson?.LastName}";
+            return ""; // Service katmanında doldurulacak
         }
         public string? GetFirmDisplayName()
         {
-            return $"({Firm.Code}) - {Firm.Title}";
+            return ""; // Service katmanında doldurulacak
         }
         public string? GetStartDateStr()
         {

@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 var SupportModalPartialPage = function () {
     var selectedId = "";
     var appointedUserOid = "";
@@ -317,9 +317,19 @@ var SupportModalPartialPage = function () {
             });
 
         });
-        $(".add-support").click(function () {
-            // $('#crt_sup_cal_time').val("05-01-2017 13:36");
-            var firmOid = window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+        $(document).off('click', '.add-support').on('click', '.add-support', function () {
+            // Support context extracted from button's data attributes
+            var projCode = $(this).attr('data-project') || '';
+            var projLineId = $(this).attr('data-lineid') || '';
+            var projLineWorkId = $(this).attr('data-lineworkid') || '';
+            
+            $("#crt_sup_projectcode_hdn").val(projCode);
+            $("#crt_sup_lineid_hdn").val(projLineId);
+            $("#crt_sup_lineworkid_hdn").val(projLineWorkId);
+
+            var explicitFirmOid = $(this).attr('data-firm');
+            var firmOid = explicitFirmOid || window.location.pathname.substring(window.location.pathname.lastIndexOf("/") + 1);
+
             $('#crt_sup_firm_sb').val(firmOid).trigger('change');
             $("#support-create-modal").modal();
         });
@@ -661,7 +671,11 @@ var SupportModalPartialPage = function () {
                 SupportType: $("#crt_sup_type_sb").val(),
                 CallTime: $("#crt_sup_cal_time").find("input").val(),
                 Priority: $("#crt_sup_priority_sb").val(),
-                Description: $("#crt_sup_description_tb").val()
+                Description: $("#crt_sup_description_tb").val(),
+                // Include Project Context
+                ProjectCode: $("#crt_sup_projectcode_hdn").val(),
+                ProjectLineId: $("#crt_sup_lineid_hdn").val(),
+                ProjectLineWorkId: $("#crt_sup_lineworkid_hdn").val()
             }
 
 

@@ -1,4 +1,24 @@
 "use strict";
+
+// ProjectLineStatusEnum values for better maintainability
+const ProjectLineStatus = {
+    NotStarted: 1,
+    InProgress: 2,
+    WaitingApproval: 3,
+    Cancelled: 4,
+    Completed: 5
+};
+
+// ProjectLineWorkStatusEnum values
+const ProjectLineWorkStatus = {
+    NotStarted: 1,
+    InProgress: 2,
+    WaitingApproval: 3,
+    Rejected: 4,
+    Cancelled: 5,
+    Completed: 6
+};
+
 var ProjectLineTable = function () {
 
     var initTable = function () {
@@ -83,14 +103,14 @@ var ProjectLineTable = function () {
         $(document).on("click", ".btn-start-phase", function (e) {
             e.preventDefault();
             var id = $(this).data("id");
-            changeProjectLineStatus(id, 2); // 2 = InProgress (Devam Ediyor)
+            changeProjectLineStatus(id, ProjectLineStatus.InProgress);
         });
 
         // Tamamla butonu
         $(document).on("click", ".btn-complete-phase", function (e) {
             e.preventDefault();
             var id = $(this).data("id");
-            changeProjectLineStatus(id, 5); // 5 = Completed (Tamamlandı)
+            changeProjectLineStatus(id, ProjectLineStatus.Completed);
         });
 
         // Güncelleme modal'ı - Kaydet butonu
@@ -190,21 +210,69 @@ var ProjectLineTable = function () {
         // İş Sil butonu
         $(document).on("click", ".btn-delete-work", function (e) {
             e.preventDefault();
-            var workId = $(this).data("id");
+            var workId = $(this).attr("data-id");
             deleteProjectLineWork(workId);
+        });
+
+        // İş Tamamla butonu (modal içinden liste)
+        $(document).on("click", ".btn-work-complete-from-list", function (e) {
+            e.preventDefault();
+            var workId = $(this).attr("data-id");
+            var status = $(this).attr("data-status");
+            console.log("Tamamla butonu tıklandı - WorkId:", workId, "Status:", status);
+            changeProjectLineWorkStatus(workId, parseInt(status));
+        });
+
+        // İş Düzenle butonu (modal içinden liste)
+        $(document).on("click", ".btn-edit-work-from-list", function (e) {
+            e.preventDefault();
+            var workId = $(this).attr("data-id");
+            var row = $(this).closest("tr");
+
+            // Önce faz modal'ını kapat
+            $("#project-line-works-modal").modal('hide');
+
+            // İş detaylarını API'den al ve düzenleme modal'ını aç
+            $.get("/Project/GetProjectLineWorkDetail", { id: workId }).done(function (response) {
+                if (response.isSuccess && response.data) {
+                    populateEditWorkModal(response.data);
+                }
+            });
+        });
+
+        // İş Başla butonu (modal içinden liste)
+        $(document).on("click", ".btn-work-start-from-list", function (e) {
+            e.preventDefault();
+            var workId = $(this).attr("data-id");
+            var status = $(this).attr("data-status");
+            console.log("Başla butonu tıklandı - WorkId:", workId, "Status:", status);
+            changeProjectLineWorkStatus(workId, parseInt(status));
+        });
+
+        // İş Düzenle butonu (tüm işler sekmesinden)
+        $(document).on("click", ".btn-edit-work-from-all", function (e) {
+            e.preventDefault();
+            var workId = $(this).data("id");
+            // API'den iş detaylarını al ve modal'ı aç
+            $.get("/Project/GetProjectLineWorkDetail", { id: workId }).done(function (response) {
+                if (response.isSuccess && response.data) {
+                    populateEditWorkModal(response.data);
+                    $("#edit-project-line-work-modal").modal('show');
+                }
+            });
         });
 
         // İş Durumu Değiştir butonları
         $(document).on("click", ".btn-work-start", function (e) {
             e.preventDefault();
             var workId = $(this).data("id");
-            changeProjectLineWorkStatus(workId, 2); // InProgress
+            changeProjectLineWorkStatus(workId, ProjectLineWorkStatus.InProgress);
         });
 
         $(document).on("click", ".btn-work-complete", function (e) {
             e.preventDefault();
             var workId = $(this).data("id");
-            changeProjectLineWorkStatus(workId, 6); // Completed
+            changeProjectLineWorkStatus(workId, ProjectLineWorkStatus.Completed);
         });
 
         // Modal initialization handlers
@@ -227,6 +295,18 @@ var ProjectLineTable = function () {
         });
 
         $('#add-project-line-work-modal').on('shown.bs.modal', function () {
+            $('#work_Department').select2({
+                placeholder: 'Departman Seçiniz',
+                language: "tr",
+                dropdownParent: $('#add-project-line-work-modal'),
+                width: '100%'
+            });
+            $('#work_AssignedTo').select2({
+                placeholder: 'Önce Departman Seçiniz',
+                language: "tr",
+                dropdownParent: $('#add-project-line-work-modal'),
+                width: '100%'
+            });
             $('#work_LineFirmOfficialId').select2({
                 placeholder: 'Firma Yetkilisi Seçiniz',
                 language: "tr",
@@ -238,6 +318,49 @@ var ProjectLineTable = function () {
                 language: "tr",
                 dropdownParent: $('#add-project-line-work-modal'),
                 width: '100%'
+            });
+        });
+
+        // Departman değişince kullanıcı listesini yenile
+        $('#work_Department').on('change', function () {
+            var departmentOid = $(this).val();
+            var $userSelect = $('#work_AssignedTo');
+
+            console.log("Departman değişti, OID:", departmentOid);
+
+            if (!departmentOid) {
+                $userSelect.empty().append('<option value="">Önce Departman Seçiniz</option>');
+                $userSelect.trigger('change');
+                return;
+            }
+
+            // Kullanıcıları AJAX ile getir
+            $.ajax({
+                url: '/Support/GetCreateSupportDepartmentUsers',
+                type: 'GET',
+                data: { departmentOid: departmentOid },
+                beforeSend: function () {
+                    console.log("Kullanıcılar getiriliyor, departmentOid:", departmentOid);
+                },
+                success: function (response) {
+                    console.log("Response:", response);
+                    $userSelect.empty().append('<option value="">Personel Seçiniz</option>');
+                    // Response wrapper kontrolü
+                    if (response && response.isSuccess && response.data && response.data.length > 0) {
+                        response.data.forEach(function (user) {
+                            console.log("Kullanıcı:", user);
+                            $userSelect.append('<option value="' + user.value + '">' + user.text + '</option>');
+                        });
+                    } else {
+                        console.log("Kullanıcı bulunamadı veya response formatı yanlış");
+                    }
+                    $userSelect.trigger('change');
+                },
+                error: function (xhr) {
+                    console.error('Departman kullanıcıları hatası:', xhr.responseText);
+                    console.error('Status:', xhr.status);
+                    toastr.error('Departman kullanıcıları getirilemedi', 'Hata');
+                }
             });
         });
 
@@ -536,7 +659,7 @@ var ProjectLineTable = function () {
         var model = {
             id: $("#edit_Id").val(),
             title: $("#edit_Title").val(),
-            rowOrdwer: $("#edit_RowOrder").val() ? parseInt($("#edit_RowOrder").val()) : null,
+            rowOrder: $("#edit_RowOrder").val() ? parseInt($("#edit_RowOrder").val()) : null,
             description: $("#edit_Description").val() || "",
             dueDate: $("#edit_DueDate_tb").val() || null,
             priority: parseInt($("#edit_Priority").val() || "3"),
@@ -555,7 +678,7 @@ var ProjectLineTable = function () {
             description: model.description,
             dueDate: model.dueDate,
             priority: model.priority,
-            rowOrdwer: model.rowOrdwer
+            rowOrder: model.rowOrder
         };
 
         $("#edit_project_line_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Güncelleniyor...');
@@ -906,22 +1029,125 @@ var ProjectLineTable = function () {
     var loadWorks = function (lineId) {
         $("#works-list-container").html('<div class="text-center py-5"><span class="text-muted">Yükleniyor...</span></div>');
 
-        // This would call a service to get works - for now using placeholder
-        // In real implementation, you'd need to add GetProjectLineWorks action
-        $("#works-list-container").html('<div class="text-center py-5"><span class="text-muted">İşler listesi yükleniyor...</span></div>');
+        console.log("=== İşler Yükleniyor ===");
+        console.log("LineId:", lineId);
+
+        $.get("/Project/GetProjectLineWorkList", { projectLineId: lineId }).done(function (response) {
+            console.log("İşler API Yanıtı:", response);
+
+            if (response.isSuccess && response.data && response.data.length > 0) {
+                var html = '<table class="table table-bordered table-sm"><thead><tr><th>İş Adı</th><th>Durum</th><th>Öncelik</th><th>Sıra</th><th>Tahmini Süre</th><th>Harcanan Süre</th><th>İşlemler</th></tr></thead><tbody>';
+                $.each(response.data, function (i, work) {
+                    // Durum badge
+                    var workStatusBadge = work.workStatus === 5 ? '<span class="badge badge-success">Tamamlandı</span>' :
+                                           work.workStatus === 2 ? '<span class="badge badge-info">Devam Ediyor</span>' :
+                                           work.workStatus === 3 ? '<span class="badge badge-warning">Başkasını Bekliyor</span>' :
+                                           work.workStatus === 4 ? '<span class="badge badge-dark">Ertelendi</span>' :
+                                           work.workStatus === 6 ? '<span class="badge badge-danger">İptal Edildi</span>' :
+                                           work.workStatus === 7 ? '<span class="badge badge-primary">Yeniden Açıldı</span>' :
+                                           '<span class="badge badge-secondary">Başlamadı</span>';
+
+                    // Duruma göre butonlar
+                    var buttons = '';
+                    var status = work.workStatus;
+
+                    // Başla butonu - New(0), NotStarted(1), Reopened(7) durumlarında göster
+                    if (status === 0 || status === 1 || status === 7) {
+                        buttons += '<button type="button" class="btn btn-icon btn-sm btn-success btn-work-start-from-list" data-id="' + work.id + '" data-status="2" title="Başla" data-toggle="tooltip"><i class="fas fa-play"></i></button>';
+                    }
+
+                    // Tamamla butonu - InProgress(2) durumunda göster
+                    if (status === 2) {
+                        buttons += '<button type="button" class="btn btn-icon btn-sm btn-baby-blue btn-work-complete-from-list" data-id="' + work.id + '" data-status="5" title="Tamamla" data-toggle="tooltip"><i class="fas fa-check"></i></button>';
+                    }
+
+                    // Düzenle butonu - Completed(5) ve Canceled(6) dışında
+                    if (status !== 5 && status !== 6) {
+                        buttons += '<button type="button" class="btn btn-icon btn-sm btn-warning btn-edit-work-from-list" data-id="' + work.id + '" title="Düzenle"><i class="flaticon2-pen"></i></button>';
+                    }
+
+                    // Destek Ekle butonu
+                    var firmOid = $("#page_FirmOid").val();
+                    var projCode = $("#page_ProjectCode").text().trim();
+                    buttons += '<button type="button" class="btn btn-icon btn-sm btn-info add-support" ' +
+                                'data-firm="' + firmOid + '" ' +
+                                'data-project="' + projCode + '" ' +
+                                'data-lineid="' + lineId + '" ' +
+                                'data-lineworkid="' + work.id + '" ' +
+                                'title="Destek Ekle" data-toggle="tooltip"><i class="flaticon2-plus"></i></button>';
+
+                    // Sil butonu
+                    buttons += '<button type="button" class="btn btn-icon btn-sm btn-danger btn-delete-work" data-id="' + work.id + '" title="Sil"><i class="flaticon2-trash"></i></button>';
+
+                    html += '<tr data-id="' + work.id + '" data-name="' + (work.name || '') + '" data-description="' + (work.description || '') + '" data-priority="' + (work.priority || 3) + '" data-roworder="' + (work.rowOrder || 0) + '" data-linefirmofficialid="' + (work.lineFirmOfficialId || '') + '">' +
+                        '<td>' + (work.name || '') + '</td>' +
+                        '<td>' + workStatusBadge + '</td>' +
+                        '<td>' + (work.priority || 3) + '</td>' +
+                        '<td>' + (work.rowOrder || 0) + '</td>' +
+                        '<td>' + formatMinutes(work.estimatedTime) + '</td>' +
+                        '<td>' + formatMinutes(work.timeSpend) + '</td>' +
+                        '<td>' + buttons + '</td></tr>';
+                });
+                html += '</tbody></table>';
+                $("#works-list-container").html(html);
+            } else {
+                console.log("İş bulunamadı veya hata:", response);
+                $("#works-list-container").html('<div class="text-center py-5"><span class="text-muted">Bu faz için iş bulunmamaktadır.</span></div>');
+            }
+        }).fail(function (xhr, status, error) {
+            console.error("=== İşler Yükleme Hatası ===");
+            console.error("Status:", status);
+            console.error("Error:", error);
+            console.error("Response:", xhr.responseText);
+            $("#works-list-container").html('<div class="text-center py-5"><span class="text-danger">İşler yüklenirken hata oluştu!</span></div>');
+        });
     };
 
     var saveProjectLineWork = function () {
+        var departmentOid = $("#work_Department").val();
+        var assignedTo = $("#work_AssignedTo").val();
+        var createSupportTicket = $("#work_CreateSupportTicket").is(":checked");
+        var lineId = $("#work_LineId").val();
+
+        console.log("=== İş Kaydetme ===");
+        console.log("LineId:", lineId);
+        console.log("CreateSupportTicket:", createSupportTicket);
+        console.log("AssignedTo:", assignedTo);
+
+        // LineId kontrolü
+        if (!lineId || lineId.trim() === "") {
+            toastr.error("Faz bilgisi bulunamadı! Lütfen sayfayı yenileyip tekrar deneyin.", "Hata");
+            return;
+        }
+
+        // Personel seçili değil ve destek kaydı oluşturulacaksa uyarı ver
+        if (createSupportTicket && !assignedTo) {
+            toastr.warning("Destek kaydı oluşturmak için personel seçimi zorunludur!", "Uyarı");
+            return;
+        }
+
         var model = {
-            lineId: $("#work_LineId").val(),
+            lineId: lineId,
             name: $("#work_Name").val(),
             description: $("#work_Description").val(),
             reportDescription: $("#work_ReportDescription").val(),
+            assignedTo: assignedTo || null,
+            departmentOid: departmentOid || null,
             lineFirmOfficialId: $("#work_LineFirmOfficialId").val() || null,
             priority: parseInt($("#work_Priority").val() || "3"),
             rowOrder: parseInt($("#work_RowOrder").val() || "0"),
-            letTimeDeduct: $("#work_LetTimeDeduct").is(":checked")
+            estimatedTime: calculateTotalMinutes(
+                parseInt($("#work_EstimatedDays").val() || "0"),
+                parseInt($("#work_EstimatedHours").val() || "0"),
+                parseInt($("#work_EstimatedMinutes").val() || "0")
+            ),
+            letTimeDeduct: $("#work_LetTimeDeduct").is(":checked"),
+            createSupportTicket: createSupportTicket,
+            workPersons: null,
+            releatedSupport: null
         };
+
+        console.log("Gönderilecek Model:", JSON.stringify(model, null, 2));
 
         if (!model.name || model.name.trim() === "") {
             toastr.warning("İş Adı zorunludur!", "Uyarı");
@@ -942,7 +1168,16 @@ var ProjectLineTable = function () {
                     $("#add-project-line-work-modal").modal('hide');
                     setTimeout(function () { location.reload(); }, 1000);
                 } else {
-                    toastr.error(response.message || "İş eklenirken bir hata oluştu!", "Hata");
+                    // Faz tamamlanmış mı kontrol et
+                    if (response.requireReopen) {
+                        toastr.warning(response.message, "Uyarı");
+                        // Kullanıcıya fazı yeniden açma seçeneği sun
+                        if (confirm("Fazı yeniden açmak istiyor musunuz?")) {
+                            reopenProjectLine(response.lineId);
+                        }
+                    } else {
+                        toastr.error(response.message || "İş eklenirken bir hata oluştu!", "Hata");
+                    }
                 }
             },
             error: function () {
@@ -954,7 +1189,114 @@ var ProjectLineTable = function () {
         });
     };
 
+    // Fazı yeniden açma fonksiyonu
+    var reopenProjectLine = function (lineId) {
+        $.ajax({
+            url: "/Project/ChangeProjectLineStatus",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: JSON.stringify({ id: lineId, status: 2 }), // 2 = InProgress (Devam Ediyor)
+            success: function (response) {
+                if (response.isSuccess) {
+                    toastr.success("Faz yeniden açıldı, şimdi iş ekleyebilirsiniz!", "Başarılı");
+                    // İş ekle modal'ını tekrar aç
+                    setTimeout(function () {
+                        $("#work_LineId").val(lineId);
+                        $("#add-project-line-work-modal").modal('show');
+                    }, 500);
+                } else {
+                    toastr.error(response.message || "Faz yeniden açılırken hata oluştu!", "Hata");
+                }
+            },
+            error: function () {
+                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            }
+        });
+    };
+
+    // İş detaylarını düzenleme modal'ına yerleştir
+    var populateEditWorkModal = function (work) {
+        console.log("İş detayları:", work);
+
+        $("#edit_work_Id").val(work.Id);
+        $("#edit_work_Name").val(work.Name);
+        $("#edit_work_Description").val(work.Description);
+        $("#edit_work_Priority").val(work.Priority);
+        $("#edit_work_RowOrder").val(work.RowOrder);
+        $("#edit_work_LineFirmOfficialId").val(work.LineFirmOfficialId);
+        $("#edit_work_Status").val(work.WorkStatus);
+
+        // İptal açıklamasını göster/gizle
+        $("#edit_work_CancelDescriptionRow").toggle(work.WorkStatus === 6); // 6 = Canceled
+        if (work.CancelDescription) {
+            $("#edit_work_CancelDescription").val(work.CancelDescription);
+        }
+
+        // Durum değişikliği kontrolü
+        $("#edit_work_Status").off("change").on("change", function () {
+            var newStatus = parseInt($(this).val());
+            $("#edit_work_CancelDescriptionRow").toggle(newStatus === 6);
+        });
+
+        // Tahmini süre
+        if (work.EstimatedTime) {
+            var totalMins = work.EstimatedTime;
+            $("#edit_work_EstimatedDays").val(Math.floor(totalMins / (24 * 60)));
+            $("#edit_work_EstimatedHours").val(Math.floor((totalMins % (24 * 60)) / 60));
+            $("#edit_work_EstimatedMinutes").val(totalMins % 60);
+        } else {
+            $("#edit_work_EstimatedDays").val(0);
+            $("#edit_work_EstimatedHours").val(0);
+            $("#edit_work_EstimatedMinutes").val(0);
+        }
+
+        // Harcanan süre
+        if (work.TimeSpend) {
+            var totalMins = work.TimeSpend;
+            $("#edit_work_TimeSpendDays").val(Math.floor(totalMins / (24 * 60)));
+            $("#edit_work_TimeSpendHours").val(Math.floor((totalMins % (24 * 60)) / 60));
+            $("#edit_work_TimeSpendMinutes").val(totalMins % 60);
+        } else {
+            $("#edit_work_TimeSpendDays").val(0);
+            $("#edit_work_TimeSpendHours").val(0);
+            $("#edit_work_TimeSpendMinutes").val(0);
+        }
+
+        $("#edit-project-line-work-modal").modal('show');
+    };
+
+    // Dakika hesaplama yardımcı fonksiyonu
+    var calculateTotalMinutes = function (days, hours, minutes) {
+        return (days * 24 * 60) + (hours * 60) + minutes;
+    };
+
+    // Dakikayı Gün-Saat-Dakika formatına çeviren yardımcı fonksiyon
+    var formatMinutes = function (totalMinutes) {
+        if (!totalMinutes || totalMinutes === 0) return "0 dk";
+
+        const days = Math.floor(totalMinutes / (24 * 60));
+        const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+        const mins = totalMinutes % 60;
+
+        var result = [];
+        if (days > 0) result.push(days + " gün");
+        if (hours > 0) result.push(hours + " saat");
+        if (mins > 0) result.push(mins + " dk");
+        if (result.length === 0) return "0 dk";
+
+        return result.join(" ");
+    };
+
     var updateProjectLineWork = function () {
+        var status = parseInt($("#edit_work_Status").val() || 0);
+
+        // İptal ediliyorsa açıklama zorunlu
+        if (status === 6 && !$("#edit_work_CancelDescription").val().trim()) {
+            toastr.warning("İptal edilmesi için iptal sebebi girilmelidir!", "Uyarı");
+            return;
+        }
+
         var model = {
             id: $("#edit_work_Id").val(),
             name: $("#edit_work_Name").val(),
@@ -962,8 +1304,22 @@ var ProjectLineTable = function () {
             lineFirmOfficialId: $("#edit_work_LineFirmOfficialId").val() || null,
             priority: parseInt($("#edit_work_Priority").val() || "3"),
             rowOrder: parseInt($("#edit_work_RowOrder").val() || "0"),
-            letTimeDeduct: $("#edit_work_LetTimeDeduct").is(":checked")
+            estimatedTime: calculateTotalMinutes(
+                parseInt($("#edit_work_EstimatedDays").val() || "0"),
+                parseInt($("#edit_work_EstimatedHours").val() || "0"),
+                parseInt($("#edit_work_EstimatedMinutes").val() || "0")
+            ),
+            timeSpend: calculateTotalMinutes(
+                parseInt($("#edit_work_TimeSpendDays").val() || "0"),
+                parseInt($("#edit_work_TimeSpendHours").val() || "0"),
+                parseInt($("#edit_work_TimeSpendMinutes").val() || "0")
+            ),
+            letTimeDeduct: $("#edit_work_LetTimeDeduct").is(":checked"),
+            workStatus: status,
+            cancelDescription: status === 6 ? $("#edit_work_CancelDescription").val() : null
         };
+
+        console.log("Güncellenecek İş:", model);
 
         $("#edit_project_line_work_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Güncelleniyor...');
 
@@ -1016,9 +1372,12 @@ var ProjectLineTable = function () {
 
     var changeProjectLineWorkStatus = function (workId, status) {
         var model = {
-            id: workId,
-            workStatus: status
+            Id: workId,
+            WorkStatus: status
         };
+
+        console.log("=== İş Durumu Değiştiriliyor ===");
+        console.log("WorkId:", workId, "Status:", status);
 
         $.ajax({
             url: "/Project/ChangeProjectLineWorkStatus",
@@ -1028,13 +1387,14 @@ var ProjectLineTable = function () {
             data: JSON.stringify(model),
             success: function (response) {
                 if (response.isSuccess) {
-                    toastr.success(response.message || "İş durumu başarıyla değiştirildi!", "Başarılı");
+                    toastr.success("İş durumu başarıyla değiştirildi!", "Başarılı");
                     setTimeout(function () { location.reload(); }, 1000);
                 } else {
                     toastr.error(response.message || "İş durumu değiştirilirken bir hata oluştu!", "Hata");
                 }
             },
-            error: function () {
+            error: function (xhr) {
+                console.error("Hata:", xhr.responseText);
                 toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
             }
         });
@@ -1044,6 +1404,10 @@ var ProjectLineTable = function () {
 
     // Bulk status change function
     var bulkChangeProjectLineStatus = function (lineIds, status) {
+
+
+        
+
         $.ajax({
             url: "/Project/BulkChangeProjectLineStatus",
             type: "POST",

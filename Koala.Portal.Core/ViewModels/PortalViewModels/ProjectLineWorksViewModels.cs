@@ -1,4 +1,4 @@
-﻿using Koala.Portal.Core.Dtos;
+using Koala.Portal.Core.Dtos;
 using Koala.Portal.Core.Helpers;
 using Koala.Portal.Core.ViewModels.CrmViewModels;
 
@@ -36,15 +36,35 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         /// Sıra Numarası
         /// </summary>
         public int RowOrder { get; set; } = 0;
+        /// <summary>
+        /// İş Yapacak Personel ID
+        /// </summary>
+        public string? AssignedTo { get; set; }
+        /// <summary>
+        /// İş Yapacak Personel CRM OID
+        /// </summary>
+        public string? AssignedToCrmOid { get; set; }
+        /// <summary>
+        /// Departman OID
+        /// </summary>
+        public string? DepartmentOid { get; set; }
+        /// <summary>
+        /// Destek Kaydı Oluşturulsun mu?
+        /// </summary>
+        public bool CreateSupportTicket { get; set; } = false;
 
+        /// <summary>
+        /// Tahmini Süre (Dakika)
+        /// </summary>
+        public int? EstimatedTime { get; set; }
         /// <summary>
         /// İlişki Destek Kaydı
         /// </summary>
-        public CrmCreateSupportViewModel ReleatedSupport { get; set; }
+        public CrmCreateSupportViewModel? ReleatedSupport { get; set; }
         /// <summary>
         /// Çalışan Kullanıcılar
         /// </summary>
-        public List<AddProjectPersonViewModel> WorkPersons { get; set; }
+        public List<AddProjectPersonViewModel>? WorkPersons { get; set; }
     }
     public class UpdateProjectLineWorkViewModel
     {
@@ -75,22 +95,41 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         /// </summary>
         public int RowOrder { get; set; }
         /// <summary>
+        /// Tahmini Süre (Dakika)
+        /// </summary>
+        public int? EstimatedTime { get; set; }
+        /// <summary>
+        /// Harcanan Süre (Dakika)
+        /// </summary>
+        public int? TimeSpend { get; set; }
+        /// <summary>
+        /// İş Durumu
+        /// </summary>
+        public ProjectLineWorkStatusEnum WorkStatus { get; set; }
+        /// <summary>
+        /// İptal Açıklaması
+        /// </summary>
+        public string? CancelDescription { get; set; }
+        /// <summary>
         /// Çalışan Kullanıcılar
         /// </summary>
-        public List<AddProjectPersonViewModel> WorkPersons { get; set; }
+        public List<AddProjectPersonViewModel>? WorkPersons { get; set; }
     }
     public class ProjectLineWorkDetailViewModel
     {
         public string Id { get; set; } = Tools.CreateGuidStr().ToString();
+        public string LineId { get; set; }
         public string Line { get; set; }
         /// <summary>
         /// İş Firma Yetkilisi
         /// </summary>
         public string? LineFirmOfficialId { get; set; }
+        public string? LineFirmOfficialName { get; set; }
         /// <summary>
         /// Teslim Edilen Firma Çalışanı
         /// </summary>
         public string? DeliveredPersonOid { get; set; }
+        public string? DeliveredPersonName { get; set; }
         /// <summary>
         /// İş Adı
         /// </summary>
@@ -134,7 +173,7 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         /// <summary>
         /// Çalışan Kullanıcılar
         /// </summary>
-        public List<AddProjectPersonViewModel> WorkPersons { get; set; }
+        public List<AddProjectPersonViewModel>? WorkPersons { get; set; }
     }
     public class ProjectLineWorkListViewModel
     {
@@ -154,6 +193,10 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         /// </summary>
 
         public int? TimeSpend { get; set; }
+        /// <summary>
+        /// Tahmini Süre (Dakika)
+        /// </summary>
+        public int? EstimatedTime { get; set; }
         /// <summary>
         /// Servis Süresinden Düşsün mü?
         /// </summary>

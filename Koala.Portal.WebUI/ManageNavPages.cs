@@ -10,6 +10,7 @@ namespace Koala.Portal.WebUI
         private static string CustomerPortal => "CustomerPortal";
         private static string Firm => "Firm";
         private static string UserList => "UserList";
+        private static string TicketReports => "TicketReports";
         private static string CreateUser => "CreateUser";
         private static string Roles => "Roles";
         private static string Claims => "Claims";
@@ -39,6 +40,7 @@ namespace Koala.Portal.WebUI
         //================================================================//
         private static string UserAccount => "UserAccount";
         private static string Settings => "Settings";
+        private static string Report => "Report";
         private static string HelpDesk => "HelpDesk";
 
         //================================================================//
@@ -65,6 +67,9 @@ namespace Koala.Portal.WebUI
         public static string ProjectsNavClass(ViewContext viewContext) => PageMainNavClass(viewContext, Projects);
         public static string AgendaNavClass(ViewContext viewContext) => PageMainNavClass(viewContext, Agenda);
         public static string UserListNavClass(ViewContext viewContext) => PageMainNavClass(viewContext,UserList);
+        public static string TicketReportsNavClass(ViewContext viewContext) => PageMainNavClass(viewContext, TicketReports);
+
+
         public static string CreateUserNavClass(ViewContext viewContext) => PageMainNavClass(viewContext,CreateUser);
         public static string RolesNavClass(ViewContext viewContext) => PageMainNavClass(viewContext,Roles);
         public static string ClaimsNavClass(ViewContext viewContext) => PageMainNavClass(viewContext,Claims);
@@ -91,6 +96,7 @@ namespace Koala.Portal.WebUI
         public static string ApplicationNavClass(ViewContext viewContext) => PageMainToogleNavClass(viewContext, Applications);
         public static string UserAccountNavClass(ViewContext viewContext) => PageMainToogleNavClass(viewContext,UserAccount);
         public static string SettingsNavClass(ViewContext viewContext) => PageMainToogleNavClass(viewContext,Settings);
+        public static string ReportNavClass(ViewContext viewContext) => PageMainToogleNavClass(viewContext,Report);
         public static string HelpDeskNavClass(ViewContext viewContext) => PageMainToogleNavClass(viewContext, HelpDesk);
         //================User Management=======================//
 

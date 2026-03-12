@@ -1,4 +1,4 @@
-﻿using Koala.Portal.Core.Models;
+using Koala.Portal.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,13 +16,6 @@ namespace Koala.Portal.Repository.Configurations
                 .HasForeignKey(x => x.LineId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            //Teslim Edilen Personel - DeliveredPersonOid now stores CRM OID directly, no FK constraint
-            // The navigation property DeliveredPerson is kept for compatibility but won't be loaded from local DB
-            builder.Ignore(x => x.DeliveredPerson);
-
-            //Firma iş Sorumlusu - LineFirmOfficialId now stores CRM OID directly, no FK constraint
-            // The navigation property WorkFirmOffcial is kept for compatibility but won't be loaded from local DB
-            builder.Ignore(x => x.WorkFirmOffcial);
 
             //Sadece bir destek kaydı olacağı için burası iptal edildi
             ////İlişkili Destek Kayıtları

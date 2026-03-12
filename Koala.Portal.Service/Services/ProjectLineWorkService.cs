@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Koala.Portal.Core.CrmModels;
 using Koala.Portal.Core.Dtos;
 using Koala.Portal.Core.Models;
@@ -20,7 +20,8 @@ namespace Koala.Portal.Service.Services
         IProjectLineWorkRepository repository,
         ICrmSupportService supportService,
         IProjectLineRepository lineRepository,
-        ICrmSupportRepository supportRepository)
+        ICrmSupportRepository supportRepository,
+        IFirmContactService firmContactService)
         : IProjectLineWorkService
     {
         public async Task<Response> AddAsync(AddProjectLineWorkViewModel model)
@@ -29,41 +30,84 @@ namespace Koala.Portal.Service.Services
             {
                 var line = await lineRepository.GetByIdAsyc(model.LineId);
                 var entity = mapper.Map<ProjectLineWork>(model);
-                var tModel = mapper.Map<MT_Ticket>(model.ReleatedSupport);
-                tModel.SpeCode = "Koala Portal";
-                tModel.TicketId = supportService.GetNextTicketId();
-                tModel.TicketState = new Guid("5D982B4A-4D94-43F2-960F-834743CBE1B0");
-                tModel.ProjectCode = line.Project.ProjectCode;
-                tModel.ProjectLineId = model.LineId;
-                tModel.ProjectLineWorkId=entity.Id;
-                await supportRepository.AddAsyc(tModel);
+                // WorkId'yi metodun başında oluştur
+                entity.Id = Tools.CreateGuidStr().ToString();
+                entity.UpdateTime=DateTime.Now;
+                entity.UpdateUser = model.CreateUserId;
+                // WorkPersons listesini temizle ve yeniden oluştur
+                entity.WorkPersons.Clear();
 
-
-                //var supportRes = await _supportService.AddAsyc(model.ReleatedSupport);
-                //if (!supportRes.IsSuccess)
-                //{
-                //    return supportRes;
-                //}
-
-                foreach (var item in model.WorkPersons)
+                if (model.WorkPersons != null)
                 {
-                    entity.WorkPersons.Add(new ProjectPerson
+                    foreach (var item in model.WorkPersons)
                     {
-                        Id = Tools.CreateGuidStr(),
-                        ProjectId = line.ProjectId,
-                        ProjectLineId = line.Id,
-                        ProjectLineWorkId = entity.Id,
-                        UserId = item.UserId
-                    });
+                        entity.WorkPersons.Add(new ProjectPerson
+                        {
+                            Id = Tools.CreateGuidStr(),
+                            ProjectId = line.ProjectId,
+                            ProjectLineId = line.Id,
+                            ProjectLineWorkId = entity.Id,
+                            UserId = item.UserId
+                        });
+                    }
                 }
 
-
+                // İş entity'sini önce veritabanına kaydet
                 await repository.AddAsync(entity);
-
-
-                //TODO : buraya Personel ve destek kaydı ekleme işlemleri eklenecek
                 await unitOfWork.CommitAsync();
-                return Response.Success(404, "Proje Fazına İş Başarıyla Eklendi");
+
+                // Destek kaydı oluşturma işlemi - İş kaydından sonra yapılmalı
+                if (model.CreateSupportTicket && model.ReleatedSupport != null)
+                {
+                    // DEBUG: Destek kaydı değerlerini logla
+                    Console.WriteLine($"[DEBUG] ReleatedSupport.Firm: {model.ReleatedSupport.Firm}");
+                    Console.WriteLine($"[DEBUG] ReleatedSupport.Contact: {model.ReleatedSupport.Contact}");
+                    Console.WriteLine($"[DEBUG] ReleatedSupport.Department: {model.ReleatedSupport.Department}");
+                    Console.WriteLine($"[DEBUG] ReleatedSupport.AssignedTo: {model.ReleatedSupport.AssignedTo}");
+
+                    // ReleatedSupport'ın geçerli veriler içerip içermediğini kontrol et
+                    var hasValidSupportData = model.ReleatedSupport.Firm != Guid.Empty
+                                           && model.ReleatedSupport.Contact != Guid.Empty
+                                           && model.ReleatedSupport.Department != Guid.Empty
+                                           && model.ReleatedSupport.AssignedTo != Guid.Empty;
+
+                    if (hasValidSupportData)
+                    {
+                        var tModel = mapper.Map<MT_Ticket>(model.ReleatedSupport);
+                        tModel.Oid = Tools.CreateGuid(); // Oid explicitly generated
+                        tModel.SpeCode = "Koala Portal";
+                        tModel.TicketId = supportService.GetNextTicketId();
+                        tModel.TicketState = new Guid("5D982B4A-4D94-43F2-960F-834743CBE1B0");
+                        tModel.ProjectCode = line.Project.ProjectCode;
+                        tModel.ProjectLineId = model.LineId;
+                        tModel.ProjectLineWorkId = entity.Id;
+                        
+                        // Default properties required by CRM/XPO
+                        tModel._CreatedDateTime = DateTime.Now;
+                        tModel._LastModifiedDateTime = DateTime.Now;
+                        tModel.OptimisticLockField = 1;
+
+                        await supportRepository.AddAsyc(tModel);
+                        await unitOfWork.CommitAsync();
+
+                        // Destek kaydı OID'sini al ve iş entity'sine bağla
+                        var latestSupport = await supportRepository
+                            .Where(s => s.ProjectLineWorkId == entity.Id)
+                            .OrderByDescending(s => s._CreatedDateTime)
+                            .FirstOrDefaultAsync();
+
+                        if (latestSupport != null)
+                        {
+                            entity.ReleatedSupportId = latestSupport.TicketId;
+                            entity.ReleatedSupportOid = latestSupport.Oid.ToString();
+                            entity.UpdateTime = DateTime.Now;
+                            repository.Update(entity);
+                            await unitOfWork.CommitAsync();
+                        }
+                    }
+                }
+
+                return Response.Success(200, "Proje Fazına İş Başarıyla Eklendi");
             }
             catch (Exception ex)
             {
@@ -129,21 +173,40 @@ namespace Koala.Portal.Service.Services
         /// </summary>
         /// <param name="id">iş Id Bilgisi</param>
         /// <returns></returns>
-        public async Task<Response<ProjectLineDetailViewModel>> GetProjectLineWorkDetailAsync(string id)
+        public async Task<Response<ProjectLineWorkDetailViewModel>> GetProjectLineWorkDetailAsync(string id)
         {
             try
             {
                 var res = await repository.GetByIdAsyc(id);
                 if (res == null)
                 {
-                    return Response<ProjectLineDetailViewModel>.FailData(404, "Faza işine ait detay bilgileri alınırken bir sorunla karşılaşıldı", $"{id} kimlik bilgisine sahip  faz işi bulunamadı", true);
+                    return Response<ProjectLineWorkDetailViewModel>.FailData(404, "Faza işine ait detay bilgileri alınırken bir sorunla karşılaşıldı", $"{id} kimlik bilgisine sahip  faz işi bulunamadı", true);
                 }
-                var retVal = mapper.Map<ProjectLineDetailViewModel>(res);
-                return Response<ProjectLineDetailViewModel>.SuccessData(200, "Faz işi detaylı bilgileri başarıyla alındı", retVal);
+                var retVal = mapper.Map<ProjectLineWorkDetailViewModel>(res);
+
+                // CRM yetkilisini çek
+                if (!string.IsNullOrEmpty(res.LineFirmOfficialId))
+                {
+                    var crmContact = await firmContactService.GetDetailAsync(res.LineFirmOfficialId);
+                    if (crmContact?.Data != null)
+                    {
+                        retVal.LineFirmOfficialName = crmContact.Data.FullName;
+                    }
+                }
+                if (!string.IsNullOrEmpty(res.DeliveredPersonOid))
+                {
+                    var crmContact = await firmContactService.GetDetailByOidAsync(res.DeliveredPersonOid);
+                    if (crmContact?.Data != null)
+                    {
+                        retVal.DeliveredPersonName = crmContact.Data.FullName;
+                    }
+                }
+
+                return Response<ProjectLineWorkDetailViewModel>.SuccessData(200, "Faz işi detaylı bilgileri başarıyla alındı", retVal);
             }
             catch (Exception ex)
             {
-                return Response<ProjectLineDetailViewModel>.FailData(404, "Faza işine ait detay bilgileri alınırken bir sorunla karşılaşıldı", ex.Message, false);
+                return Response<ProjectLineWorkDetailViewModel>.FailData(404, "Faza işine ait detay bilgileri alınırken bir sorunla karşılaşıldı", ex.Message, false);
             }
         }
         /// <summary>
@@ -158,6 +221,23 @@ namespace Koala.Portal.Service.Services
             {
                 var res = await repository.Where(x => x.LineId == projectLineId).ToListAsync();
                 var retVal = mapper.Map<List<ProjectLineWorkListViewModel>>(res);
+
+                // CRM bilgilerini doldur
+                foreach (var item in retVal)
+                {
+                    var entity = res.First(x => x.Id == item.Id);
+                    if (!string.IsNullOrEmpty(entity.LineFirmOfficialId))
+                    {
+                        var crmContact = await firmContactService.GetDetailAsync(entity.LineFirmOfficialId);
+                        if (crmContact?.Data != null) item.LineFirmOfficial = crmContact.Data.FullName;
+                    }
+                    if (!string.IsNullOrEmpty(entity.DeliveredPersonOid))
+                    {
+                        var crmContact = await firmContactService.GetDetailByOidAsync(entity.DeliveredPersonOid);
+                        if (crmContact?.Data != null) item.DeliveredPerson = crmContact.Data.FullName;
+                    }
+                }
+
                 return Response<List<ProjectLineWorkListViewModel>>.SuccessData(200, "Faza Ait İşler Başarıyla Alındı", retVal);
             }
             catch (Exception ex)
@@ -183,17 +263,23 @@ namespace Koala.Portal.Service.Services
                 res.RowOrder = model.RowOrder;
                 res.UpdateUser = model.LastUpdateUserId;
 
-                res.WorkPersons.Clear();
-                foreach (var item in model.WorkPersons)
+                // WorkPersons'ı güncelle - Her item'ın UserId'sini kullan
+                if (model.WorkPersons != null && model.WorkPersons.Any())
                 {
-                    res.WorkPersons.Add(new ProjectPerson
+                    // Mevcut WorkPersons'ı temizle
+                    res.WorkPersons.Clear();
+
+                    foreach (var item in model.WorkPersons)
                     {
-                        Id = Tools.CreateGuidStr(),
-                        ProjectId = res.Line.ProjectId,
-                        ProjectLineId = res.LineId,
-                        ProjectLineWorkId = res.Id,
-                        UserId = model.LastUpdateUserId
-                    });
+                        res.WorkPersons.Add(new ProjectPerson
+                        {
+                            Id = Tools.CreateGuidStr(),
+                            ProjectId = res.Line.ProjectId,
+                            ProjectLineId = res.LineId,
+                            ProjectLineWorkId = res.Id,
+                            UserId = item.UserId // item'dan UserId kullan
+                        });
+                    }
                 }
 
                 await unitOfWork.CommitAsync();
@@ -202,6 +288,26 @@ namespace Koala.Portal.Service.Services
             catch (Exception ex)
             {
                 return Response.Fail(404, "Faza işine ait detay bilgileri alınırken bir sorunla karşılaşıldı", ex.Message, false);
+            }
+        }
+
+        public async Task<Response> DeleteAsync(string id)
+        {
+            try
+            {
+                var entity = await repository.GetByIdAsyc(id);
+                if (entity == null)
+                {
+                    return Response.Fail(404, "İş bulunamadı", $"{id} kimlik bilgisine sahip iş bulunamadı.", true);
+                }
+
+                repository.Delete(entity);
+                await unitOfWork.CommitAsync();
+                return Response.Success(200, "İş başarıyla silindi.");
+            }
+            catch (Exception ex)
+            {
+                return Response.Fail(400, "İş silinirken bir hata oluştu.", ex.Message, false);
             }
         }
     }

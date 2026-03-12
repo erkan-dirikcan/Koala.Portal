@@ -113,10 +113,10 @@ namespace Koala.Portal.Service.Services
                     return Response.Fail(404, "İş bulunamadı", "İş bilgilerine ulaşılamadı", true);
                 }
 
-                var projectLine = workResult.Data;
+                var workDetail = workResult.Data;
                 var title = "Yeni İş Ataması";
-                var message = $"Size yeni bir iş atandı: {projectLine.Title}";
-                var actionUrl = $"/Project/Detail/{projectLine.ProjectId}";
+                var message = $"Size yeni bir iş atandı: {workDetail.Name}";
+                var actionUrl = $"/Project/Detail/{workDetail.LineId}"; // ActionUrl can be determined by LineId, or we need to add ProjectId to ViewModel.
 
                 await CreateInAppNotificationAsync(userId, title, message, "ViewWork", workId, actionUrl);
 

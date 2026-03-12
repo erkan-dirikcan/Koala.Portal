@@ -1,4 +1,4 @@
-﻿namespace Koala.Portal.Core.ViewModels.CrmViewModels
+namespace Koala.Portal.Core.ViewModels.CrmViewModels
 {
     public class CreateCrmFirmContacViewModel
     {
@@ -63,6 +63,7 @@
         public string FirmId { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }
+        public string FullName => $"{Name} {LastName}";
         public bool InUse { get; set; } = false;
         public bool SupportTicket { get; set; } = false;
         public DateTime LastUpdate { get; set; } = DateTime.Now;

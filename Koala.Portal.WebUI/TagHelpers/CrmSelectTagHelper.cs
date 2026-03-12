@@ -85,6 +85,16 @@ namespace Koala.Portal.WebUI.TagHelpers
             }
         }
     }
+    public class CrmDepartmentUserSelectTagHelper : TagHelper
+    {
+        public override void Process(TagHelperContext context, TagHelperOutput output)
+        {
+            output.TagName = "select";
+            output.AddClass("form-control", HtmlEncoder.Default);
+            // Dinamik olarak JavaScript ile doldurulacak
+            output.Content.SetHtmlContent("<option value=\"\">Önce Departman Seçiniz</option>");
+        }
+    }
     public class CrmCategorySelectTagHelper : TagHelper
     {
         private readonly ICrmCategoryService _categoryService;

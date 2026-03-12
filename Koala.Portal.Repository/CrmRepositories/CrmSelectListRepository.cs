@@ -202,9 +202,10 @@ namespace Koala.Portal.Repository.CrmRepositories
 
         public Task<Response<List<SelectListItem>>> GetDepartmentUserSelectList(string departmentOid, string selected = "")
         {
-            string query = $@"select us.Oid,us.Caption from CT_User_Departments as dp left join 
-                                    RL_Users_Departments as ud on ud.DepartmentOid=dp.Oid left join 
-                                    ST_User as us on us.Oid=ud.UserOid
+            string query = $@"select us.Oid, us.Caption
+                                    from CT_User_Departments as dp
+                                    left join RL_Users_Departments as ud on ud.DepartmentOid=dp.Oid
+                                    left join ST_User as us on us.Oid=ud.UserOid
                                     where us.IsActive=1 and dp.GCRecord is null and dp.Oid='{departmentOid}'
                                     order by us.Caption";
 
@@ -222,7 +223,7 @@ namespace Koala.Portal.Repository.CrmRepositories
                 {
                     Text = $"{res.Data.Rows[i][1]}",
                     Selected = string.Equals(selected, res.Data.Rows[i][0].ToString(), StringComparison.CurrentCultureIgnoreCase),
-                    Value = res.Data.Rows[i][0].ToString()!
+                    Value = res.Data.Rows[i][0].ToString()! // CRM User OID
                 };
                 items.Add(model);
             }

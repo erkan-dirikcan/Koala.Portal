@@ -15,5 +15,6 @@ namespace Koala.Portal.Core.Services
         Task<Response<List<ProjectLineNoteViewModel>>> GetProjectLineNotesAsync(string projectLineId);
         Task<Response> AddProjectLineNote(AddProjectLineNoteViewModel model);
         Task<Response> UpdateProjectLineNote(UpdateProjectLineNoteViewModel model);
+        Task<Response> DeleteProjectLineNoteAsync(string id);
     }
 }

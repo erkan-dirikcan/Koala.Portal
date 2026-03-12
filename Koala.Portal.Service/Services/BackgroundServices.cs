@@ -22,7 +22,7 @@ public class BackgroundServices : IBackgroundServices
 
         //Hangfire.RecurringJob.AddOrUpdate("SendDailyReportEmail", () => SendDailyReportEmail(), Cron.Minutely);
         //Hangfire.RecurringJob.AddOrUpdate("SendDailyReportEmail", () => SendDailyReportEmail(), Cron.Weekly(DayOfWeek.Monday,18,0));
-        Hangfire.RecurringJob.AddOrUpdate("SencronFirm", () => SencronFirm(), "0 22 * * 1,2,3,4,5");
+        //Hangfire.RecurringJob.AddOrUpdate("SencronFirm", () => SencronFirm(), "0 22 * * 1,2,3,4,5");
         //Hangfire.RecurringJob.AddOrUpdate("SendDailyReportEmail", () => SendDailyReportEmail(), "1/1 * * * *");
 
     }

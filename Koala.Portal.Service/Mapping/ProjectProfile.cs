@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Koala.Portal.Core.DTOs;
 using Koala.Portal.Core.Models;
 using Koala.Portal.Core.ViewModels.PortalViewModels;
@@ -24,7 +24,7 @@ namespace Koala.Portal.Service.Mapping
             // DTO Mappings for API
             CreateMap<Project, ProjectDto>()
                 .ForMember(dest => dest.ProjectManagerName, opts => opts.MapFrom(x => x.ProjectManager != null ? x.ProjectManager.Name + " " + x.ProjectManager.Lastname : null))
-                .ForMember(dest => dest.FirmName, opts => opts.MapFrom(x => x.Firm != null ? x.Firm.Title : null));
+                .ForMember(dest => dest.FirmName, opts => opts.Ignore());
             CreateMap<CreateProjectDto, AddProjectViewModel>();
             CreateMap<UpdateProjectDto, UpdateProjectViewModel>();
 

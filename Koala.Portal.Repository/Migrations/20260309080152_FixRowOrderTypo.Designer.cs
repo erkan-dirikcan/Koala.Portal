@@ -4,6 +4,7 @@ using Koala.Portal.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Koala.Portal.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260309080152_FixRowOrderTypo")]
+    partial class FixRowOrderTypo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1053,10 +1056,10 @@ namespace Koala.Portal.Repository.Migrations
 
                     b.Property<string>("FirmId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FirmPersonId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProjectCode")
                         .IsRequired()
@@ -1089,6 +1092,10 @@ namespace Koala.Portal.Repository.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FirmId");
+
+                    b.HasIndex("FirmPersonId");
 
                     b.HasIndex("ProjectCode");
 
@@ -1961,9 +1968,24 @@ namespace Koala.Portal.Repository.Migrations
 
             modelBuilder.Entity("Koala.Portal.Core.Models.Project", b =>
                 {
+                    b.HasOne("Koala.Portal.Core.Models.CrmFirm", "Firm")
+                        .WithMany("FirmProjects")
+                        .HasForeignKey("FirmId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Koala.Portal.Core.Models.CrmFirmContact", "FirmPerson")
+                        .WithMany("PersonProjects")
+                        .HasForeignKey("FirmPersonId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Koala.Portal.Core.Models.AppUser", "ProjectManager")
                         .WithMany("ManagedProjects")
                         .HasForeignKey("ProjectManagerId");
+
+                    b.Navigation("Firm");
+
+                    b.Navigation("FirmPerson");
 
                     b.Navigation("ProjectManager");
                 });
@@ -2196,6 +2218,8 @@ namespace Koala.Portal.Repository.Migrations
 
                     b.Navigation("Contacts");
 
+                    b.Navigation("FirmProjects");
+
                     b.Navigation("Licences");
 
                     b.Navigation("Phones");
@@ -2203,6 +2227,8 @@ namespace Koala.Portal.Repository.Migrations
 
             modelBuilder.Entity("Koala.Portal.Core.Models.CrmFirmContact", b =>
                 {
+                    b.Navigation("PersonProjects");
+
                     b.Navigation("Phones");
                 });
 

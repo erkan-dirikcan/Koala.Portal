@@ -1,4 +1,4 @@
-﻿using Koala.Portal.Core.Dtos;
+using Koala.Portal.Core.Dtos;
 using Koala.Portal.Core.Helpers;
 
 namespace Koala.Portal.Core.Models
@@ -10,7 +10,7 @@ namespace Koala.Portal.Core.Models
             LineWorks=new HashSet<ProjectLineWork>();
             LineNotes = new HashSet<ProjectLineNote>();
         }
-        public string Id { get; set; } = Tools.CreateGuidStr().ToString();
+        public string Id { get; set; } = Tools.CreateGuidStr();
         public string ProjectId { get; set; }
         public string? LineOfficialId { get; set; }
         public string? LineFirmOfficialId { get; set; }
@@ -31,23 +31,22 @@ namespace Koala.Portal.Core.Models
         public ProjectLineStatusEnum StateStatus { get; set; } = ProjectLineStatusEnum.NotStarted;
         public StatusEnum Status { get; set; } = StatusEnum.Active;
         public string? CancelDescription { get; set; }
-        public int? RowOrdwer { get; set; }
+        public int? RowOrder { get; set; }
 
 
         public virtual Project Project { get; set; }
         public virtual AppUser? LineOffcial { get; set; }
-        public virtual CrmFirmContact? LineFirmOfficial { get; set; }
 
         public virtual ICollection<ProjectLineWork> LineWorks { get; set; }
         public virtual ICollection<ProjectLineNote> LineNotes { get; set; }
 
         public string GetManagerFullName()
         {
-            return $"{LineOffcial?.Name} {LineOffcial?.Lastname}";
+            return LineOffcial != null ? $"{LineOffcial.Name} {LineOffcial.Lastname}" : "";
         }
         public string GetFirmPersonFullName()
         {
-            return $"{LineFirmOfficial?.Name} {LineFirmOfficial?.LastName}";
+            return ""; // Service katmanında doldurulacak
         }       
         public string? GetStartDateStr()
         {

@@ -9,6 +9,10 @@ namespace Koala.Portal.Repository.Repositories
     {
         private readonly AppDbContext _context;
         private readonly DbSet<ProjectLineWork> _dbSet;
+        public ProjectLineWorkRepository(AppDbContext context)
+        {
+            _dbSet= context.Set<ProjectLineWork>();
+        }
         public async Task AddAsync(ProjectLineWork projectLine)
         {
             _dbSet.Add(projectLine);
@@ -17,8 +21,6 @@ namespace Koala.Portal.Repository.Repositories
         public async Task<ProjectLineWork?> GetByIdAsyc(string id)
         {
             return await _dbSet.Include(x => x.Line)
-                 .Include(x => x.DeliveredPerson)
-                 .Include(x => x.WorkFirmOffcial)
                  .Include(x => x.WorkPersons)
                  .FirstOrDefaultAsync(x => x.Id == id);
         }
@@ -26,6 +28,11 @@ namespace Koala.Portal.Repository.Repositories
         public void Update(ProjectLineWork entity)
         {
             _dbSet.Entry(entity).State = EntityState.Modified;
+        }
+
+        public void Delete(ProjectLineWork entity)
+        {
+            _dbSet.Remove(entity);
         }
 
         public IQueryable<ProjectLineWork?> Where(Expression<Func<ProjectLineWork, bool>> predicate)

@@ -1,4 +1,4 @@
-﻿using Koala.Portal.Core.Dtos;
+using Koala.Portal.Core.Dtos;
 using Koala.Portal.Core.Helpers;
 
 namespace Koala.Portal.Core.Models
@@ -8,6 +8,8 @@ namespace Koala.Portal.Core.Models
         public ProjectLineWork()
         {
             WorkPersons = new HashSet<ProjectPerson>();
+            UpdateUser = CreateUser;
+            UpdateTime = CreateTime;
         }
         public string Id { get; set; } = Tools.CreateGuidStr().ToString();
         public string LineId { get; set; }
@@ -35,9 +37,13 @@ namespace Koala.Portal.Core.Models
         /// </summary>
         public string? Description { get; set; }
         /// <summary>
-        /// Harcanan Süre
+        /// Harcanan Süre (Dakika)
         /// </summary>
         public int? TimeSpend { get; set; }
+        /// <summary>
+        /// Tahmini Süre (Dakika)
+        /// </summary>
+        public int? EstimatedTime { get; set; }
         /// <summary>
         /// Servis Süresinden Düşsün mü?
         /// </summary>
@@ -60,14 +66,6 @@ namespace Koala.Portal.Core.Models
         public int RowOrder { get; set; }=0;
 
         public ProjectLine Line { get; set; }
-        /// <summary>
-        /// İş Firma Teslim Edilen
-        /// </summary>
-        public virtual CrmFirmContact? DeliveredPerson { get; set; }
-        /// <summary>
-        /// İş Firma Yetkilisi
-        /// </summary>
-        public virtual CrmFirmContact? WorkFirmOffcial { get; set; }
         /// <summary>
         /// Çalışan Kullanıcılar
         /// </summary>

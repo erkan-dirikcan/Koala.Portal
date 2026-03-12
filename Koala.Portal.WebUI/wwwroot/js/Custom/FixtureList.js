@@ -1,8 +1,8 @@
 ﻿"use strict";
-var UserTable = function () {
+var TicketReportTable = function () {
 
 	var initTable = function () {
-		var table = $('#FixtureTable');
+		var table = $('#TicketReportTable');
 
 		// begin first table
 		table.DataTable({
@@ -26,5 +26,5 @@ var UserTable = function () {
 }();
 
 jQuery(document).ready(function () {
-	UserTable.init();
+	TicketReportTable.init();
 });

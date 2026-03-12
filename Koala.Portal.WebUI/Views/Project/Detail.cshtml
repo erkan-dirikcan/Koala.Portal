@@ -139,8 +139,9 @@
                                         <table class="table table-borderless">
                                             <tr>
                                                 <td style="width: 40%"><strong>Proje Kodu:</strong></td>
-                                                <td>@Model.project.ProjectCode</td>
+                                                <td id="page_ProjectCode">@Model.project.ProjectCode</td>
                                             </tr>
+                                            <input type="hidden" id="page_FirmOid" value="@Model.firm.Oid" />
                                             <tr>
                                                 <td><strong>Proje Adı:</strong></td>
                                                 <td>@Model.project.ProjectName</td>
@@ -242,6 +243,7 @@
                                     <th width="40"><input type="checkbox" id="selectAllLines" /></th>
                                     <th>Faz Adı</th>
                                     <th>Durum</th>
+                                    <th width="150">İlerleme</th>
                                     <th>Teslim Tarihi</th>
                                     <th>Başlangıç Tarihi</th>
                                     <th>Faz Yöneticisi</th>
@@ -268,6 +270,15 @@
                                             <td><input type="checkbox" class="line-checkbox" data-id="@item.Id" /></td>
                                             <td>@item.Title</td>
                                             <td>@Html.Raw(lineStatusBadge)</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 mr-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-@(item.ProgressPercentage >= 100 ? "success" : item.ProgressPercentage >= 50 ? "info" : "primary")" style="width: @(item.ProgressPercentage)%"></div>
+                                                    </div>
+                                                    <span class="font-size-sm font-weight-bold" style="min-width: 45px;">@item.ProgressPercentage%</span>
+                                                </div>
+                                                <small class="text-muted d-block">@item.CompletedWorkCount/@item.TotalWorkCount iş</small>
+                                            </td>
                                             <td>@item.DueDate</td>
                                             <td>@item.StartDate</td>
                                             <td>@item.LineOfficial</td>
@@ -275,12 +286,12 @@
                                             <td>@item.Priority</td>
                                             <td>@item.RowOrder</td>
                                             <td>
-                                                <button type="button" class="btn btn-icon btn-success btn-sm btn-start-phase" data-toggle="tooltip" title="Faza Başla" data-id="@item.Id"><i class="flaticon2-play"></i></button>
-                                                <button type="button" class="btn btn-icon btn-warning btn-sm btn-complete-phase" data-toggle="tooltip" title="Tamamla" data-id="@item.Id"><i class="flaticon2-check-mark"></i></button>
-                                                <button type="button" class="btn btn-icon btn-primary btn-sm btn-edit-phase" data-toggle="tooltip" title="Düzenle"><i class="flaticon2-pen"></i></button>
-                                                <button type="button" class="btn btn-icon btn-info btn-sm btn-notes-phase" data-toggle="tooltip" title="Notlar" data-id="@item.Id" data-title="@item.Title"><i class="flaticon2-paper"></i></button>
-                                                <button type="button" class="btn btn-icon btn-purple btn-sm btn-works-phase" data-toggle="tooltip" title="İşler" data-id="@item.Id" data-title="@item.Title"><i class="flaticon-list-1"></i></button>
-                                                <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-phase" data-toggle="tooltip" title="Sil" data-id="@item.Id"><i class="flaticon2-trash"></i></button>
+                                                <button type="button" class="btn btn-icon btn-success btn-sm btn-start-phase mt-1" data-toggle="tooltip" title="Faza Başla" data-id="@item.Id"><i class="fas fa-play"></i></button>
+                                                <button type="button" class="btn btn-icon btn-warning btn-sm btn-complete-phase mt-1" data-toggle="tooltip" title="Tamamla" data-id="@item.Id"><i class="flaticon2-check-mark"></i></button>
+                                                <button type="button" class="btn btn-icon btn-primary btn-sm btn-edit-phase mt-1" data-toggle="tooltip" title="Düzenle"><i class="flaticon2-pen"></i></button>
+                                                <button type="button" class="btn btn-icon btn-info btn-sm btn-notes-phase mt-1" data-toggle="tooltip" title="Notlar" data-id="@item.Id" data-title="@item.Title"><i class="flaticon2-paper"></i></button>
+                                                <button type="button" class="btn btn-icon btn-baby-blue btn-sm btn-works-phase mt-1" data-toggle="tooltip" title="İşler" data-id="@item.Id" data-title="@item.Title"><i class="fas fa-network-wired"></i></button>
+                                                <button type="button" class="btn btn-icon btn-danger btn-sm btn-delete-phase mt-1" data-toggle="tooltip" title="Sil" data-id="@item.Id"><i class="flaticon2-trash"></i></button>
                                             </td>
                                         </tr>
                                     }
@@ -288,7 +299,7 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="10" class="text-center">Kayıtlı faz bulunmamaktadır.</td>
+                                        <td colspan="11" class="text-center">Kayıtlı faz bulunmamaktadır.</td>
                                     </tr>
                                 }
                             </tbody>
@@ -619,6 +630,14 @@
                         <div class="col-lg-9"><textarea id="work_ReportDescription" class="form-control" rows="2"></textarea></div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Departman</label>
+                        <div class="col-lg-9"><crm-department-select id="work_Department"></crm-department-select></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">İş Yapacak Personel</label>
+                        <div class="col-lg-9"><crm-department-user-select id="work_AssignedTo" placeholder="Personel Seçin"></crm-department-user-select></div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-form-label text-right col-lg-3">Firma Yetkilisi</label>
                         <div class="col-lg-9"><firm-contact-select id="work_LineFirmOfficialId" firm-id="@Model.firm.Oid"></firm-contact-select></div>
                     </div>
@@ -631,9 +650,29 @@
                         <div class="col-lg-9"><input type="number" id="work_RowOrder" class="form-control" value="0" /></div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Tahmini Süre</label>
+                        <div class="col-lg-9">
+                            <div class="input-group">
+                                <input type="number" id="work_EstimatedDays" class="form-control" placeholder="Gün" min="0" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Gün</span>
+                                <input type="number" id="work_EstimatedHours" class="form-control" placeholder="Saat" min="0" max="23" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Saat</span>
+                                <input type="number" id="work_EstimatedMinutes" class="form-control" placeholder="Dakika" min="0" max="59" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Dakika</span>
+                            </div>
+                            <small class="text-muted">Toplam dakika olarak kaydedilecektir</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-form-label text-right col-lg-3">Süre Düşsün mü?</label>
                         <div class="col-lg-9">
                             <label class="checkbox"><input type="checkbox" id="work_LetTimeDeduct" value="true" /><span></span> Evet</label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Destek Kaydı Oluştur</label>
+                        <div class="col-lg-9">
+                            <label class="checkbox"><input type="checkbox" id="work_CreateSupportTicket" value="true" /><span></span> Evet</label>
                         </div>
                     </div>
                 </form>
@@ -647,7 +686,7 @@
 </div>
 
 <!-- Work Edit Modal -->
-<div class="modal fade" id="edit-project-line-work-modal" tabindex="-1" role="dialog">
+<div class="modal fade" id="edit-project-line-work-modal" tabindex="-1" role="dialog" style="z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -678,9 +717,56 @@
                         <div class="col-lg-9"><input type="number" id="edit_work_RowOrder" class="form-control" /></div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Tahmini Süre</label>
+                        <div class="col-lg-9">
+                            <div class="input-group">
+                                <input type="number" id="edit_work_EstimatedDays" class="form-control" placeholder="Gün" min="0" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Gün</span>
+                                <input type="number" id="edit_work_EstimatedHours" class="form-control" placeholder="Saat" min="0" max="23" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Saat</span>
+                                <input type="number" id="edit_work_EstimatedMinutes" class="form-control" placeholder="Dakika" min="0" max="59" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Dakika</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Harcanan Süre</label>
+                        <div class="col-lg-9">
+                            <div class="input-group">
+                                <input type="number" id="edit_work_TimeSpendDays" class="form-control" placeholder="Gün" min="0" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Gün</span>
+                                <input type="number" id="edit_work_TimeSpendHours" class="form-control" placeholder="Saat" min="0" max="23" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Saat</span>
+                                <input type="number" id="edit_work_TimeSpendMinutes" class="form-control" placeholder="Dakika" min="0" max="59" value="0" style="max-width: 80px;" />
+                                <span class="input-group-text">Dakika</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-form-label text-right col-lg-3">Durum</label>
+                        <div class="col-lg-9">
+                            <select id="edit_work_Status" class="form-control">
+                                <option value="0">Yeni</option>
+                                <option value="1">Başlamadı</option>
+                                <option value="2">Devam Ediyor</option>
+                                <option value="3">Başkasını Bekliyor</option>
+                                <option value="4">Ertelendi</option>
+                                <option value="5">Tamamlandı</option>
+                                <option value="6">İptal Edildi</option>
+                                <option value="7">Yeniden Açıldı</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="edit_work_CancelDescriptionRow" style="display: none;">
+                        <label class="col-form-label text-right col-lg-3">İptal Sebebi</label>
+                        <div class="col-lg-9">
+                            <textarea id="edit_work_CancelDescription" class="form-control" rows="2" placeholder="İptal nedenini giriniz..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-form-label text-right col-lg-3">Süre Düşsün mü?</label>
                         <div class="col-lg-9">
-                            <label class="checkbox"><input type="checkbox" id="edit_work_LetTimeDeduct" value="true" /><span></span> Evet</label>
+                            <label class="checkbox"><input type="checkbox" id="edit_work_LetTimeDeduct" value="true" /><span></span> EVet</label>
                         </div>
                     </div>
                 </form>

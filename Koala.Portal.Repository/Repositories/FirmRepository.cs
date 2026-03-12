@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Koala.Portal.Core.Models;
 using Koala.Portal.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +24,6 @@ namespace Koala.Portal.Repository.Repositories
         {
             var res = _dbSet
                 .Include(x => x.Contacts)
-                //.Include(x => x.FirmProjects)
                 .Include(x => x.Phones)
                 .FirstOrDefault(x => x.Id == id);
             return res;
@@ -37,7 +36,6 @@ namespace Koala.Portal.Repository.Repositories
         public IQueryable<CrmFirm> Where(Expression<Func<CrmFirm, bool>> predicate)
         {
             return _dbSet.Include(x => x.Contacts)
-                .Include(x => x.FirmProjects)
                 .Include(x => x.Phones)
                 .Where(x => x.InUse == true);
         }
@@ -48,7 +46,6 @@ namespace Koala.Portal.Repository.Repositories
             {
                 var res = await _dbSet
                         .Include(x => x.Contacts)
-                        .Include(x => x.FirmProjects)
                         .Include(x => x.Phones)
                         .ToListAsync();
                 return res;

@@ -20,6 +20,18 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         public StatusEnum Status { get; set; }
         public string? CancelDescription { get; set; }
         public int? RowOrder { get; set; }
+        /// <summary>
+        /// İlerleme Yüzdesi (0-100)
+        /// </summary>
+        public int ProgressPercentage { get; set; }
+        /// <summary>
+        /// Tamamlanan İş Sayısı
+        /// </summary>
+        public int CompletedWorkCount { get; set; }
+        /// <summary>
+        /// Toplam İş Sayısı
+        /// </summary>
+        public int TotalWorkCount { get; set; }
 
     }
     public class ProjectLineDetailViewModel
@@ -38,7 +50,7 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         public ProjectLineStatusEnum StateStatus { get; set; }
         public StatusEnum Status { get; set; }
         public string? CancelDescription { get; set; }
-        public int? RowOrdwer { get; set; }
+        public int? RowOrder { get; set; }
 
 
         public ProjectListViewModel Project { get; set; }
@@ -70,7 +82,7 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
         public string? Description { get; set; }
         public DateTime? DueDate { get; set; }
         public PriorityEnum Priority { get; set; }
-        public int? RowOrdwer { get; set; }
+        public int? RowOrder { get; set; }
         public string UpdateUser { get; set; }
         public DateTime UpdateTime { get; set; }
     }

@@ -15,7 +15,11 @@ using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
 //builder.Services.Configure<EmailSettingViewModel>(builder.Configuration.GetSection("EmailSettings"));
 //builder.Host.UseNLog();
 
@@ -44,16 +48,16 @@ builder.Services.AddHangfire(options =>
 var context = builder.Services.BuildServiceProvider()
                        .GetService<AppDbContext>();
 
-builder.Services.AddDataProtection();//Id bilgisini þifrelemek için, Þu anda kullanýlmýyor
-builder.Services.AddMappingConfExt();//Mapping Class Tanýmlamarý
-builder.Services.AddIdentityConfExt(builder.Configuration);//Identity Ayarlarý
-builder.Services.AddIdentityWithExt();// Identity Üyelik Ayarlarý için
-builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();//Dýþarýdan context e eriþim için
-builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));//Dosya yükleme iþlemleri için
-builder.Services.AddApplicationServices();//Uygulama servisleri için extention metot
-builder.Services.AddApplicationRepositories();//Uygulama Özellikleri için extention metot
-builder.Services.AddApplicationProviders();//Uygulama Yetki Kurallarýný Yüklemek için extention metot
-builder.Services.AddAuthorizationRules(context);//Uygulama Saðlayýcýlar için extention metot
+builder.Services.AddDataProtection();//Id bilgisini ï¿½ifrelemek iï¿½in, ï¿½u anda kullanï¿½lmï¿½yor
+builder.Services.AddMappingConfExt();//Mapping Class Tanï¿½mlamarï¿½
+builder.Services.AddIdentityConfExt(builder.Configuration);//Identity Ayarlarï¿½
+builder.Services.AddIdentityWithExt();// Identity ï¿½yelik Ayarlarï¿½ iï¿½in
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();//Dï¿½ï¿½arï¿½dan context e eriï¿½im iï¿½in
+builder.Services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));//Dosya yï¿½kleme iï¿½lemleri iï¿½in
+builder.Services.AddApplicationServices();//Uygulama servisleri iï¿½in extention metot
+builder.Services.AddApplicationRepositories();//Uygulama ï¿½zellikleri iï¿½in extention metot
+builder.Services.AddApplicationProviders();//Uygulama Yetki Kurallarï¿½nï¿½ Yï¿½klemek iï¿½in extention metot
+builder.Services.AddAuthorizationRules(context);//Uygulama Saï¿½layï¿½cï¿½lar iï¿½in extention metot
 
 //builder.Services.AddScoped<IClaimsTransformation, UserClaimProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, DepartmentRequirementHandler>();
@@ -99,7 +103,7 @@ app.UseHttpsRedirection();
 //        Path.Combine(builder.Environment.ContentRootPath, "Template")),
 //    RequestPath = "/Template"
 //});
-app.UseStaticFiles();//Root klasörünü kullanýma açar
+app.UseStaticFiles();//Root klasï¿½rï¿½nï¿½ kullanï¿½ma aï¿½ar
 app.UseRouting();
 //app.UseRouting();
 

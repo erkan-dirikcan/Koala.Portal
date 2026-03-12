@@ -1,4 +1,4 @@
-﻿using Koala.Portal.Core.Helpers;
+using Koala.Portal.Core.Helpers;
 
 namespace Koala.Portal.Core.Models
 {
@@ -7,7 +7,6 @@ namespace Koala.Portal.Core.Models
         public CrmFirm()
         {
             Contacts = new HashSet<CrmFirmContact>();
-            FirmProjects = new HashSet<Project>();
         }
         public string Id { get; set; } = Tools.CreateGuidStr();
         public string Oid { get; set; }
@@ -17,7 +16,6 @@ namespace Koala.Portal.Core.Models
         public bool InUse { get; set; } = false;
         public DateTime LastUpdate { get; set; } = DateTime.Now;
         public virtual ICollection<CrmFirmContact> Contacts { get; set; }
-        public virtual ICollection<Project> FirmProjects { get; set; }
         public virtual ICollection<CrmPhoneNumber> Phones { get; set; }
         public virtual ICollection<ApplicationLicences> Licences { get; set; }
         public virtual ICollection<ApplicationFirms> Applications { get; set; }

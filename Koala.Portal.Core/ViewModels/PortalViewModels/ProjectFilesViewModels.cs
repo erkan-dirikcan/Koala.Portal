@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace Koala.Portal.Core.ViewModels.PortalViewModels
 {
@@ -12,9 +12,10 @@ namespace Koala.Portal.Core.ViewModels.PortalViewModels
 
     public class AddProjectFilesViewModel
     {
+        public string ProjectId { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public string UrlSlug { get; set; }
+        public string? UrlSlug { get; set; }
         public IFormFile? File { get; set; }
         public string? CreateUser { get; set; }
         public DateTime CreateTime { get; set; }

@@ -86086,3 +86086,81 @@ body {
     left: 70px;
   }
 }
+/* Custom Button Styles */
+
+.btn-purple {
+    color: #ffffff;
+    background-color: #6b0b87;
+    border-color: #6b0b87;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+    .btn-purple:hover {
+        color: #ffffff;
+        background-color: #8e04b6;
+        border-color: #8e04b6;
+    }
+
+    .btn-purple:focus, .btn-purple.focus {
+        color: #ffffff;
+        background-color: #8e04b6;
+        border-color: #6b0b87;
+        -webkit-box-shadow: 0 0 0 0.2rem rgba(142, 4, 182, 0.5);
+        box-shadow: 0 0 0 0.2rem rgba(142, 4, 182, 0.5);
+    }
+
+    .btn-purple.disabled, .btn-purple:disabled {
+        color: #ffffff;
+        background-color: #8950FC;
+        border-color: #8950FC;
+    }
+
+    .btn-purple:not(:disabled):not(.disabled):active, .btn-purple:not(:disabled):not(.disabled).active, .show > .btn-purple.dropdown-toggle {
+        color: #ffffff;
+        background-color: #6b0b87;
+        border-color: #8e04b6;
+    }
+
+        .btn-purple:not(:disabled):not(.disabled):active:focus, .btn-purple:not(:disabled):not(.disabled).active:focus, .show > .btn-purple.dropdown-toggle:focus {
+            -webkit-box-shadow: 0 0 0 0.2rem rgba(142, 4, 182, 0.5);
+            box-shadow: 0 0 0 0.2rem rgba(142, 4, 182, 0.5);
+        }
+
+
+
+
+
+/*.btn-purple {
+    background-color: #6b0b87 !important;
+    border-color: #6b0b87 !important;
+    color: #FFFFFF !important;
+}
+.btn-purple:hover {
+    background-color: #8e04b6 !important;
+    border-color: #8e04b6 !important;
+    color: #FFFFFF !important;
+}
+.btn-purple:focus, .btn-purple:active {
+    background-color: #8e04b6 !important;
+    border-color: #8e04b6 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 0 0.2rem rgba(142, 4, 182, 0.5);
+}
+*/
+.btn-baby-blue {
+    background-color: #00b4e8 !important;
+    border-color: #00b4e8 !important;
+    color: #FFFFFF !important;
+}
+.btn-baby-blue:hover {
+    background-color: #39c3eb !important;
+    border-color: #39c3eb !important;
+    color: #FFFFFF !important;
+}
+.btn-baby-blue:focus, .btn-baby-blue:active {
+    background-color: #39c3eb !important;
+    border-color: #39c3eb !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 0 0.2rem rgba(57, 195, 235, 0.5);
+}

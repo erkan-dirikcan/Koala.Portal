@@ -231,3 +231,79 @@ public class CrmSendToUserViewModel
     public string UserId { get; set; }
     public string Description { get; set; }
 }
+
+// ==================== Ticket Report ViewModels ====================
+
+public class TicketReportFilterViewModel
+{
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    public Guid? FirmId { get; set; }
+    public Guid? UserId { get; set; }
+}
+
+public class TicketReportStatsViewModel
+{
+    public int TotalTickets { get; set; }
+    public int CompletedTickets { get; set; }
+    public int PendingTickets { get; set; }
+    public double AvgCompletionDays { get; set; }
+    public int TotalFirms { get; set; }
+    public int TotalPersonnel { get; set; }
+    public decimal CompletionRate => TotalTickets > 0 ? (decimal)CompletedTickets / TotalTickets * 100 : 0;
+}
+
+public class TicketReportCompanySummary
+{
+    public string FirmName { get; set; }
+    public int TotalTickets { get; set; }
+    public int CompletedTickets { get; set; }
+    public int PendingTickets { get; set; }
+    public decimal CompletionRate { get; set; }
+    public double AvgHours { get; set; }
+}
+
+public class TicketReportPersonnelSummary
+{
+    public string UserName { get; set; }
+    public Guid UserId { get; set; }
+    public int TotalAssigned { get; set; }
+    public int CompletedTickets { get; set; }
+    public int PendingTickets { get; set; }
+    public decimal CompletionRate { get; set; }
+    public double AvgCompletionDays { get; set; }
+}
+
+public class TicketReportStatusDistribution
+{
+    public string StatusName { get; set; }
+    public int Count { get; set; }
+    public decimal Percentage { get; set; }
+}
+
+public class TicketReportCategoryDistribution
+{
+    public string MainCategory { get; set; }
+    public string SubCategory { get; set; }
+    public int Count { get; set; }
+}
+
+public class TicketReportMonthlyTrend
+{
+    public int Month { get; set; }
+    public int Year { get; set; }
+    public int NewTickets { get; set; }
+    public int CompletedTickets { get; set; }
+}
+
+public class TicketReportDetail
+{
+    public string TicketId { get; set; }
+    public string FirmName { get; set; }
+    public string AssignedUser { get; set; }
+    public string StatusName { get; set; }
+    public int Priority { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime? CompletedDate { get; set; }
+    public int DurationDays { get; set; }
+}

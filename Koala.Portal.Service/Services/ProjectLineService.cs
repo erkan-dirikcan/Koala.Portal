@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Koala.Portal.Core.Dtos;
 using Koala.Portal.Core.Models;
 using Koala.Portal.Core.Repositories;
@@ -14,14 +14,16 @@ namespace Koala.Portal.Service.Services
     {
         private readonly IUnitOfWork<AppDbContext> _unitOfWork;
         private readonly IProjectLineRepository _repository;
-        private readonly IProjectLineNoteRepository _noteRepository;
+        private readonly IFirmContactService _firmContactService;
         private readonly IMapper _mapper;
-        public ProjectLineService(IUnitOfWork<AppDbContext> unitOfWork, IProjectLineRepository repository, IProjectLineNoteRepository noteRepository, IMapper mapper)
+        private readonly IProjectLineNoteRepository _noteRepository;
+        public ProjectLineService(IUnitOfWork<AppDbContext> unitOfWork, IProjectLineRepository repository, IProjectLineNoteRepository noteRepository, IMapper mapper, IFirmContactService firmContactService)
         {
             _unitOfWork = unitOfWork;
             _repository = repository;
             _mapper = mapper;
             _noteRepository = noteRepository;
+            _firmContactService = firmContactService;
         }
         public async Task<Response> AddAsync(AddProjectLineViewModel model)
         {
@@ -47,6 +49,21 @@ namespace Koala.Portal.Service.Services
                     return Response<ProjectLineDetailViewModel>.FailData(404, "Proje Faz Bilgilerine Ulaşılamadı", $"{id} kimlik bilgisine sahip faz bilgilerine ulaşılamadı.", true);
                 }
                 var retVal = _mapper.Map<ProjectLineDetailViewModel>(res);
+                
+                // CRM yetkilisini manuel çekiyoruz
+                if (!string.IsNullOrEmpty(res.LineFirmOfficialId))
+                {
+                    var crmContact = await _firmContactService.GetDetailAsync(res.LineFirmOfficialId);
+                    if (crmContact?.Data != null)
+                    {
+                        retVal.LineFirmOffcial = new Koala.Portal.Core.ViewModels.CrmViewModels.CrmFirmContactListViewModel 
+                        { 
+                            Oid = crmContact.Data.Oid, 
+                            FullName = crmContact.Data.FullName 
+                        };
+                    }
+                }
+
                 return Response<ProjectLineDetailViewModel>.SuccessData(200, "", retVal);
             }
             catch (Exception ex)
@@ -61,6 +78,58 @@ namespace Koala.Portal.Service.Services
             {
                 var res = await _repository.Where(x => x.Status != StatusEnum.Deleted).ToListAsync();
                 var retVal = _mapper.Map<List<ProjectLineListViewModel>>(res);
+
+                // Her faz için ilerleme hesapla ve CRM yetkilisini çek
+                foreach (var line in retVal)
+                {
+                    var lineEntity = res.FirstOrDefault(x => x.Id == line.Id);
+                    if (lineEntity != null)
+                    {
+                        if (lineEntity.LineWorks != null)
+                        {
+                            var works = lineEntity.LineWorks.ToList();
+                            line.TotalWorkCount = works.Count;
+                            line.CompletedWorkCount = works.Count(x => x.WorkStatus == ProjectLineWorkStatusEnum.Completed);
+
+                            // Tahmini süreleri baz alarak ilerleme hesapla
+                            var totalEstimated = works.Where(x => x.EstimatedTime.HasValue).Sum(x => x.EstimatedTime.Value);
+                            var completedEstimated = works
+                                .Where(x => x.WorkStatus == ProjectLineWorkStatusEnum.Completed && x.EstimatedTime.HasValue)
+                                .Sum(x => x.EstimatedTime.Value);
+
+                            if (totalEstimated > 0)
+                            {
+                                line.ProgressPercentage = (int)Math.Round((double)completedEstimated / totalEstimated * 100);
+                            }
+                            else if (line.CompletedWorkCount > 0 && line.TotalWorkCount > 0)
+                            {
+                                // Tahmini süre yoksa iş sayısına göre hesapla
+                                line.ProgressPercentage = (int)Math.Round((double)line.CompletedWorkCount / line.TotalWorkCount * 100);
+                            }
+                            else
+                            {
+                                line.ProgressPercentage = 0;
+                            }
+
+                            // Tamamlanmış fazlarda %100 göster
+                            if (line.StateStatus == ProjectLineStatusEnum.Completed)
+                            {
+                                line.ProgressPercentage = 100;
+                            }
+                        }
+
+                        // CRM yetkilisi ismini çek
+                        if (!string.IsNullOrEmpty(lineEntity.LineFirmOfficialId))
+                        {
+                            var crmContact = await _firmContactService.GetDetailAsync(lineEntity.LineFirmOfficialId);
+                            if (crmContact?.Data != null)
+                            {
+                                line.LineFirmOfficial = crmContact.Data.FullName;
+                            }
+                        }
+                    }
+                }
+
                 return Response<List<ProjectLineListViewModel>>.SuccessData(200, "Proje Fazları Başarıyla Alındı.", retVal);
             }
             catch (Exception ex)
@@ -84,7 +153,7 @@ namespace Koala.Portal.Service.Services
                 entity.Description = model.Description;
                 entity.DueDate = model.DueDate;
                 entity.Priority = model.Priority;
-                entity.RowOrdwer = model.RowOrdwer;
+                entity.RowOrder = model.RowOrder;
                 entity.UpdateUser = model.UpdateUser;
                 entity.UpdateTime = model.UpdateTime;
                 await _unitOfWork.CommitAsync();
@@ -213,6 +282,26 @@ namespace Koala.Portal.Service.Services
             catch (Exception ex)
             {
                 return Response.Fail(400, "Faz durumu değiştirilirken bir hata oluştu.", ex.Message, false);
+            }
+        }
+
+        public async Task<Response> DeleteProjectLineNoteAsync(string id)
+        {
+            try
+            {
+                var entity = await _noteRepository.GetByIdAsyc(id);
+                if (entity == null)
+                {
+                    return Response.Fail(404, "Not bulunamadı", $"{id} kimlik bilgisine sahip not bulunamadı.", true);
+                }
+
+                _noteRepository.Delete(entity);
+                await _unitOfWork.CommitAsync();
+                return Response.Success(200, "Not başarıyla silindi.");
+            }
+            catch (Exception ex)
+            {
+                return Response.Fail(400, "Not silinirken bir hata oluştu.", ex.Message, false);
             }
         }
 

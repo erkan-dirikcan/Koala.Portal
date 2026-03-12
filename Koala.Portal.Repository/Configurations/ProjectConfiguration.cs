@@ -1,4 +1,4 @@
-﻿using Koala.Portal.Core.Models;
+using Koala.Portal.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,16 +15,6 @@ namespace Koala.Portal.Repository.Configurations
             builder.HasOne(x => x.ProjectManager)
                 .WithMany(x => x.ManagedProjects)
                 .HasForeignKey(x => x.ProjectManagerId);
-            //Firma
-            builder.HasOne(x => x.Firm)
-                .WithMany(x => x.FirmProjects)
-                .HasForeignKey(x => x.FirmId)
-                .OnDelete(DeleteBehavior.NoAction).IsRequired(true);
-            //Firma Proje Yöneticisi
-            builder.HasOne(x => x.FirmPerson)
-                .WithMany(x => x.PersonProjects)
-                .HasForeignKey(x => x.FirmPersonId);
-
             //Proje Dosyaları
             builder.HasMany(x => x.ProjectFiles)
                 .WithOne(x => x.Project)

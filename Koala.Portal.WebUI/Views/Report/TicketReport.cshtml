@@ -1,0 +1,304 @@
+@model IEnumerable<Koala.Portal.Core.ViewModels.CrmViewModels.TicketReportViewModel>
+@{
+    ViewData["Title"] = "Destek Kayıtları Raporu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["ActivePage"] = "TicketReports";
+    ViewData["MenuToggle"] = "Report";
+
+    var today = DateTime.Today;
+    var startDate = today.AddDays(-30);
+}
+
+<!--begin::Content-->
+<div class="content d-flex flex-column flex-column-fluid" id="kt_content">
+    <!--begin::Toolbar-->
+    <!--end::Toolbar-->
+    <!--begin::Post-->
+    <div class="post d-flex flex-column-fluid" id="kt_post">
+        <div id="kt_content_container" class="container-fluid">
+
+            <!--begin::Filter Card-->
+            <div class="card card-flush mb-5">
+                <div class="card-header">
+
+                    <h1 class="d-flex text-dark fw-bold my-1 fs-3">Destek Kayıtları Raporu</h1>
+                    <span class="d-flex flex-wrap fw-semobold fs-6 text-muted">
+                        @Model.Count() adet kayıt
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Başlangıç</label>
+                            <input type="date" class="form-control" id="filterStartDate" value="@startDate.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Bitiş</label>
+                            <input type="date" class="form-control" id="filterEndDate" value="@today.ToString("yyyy-MM-dd")">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Firmalar</label>
+                            <select class="form-select select2" id="filterFirm" multiple>
+                                @foreach (var item in (ViewData["Firms"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Personel</label>
+                            <select class="form-select select2" id="filterPerson" multiple>
+                                @foreach (var item in (ViewData["Persons"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Durum</label>
+                            <select class="form-select select2" id="filterStatus" multiple>
+                                @foreach (var item in (ViewData["States"] as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                                {
+                                    <option value="@item.Text">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--begin::Stats Cards-->
+            <div class="row g-4 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card card-xl-stretch">
+                        <div class="card-body p-0">
+                            <div class="d-flex align-items-center justify-content-between p-5">
+                                <div>
+                                    <span class="text-gray-400 d-block">Toplam</span>
+                                    <span class="fw-bolder fs-2x text-dark" id="statTotal">0</span>
+                                </div>
+                                <div class="symbol symbol-50px bg-light-primary">
+                                    <i class="fas fa-ticket-alt text-primary fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card card-xl-stretch">
+                        <div class="card-body p-0">
+                            <div class="d-flex align-items-center justify-content-between p-5">
+                                <div>
+                                    <span class="text-gray-400 d-block">Tamamlandı</span>
+                                    <span class="fw-bolder fs-2x text-success" id="statCompleted">0</span>
+                                </div>
+                                <div class="symbol symbol-50px bg-light-success">
+                                    <i class="fas fa-check text-success fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card card-xl-stretch">
+                        <div class="card-body p-0">
+                            <div class="d-flex align-items-center justify-content-between p-5">
+                                <div>
+                                    <span class="text-gray-400 d-block">Devam Ediyor</span>
+                                    <span class="fw-bolder fs-2x text-warning" id="statPending">0</span>
+                                </div>
+                                <div class="symbol symbol-50px bg-light-warning">
+                                    <i class="fas fa-clock text-warning fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card card-xl-stretch">
+                        <div class="card-body p-0">
+                            <div class="d-flex align-items-center justify-content-between p-5">
+                                <div>
+                                    <span class="text-gray-400 d-block">Ort. Süre</span>
+                                    <span class="fw-bolder fs-2x text-info" id="statAvgDuration">0</span>
+                                </div>
+                                <div class="symbol symbol-50px bg-light-info">
+                                    <i class="fas fa-hourglass-half text-info fs-2"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--begin::Charts Row-->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <div class="card card-flush">
+                        <div class="card-header pt-7">
+                            <h3 class="card-title">Alt Kategori</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="categoryChart" style="height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card card-flush">
+                        <div class="card-header pt-7">
+                            <h3 class="card-title">Aylık Dağılım</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="monthChart" style="height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card card-flush">
+                        <div class="card-header pt-7">
+                            <h3 class="card-title">Personel Performansı (Top 5)</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="personnelChart" style="height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--begin::Details Table-->
+            <div class="card card-flush">
+                <div class="card-header pt-7 d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Ticket Detayları (<span id="tableCount">0</span>)</h3>
+                    <button type="button" class="btn btn-success" onclick="TicketReport.exportFullReport()">
+                        <i class="fas fa-file-excel"></i> Excel'e Aktar
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="TicketReportTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Destek Numarası</th>
+                                    <th>Firma Kodu</th>
+                                    <th>Yetkili</th>
+                                    <th>Departman</th>
+                                    <th>Atanan</th>
+                                    <th>Aktif Kullanıcı</th>
+                                    <th>Arama Zamanı</th>
+                                    <th>Firma Adı</th>
+                                    <th>Müşteri Talebi</th>
+                                    <th>Kategori</th>
+                                    <th>Alt Kategori</th>
+                                    <th>Destek Türü</th>
+                                    <th>Durum</th>
+                                    <th>Başlama Zamanı</th>
+                                    <th>Bitiş Zamanı</th>
+                                    <th>Öncelik</th>
+                                    <th>Tamamlandı</th>
+                                    <th>Devam Ediyor</th>                                   
+                                    <th>Alınan Ücret</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.TicketId</td>
+                                        <td>@item.FirmCode</td>
+                                        <td>@item.ContactName</td>
+                                        <td>@item.Department</td>
+                                        <td>@item.AssignedTo</td>
+                                        <td>@item.ActiveUser</td>
+                                        <td>@item.CallDate?.ToString("dd-MM-yyyy HH:mm")</td>
+                                        <td>@item.FirmName</td>
+                                        <td>@item.CustomerRequest</td>
+                                        <td>@item.MainCategory</td>
+                                        <td>@item.SubCategory</td>
+                                        <td>@item.Type</td>
+                                        <td>@item.Status</td>
+                                        <td>@item.StartDate?.ToString("dd-MM-yyyy HH:mm")</td>
+                                        <td>@item.CompleteDate</td>
+                                        <td>@item.Priority</td>
+                                        <td>@item.IsCompleted</td>
+                                        <td>@item.IsContinuing</td>
+                                        <td>@item.Price</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Personel Detay Modal -->
+<div class="modal fade" id="personnelDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div class="mb-3">
+                    <h6 id="modalPersonName" class="fw-bold"></h6>
+                    <small class="text-muted">Toplam Ticket: <span id="modalTotalTickets">0</span></small>
+                </div>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+
+            </div>
+
+
+
+
+         @*    <div class="modal-header">
+                <h5 class="modal-title">Personel Detayları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div> *@
+            <div class="modal-body">
+                <div class="mb-3">
+                    <h6 id="modalPersonName" class="fw-bold"></h6>
+                    <small class="text-muted">Toplam Ticket: <span id="modalTotalTickets">0</span></small>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Destek Numarası</th>
+                                <th>Firma Adı</th>
+                                <th>Yetkili</th>
+                                <th>Arama Zamanı</th>
+                                <th>Bitiş Zamanı</th>
+                                <th>Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+
+                <button type="button" class="btn btn-success" onclick="TicketReport.exportPersonnelExcel()">
+                    <i class="fas fa-file-excel"></i> Excel'e Aktar
+                </button>
+                <button type="button" class="btn btn-light-primary font-weight-bold" data-dismiss="modal">İptal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Store -->
+<script>
+    window.allData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase }));
+</script>
+
+@section Scripts {
+    <script src="~/js/Custom/TicketReport.js"></script>
+}

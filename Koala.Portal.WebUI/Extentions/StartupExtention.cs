@@ -88,6 +88,7 @@ namespace Koala.Portal.WebUI.Extentions
             services.AddScoped<ICrmSupportService, CrmSupportService>();
             services.AddScoped<ICrmSupportStateService, CrmSupportStateService>();
             services.AddScoped<ICrmTicketHistoryService, CrmTicketHistoryService>();
+            services.AddScoped<ICrmReportService, CrmReportService>();
 
 
 
@@ -150,6 +151,7 @@ namespace Koala.Portal.WebUI.Extentions
             services.AddScoped<ICrmSupportStatesRepository, CrmSupportStateRepository>();
             services.AddScoped<ICrmSupportTypeRepository, CrmSupportTypeRepository>();
             services.AddScoped<ICrmTicketHistoryRepository, CrmTicketHistoryRepository>();
+            services.AddScoped<ICrmReportRepository, CrmReportRepository>();
 
 
             //==============================GetPass========================================================
