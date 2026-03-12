@@ -232,16 +232,15 @@ var ProjectLineTable = function () {
             // Önce iş detaylarını API'den al
             $.get("/Project/GetProjectLineWorkDetail", { id: workId }).done(function (response) {
                 if (response.isSuccess && response.data) {
-                    var workData = response.data;
+                    // Veriyi global değişkende sakla, modal açıldığında kullanılacak
+                    window.pendingEditWorkData = response.data;
 
                     // Modal kapandıktan sonra düzenleme modal'ını aç
-                    // Bu, Bootstrap modal backdrop sorununu çözer
                     $("#project-line-works-modal").one('hidden.bs.modal', function () {
                         // Modal tamamen kapandıktan sonra backdrop'ı temizle
                         $('.modal-backdrop').remove();
                         $('body').removeClass('modal-open').css('overflow', '');
 
-                        populateEditWorkModal(workData);
                         $("#edit-project-line-work-modal").modal('show');
                     }).modal('hide');
                 }
@@ -264,7 +263,8 @@ var ProjectLineTable = function () {
             // API'den iş detaylarını al ve modal'ı aç
             $.get("/Project/GetProjectLineWorkDetail", { id: workId }).done(function (response) {
                 if (response.isSuccess && response.data) {
-                    populateEditWorkModal(response.data);
+                    // Veriyi global değişkende sakla
+                    window.pendingEditWorkData = response.data;
                     $("#edit-project-line-work-modal").modal('show');
                 }
             });
@@ -373,6 +373,7 @@ var ProjectLineTable = function () {
         });
 
         $('#edit-project-line-work-modal').on('shown.bs.modal', function () {
+            // Select2 bileşenlerini başlat
             $('#edit_work_LineFirmOfficialId').select2({
                 placeholder: 'Firma Yetkilisi Seçiniz',
                 language: "tr",
@@ -385,6 +386,12 @@ var ProjectLineTable = function () {
                 dropdownParent: $('#edit-project-line-work-modal'),
                 width: '100%'
             });
+
+            // Bekleyen iş verisi varsa formu doldur
+            if (window.pendingEditWorkData) {
+                populateEditWorkModal(window.pendingEditWorkData);
+                window.pendingEditWorkData = null; // Temizle
+            }
         });
 
         // Güncelleme modal'ı açıldığında
