@@ -9,6 +9,9 @@ namespace Koala.Portal.Service.Mapping
     {
         public ProjectLineWorkProfile()
         {
+            // ProjectPerson mapping
+            CreateMap<ProjectPerson, AddProjectPersonViewModel>();
+
             CreateMap<ProjectLineWork, AddProjectLineWorkViewModel>()
                 .ForMember(dest => dest.ReleatedSupport, opt => opt.Ignore())
                 .ForMember(dest => dest.CreateUserId, opt => opt.MapFrom(src => src.CreateUser));
