@@ -373,12 +373,8 @@ var ProjectLineTable = function () {
         });
 
         $('#edit-project-line-work-modal').on('shown.bs.modal', function () {
-            console.log("=== edit-project-line-work-modal shown.bs.modal olayı tetiklendi ===");
-            console.log("pendingEditWorkData:", window.pendingEditWorkData);
-
             // Select2 bileşenlerini sadece ilk kez başlat (zaten başlatılmadıysa)
             if (!$('#edit_work_LineFirmOfficialId').data('select2')) {
-                console.log("FirmOfficialId Select2 başlatılıyor");
                 $('#edit_work_LineFirmOfficialId').select2({
                     placeholder: 'Firma Yetkilisi Seçiniz',
                     language: "tr",
@@ -387,7 +383,6 @@ var ProjectLineTable = function () {
                 });
             }
             if (!$('#edit_work_Priority').data('select2')) {
-                console.log("Priority Select2 başlatılıyor");
                 $('#edit_work_Priority').select2({
                     placeholder: 'Önceliği Seçiniz',
                     language: "tr",
@@ -398,11 +393,8 @@ var ProjectLineTable = function () {
 
             // Bekleyen iş verisi varsa formu doldur
             if (window.pendingEditWorkData) {
-                console.log("Bekleyen iş verisi bulundu, form dolduruluyor");
                 populateEditWorkModal(window.pendingEditWorkData);
                 window.pendingEditWorkData = null; // Temizle
-            } else {
-                console.log("Bekleyen iş verisi BULUNAMADI!");
             }
         });
 
@@ -1245,28 +1237,14 @@ var ProjectLineTable = function () {
     // İş detaylarını düzenleme modal'ına yerleştir
     // Not: Modal'ı açma işlemi çağıran fonksiyon tarafından yapılmalıdır
     var populateEditWorkModal = function (work) {
-        console.log("=== populateEditWorkModal çağrıldı ===");
-        console.log("İş detayları:", work);
-
         // Basic fields - API returns camelCase property names
         $("#edit_work_Id").val(work.id);
-        console.log("ID set to:", work.id, "Actual value:", $("#edit_work_Id").val());
-
         $("#edit_work_Name").val(work.name);
-        console.log("Name set to:", work.name, "Actual value:", $("#edit_work_Name").val());
-
         $("#edit_work_Description").val(work.description);
-        console.log("Description set to:", work.description, "Actual value:", $("#edit_work_Description").val());
 
         // Select2 elemanları için değer ata ve trigger('change') çağır
-        $("#edit_work_Priority").val(work.priority);
-        console.log("Priority set to:", work.priority, "Before trigger:", $("#edit_work_Priority").val());
-        $("#edit_work_Priority").trigger('change');
-        console.log("Priority after trigger:", $("#edit_work_Priority").val());
-
-        $("#edit_work_LineFirmOfficialId").val(work.lineFirmOfficialId);
-        console.log("FirmOfficialId set to:", work.lineFirmOfficialId);
-        $("#edit_work_LineFirmOfficialId").trigger('change');
+        $("#edit_work_Priority").val(work.priority).trigger('change');
+        $("#edit_work_LineFirmOfficialId").val(work.lineFirmOfficialId).trigger('change');
 
         $("#edit_work_RowOrder").val(work.rowOrder);
         $("#edit_work_Status").val(work.workStatus);
