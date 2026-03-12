@@ -1248,33 +1248,33 @@ var ProjectLineTable = function () {
         console.log("=== populateEditWorkModal çağrıldı ===");
         console.log("İş detayları:", work);
 
-        // Basic fields
-        $("#edit_work_Id").val(work.Id);
-        console.log("ID set to:", work.Id, "Actual value:", $("#edit_work_Id").val());
+        // Basic fields - API returns camelCase property names
+        $("#edit_work_Id").val(work.id);
+        console.log("ID set to:", work.id, "Actual value:", $("#edit_work_Id").val());
 
-        $("#edit_work_Name").val(work.Name);
-        console.log("Name set to:", work.Name, "Actual value:", $("#edit_work_Name").val());
+        $("#edit_work_Name").val(work.name);
+        console.log("Name set to:", work.name, "Actual value:", $("#edit_work_Name").val());
 
-        $("#edit_work_Description").val(work.Description);
-        console.log("Description set to:", work.Description, "Actual value:", $("#edit_work_Description").val());
+        $("#edit_work_Description").val(work.description);
+        console.log("Description set to:", work.description, "Actual value:", $("#edit_work_Description").val());
 
         // Select2 elemanları için değer ata ve trigger('change') çağır
-        $("#edit_work_Priority").val(work.Priority);
-        console.log("Priority set to:", work.Priority, "Before trigger:", $("#edit_work_Priority").val());
+        $("#edit_work_Priority").val(work.priority);
+        console.log("Priority set to:", work.priority, "Before trigger:", $("#edit_work_Priority").val());
         $("#edit_work_Priority").trigger('change');
         console.log("Priority after trigger:", $("#edit_work_Priority").val());
 
-        $("#edit_work_LineFirmOfficialId").val(work.LineFirmOfficialId);
-        console.log("FirmOfficialId set to:", work.LineFirmOfficialId);
+        $("#edit_work_LineFirmOfficialId").val(work.lineFirmOfficialId);
+        console.log("FirmOfficialId set to:", work.lineFirmOfficialId);
         $("#edit_work_LineFirmOfficialId").trigger('change');
 
-        $("#edit_work_RowOrder").val(work.RowOrder);
-        $("#edit_work_Status").val(work.WorkStatus);
+        $("#edit_work_RowOrder").val(work.rowOrder);
+        $("#edit_work_Status").val(work.workStatus);
 
         // İptal açıklamasını göster/gizle
-        $("#edit_work_CancelDescriptionRow").toggle(work.WorkStatus === 6); // 6 = Canceled
-        if (work.CancelDescription) {
-            $("#edit_work_CancelDescription").val(work.CancelDescription);
+        $("#edit_work_CancelDescriptionRow").toggle(work.workStatus === 6); // 6 = Canceled
+        if (work.cancelDescription) {
+            $("#edit_work_CancelDescription").val(work.cancelDescription);
         }
 
         // Durum değişikliği kontrolü
@@ -1284,8 +1284,8 @@ var ProjectLineTable = function () {
         });
 
         // Tahmini süre
-        if (work.EstimatedTime) {
-            var totalMins = work.EstimatedTime;
+        if (work.estimatedTime) {
+            var totalMins = work.estimatedTime;
             $("#edit_work_EstimatedDays").val(Math.floor(totalMins / (24 * 60)));
             $("#edit_work_EstimatedHours").val(Math.floor((totalMins % (24 * 60)) / 60));
             $("#edit_work_EstimatedMinutes").val(totalMins % 60);
@@ -1296,8 +1296,8 @@ var ProjectLineTable = function () {
         }
 
         // Harcanan süre
-        if (work.TimeSpend) {
-            var totalMins = work.TimeSpend;
+        if (work.timeSpend) {
+            var totalMins = work.timeSpend;
             $("#edit_work_TimeSpendDays").val(Math.floor(totalMins / (24 * 60)));
             $("#edit_work_TimeSpendHours").val(Math.floor((totalMins % (24 * 60)) / 60));
             $("#edit_work_TimeSpendMinutes").val(totalMins % 60);
