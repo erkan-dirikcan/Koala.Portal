@@ -242,6 +242,7 @@ var ProjectLineTable = function () {
                         $('body').removeClass('modal-open').css('overflow', '');
 
                         populateEditWorkModal(workData);
+                        $("#edit-project-line-work-modal").modal('show');
                     }).modal('hide');
                 }
             });
