@@ -227,15 +227,22 @@ var ProjectLineTable = function () {
         $(document).on("click", ".btn-edit-work-from-list", function (e) {
             e.preventDefault();
             var workId = $(this).attr("data-id");
-            var row = $(this).closest("tr");
+            var $row = $(this).closest("tr");
 
-            // Önce faz modal'ını kapat
-            $("#project-line-works-modal").modal('hide');
-
-            // İş detaylarını API'den al ve düzenleme modal'ını aç
+            // Önce iş detaylarını API'den al
             $.get("/Project/GetProjectLineWorkDetail", { id: workId }).done(function (response) {
                 if (response.isSuccess && response.data) {
-                    populateEditWorkModal(response.data);
+                    var workData = response.data;
+
+                    // Modal kapandıktan sonra düzenleme modal'ını aç
+                    // Bu, Bootstrap modal backdrop sorununu çözer
+                    $("#project-line-works-modal").one('hidden.bs.modal', function () {
+                        // Modal tamamen kapandıktan sonra backdrop'ı temizle
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open').css('overflow', '');
+
+                        populateEditWorkModal(workData);
+                    }).modal('hide');
                 }
             });
         });
@@ -1216,6 +1223,7 @@ var ProjectLineTable = function () {
     };
 
     // İş detaylarını düzenleme modal'ına yerleştir
+    // Not: Modal'ı açma işlemi çağıran fonksiyon tarafından yapılmalıdır
     var populateEditWorkModal = function (work) {
         console.log("İş detayları:", work);
 
@@ -1263,7 +1271,8 @@ var ProjectLineTable = function () {
             $("#edit_work_TimeSpendMinutes").val(0);
         }
 
-        $("#edit-project-line-work-modal").modal('show');
+        // Modal'ı açma işlemi çağıran fonksiyon tarafından yapılır
+        // Bu, modal geçiş sorunlarını önlemek için gereklidir
     };
 
     // Dakika hesaplama yardımcı fonksiyonu
