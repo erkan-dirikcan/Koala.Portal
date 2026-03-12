@@ -373,19 +373,23 @@ var ProjectLineTable = function () {
         });
 
         $('#edit-project-line-work-modal').on('shown.bs.modal', function () {
-            // Select2 bileşenlerini başlat
-            $('#edit_work_LineFirmOfficialId').select2({
-                placeholder: 'Firma Yetkilisi Seçiniz',
-                language: "tr",
-                dropdownParent: $('#edit-project-line-work-modal'),
-                width: '100%'
-            });
-            $('#edit_work_Priority').select2({
-                placeholder: 'Önceliği Seçiniz',
-                language: "tr",
-                dropdownParent: $('#edit-project-line-work-modal'),
-                width: '100%'
-            });
+            // Select2 bileşenlerini sadece ilk kez başlat (zaten başlatılmadıysa)
+            if (!$('#edit_work_LineFirmOfficialId').data('select2')) {
+                $('#edit_work_LineFirmOfficialId').select2({
+                    placeholder: 'Firma Yetkilisi Seçiniz',
+                    language: "tr",
+                    dropdownParent: $('#edit-project-line-work-modal'),
+                    width: '100%'
+                });
+            }
+            if (!$('#edit_work_Priority').data('select2')) {
+                $('#edit_work_Priority').select2({
+                    placeholder: 'Önceliği Seçiniz',
+                    language: "tr",
+                    dropdownParent: $('#edit-project-line-work-modal'),
+                    width: '100%'
+                });
+            }
 
             // Bekleyen iş verisi varsa formu doldur
             if (window.pendingEditWorkData) {
@@ -1238,9 +1242,12 @@ var ProjectLineTable = function () {
         $("#edit_work_Id").val(work.Id);
         $("#edit_work_Name").val(work.Name);
         $("#edit_work_Description").val(work.Description);
-        $("#edit_work_Priority").val(work.Priority);
+
+        // Select2 elemanları için değer ata ve trigger('change') çağır
+        $("#edit_work_Priority").val(work.Priority).trigger('change');
+        $("#edit_work_LineFirmOfficialId").val(work.LineFirmOfficialId).trigger('change');
+
         $("#edit_work_RowOrder").val(work.RowOrder);
-        $("#edit_work_LineFirmOfficialId").val(work.LineFirmOfficialId);
         $("#edit_work_Status").val(work.WorkStatus);
 
         // İptal açıklamasını göster/gizle
