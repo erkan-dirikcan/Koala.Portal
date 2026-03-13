@@ -22,9 +22,7 @@ namespace Koala.Portal.Repository
         public DbSet<ApplicationLicences> ApplicationLicences { get; set; }
         public DbSet<ApplicationModules> ApplicationModules { get; set; }
         public DbSet<Applications> Applications { get; set; }
-        public DbSet<AppUserCrmDepartment> AppUserCrmDepartment { get; set; }
         public DbSet<Claims> Claims { get; set; }
-        public DbSet<CrmDepartment> CrmDepartment { get; set; }
         public DbSet<CrmFirm> CrmFirm { get; set; }
         public DbSet<CrmFirmContact> CrmFirmContact { get; set; }
         public DbSet<CrmPhoneNumber> CrmPhoneNumber { get; set; }

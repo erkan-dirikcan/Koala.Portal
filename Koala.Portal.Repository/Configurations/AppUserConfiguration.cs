@@ -28,12 +28,6 @@ namespace Koala.Portal.Repository.Configurations
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-
-
-            //Departmanları
-            builder.HasMany(x => x.UserDepartments)
-                .WithOne(x => x.User)
-                .HasForeignKey(x => x.AppUserId);
             //Onayladığı Lisanslar
             builder.HasMany(x => x.ApplicationLicences)
                 .WithOne(x => x.ApprovedByUser)

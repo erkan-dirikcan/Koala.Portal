@@ -9,7 +9,6 @@ namespace Koala.Portal.Core.Models
         {
             Events = new HashSet<AgendaUsers>();
             ManagedProjects = new HashSet<Project>();
-            UserDepartments = new HashSet<AppUserCrmDepartment>();
             ApplicationLicences = new HashSet<ApplicationLicences>();
             Transactions = new HashSet<Transaction>();
             Vacations = new HashSet<VacationRequest>();
@@ -48,11 +47,7 @@ namespace Koala.Portal.Core.Models
         public virtual ICollection<ProjectPerson> WorkedProjectLineWorks { get; set; }
 
         /// <summary>
-        /// Kullanıcı CRM Departmanları
-        /// </summary>
-        public virtual ICollection<AppUserCrmDepartment> UserDepartments { get; set; }        
-        /// <summary>
-        ///Kullanıcı Transactionları 
+        ///Kullanıcı Transactionları
         /// </summary>
         public virtual ICollection<Transaction> Transactions { get; set; }
         /// <summary>
