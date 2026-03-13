@@ -1,66 +1,82 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
+using Koala.Portal.Core.Adapters;
+using Koala.Portal.Core.CrmModels;
 using Koala.Portal.Core.Models;
 using Koala.Portal.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace Koala.Portal.Repository.Repositories;
-
-public class FirmContactRepository : IFirmContactRepository
+namespace Koala.Portal.Repository.Repositories
 {
-    public readonly AppDbContext _context;
-    public readonly DbSet<CrmFirmContact> _dbSet;
-
-    public FirmContactRepository(AppDbContext context)
+    public class FirmContactRepository : IFirmContactRepository
     {
-        _context = context;
-        _dbSet = context.Set<CrmFirmContact>();
+        private readonly SistemCrmContext _crmContext;
+        private readonly ICrmContactAdapter _contactAdapter;
+        private readonly ICrmPhoneAdapter _phoneAdapter;
 
-
-    }
-
-    public async Task<IEnumerable<CrmFirmContact>> GetAllAsync(string firmId)
-    {
-        return await _dbSet
-            .Include(x => x.Firm)
-            .Include(x => x.Phones)
-            .Where(x=>x.FirmId==firmId)
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<CrmFirmContact>> GetAllByOidAsync(string firmOid)
-    {
-        return await _dbSet
-            .Include(x => x.Firm)
-            .Include(x => x.Phones)
-            .Where(x=>x.Oid==firmOid)
-            .ToListAsync();
-    }
-
-    public IQueryable<CrmFirmContact> Where(Expression<Func<CrmFirmContact, bool>> predicate)
-    {
-        return _dbSet
-            .Include(x => x.Firm)
-            .Include(x => x.Phones)
-            .Where(predicate);
-    }
-
-    public async Task<CrmFirmContact?> GetByIdAsync(string id)
-    {
-        var contact = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
-        if (contact != null)
+        public FirmContactRepository(SistemCrmContext crmContext, ICrmContactAdapter contactAdapter, ICrmPhoneAdapter phoneAdapter)
         {
-            _context.Entry(contact).State = EntityState.Detached;
+            _crmContext = crmContext;
+            _contactAdapter = contactAdapter;
+            _phoneAdapter = phoneAdapter;
         }
-        return contact;
-    }
-    
-    public async Task<CrmFirmContact?> GetByOidAsync(string oid)
-    {
-        var contact = await _dbSet.FirstOrDefaultAsync(x => x.Oid == oid);
-        if (contact != null)
+
+        public async Task<IEnumerable<CrmFirmContact>> GetAllAsync(string firmId)
         {
-            _context.Entry(contact).State = EntityState.Detached;
+            // firmId is local Id which doesn't exist in CRM
+            // Return empty - callers should use GetAllByOidAsync instead
+            return await Task.FromResult(Enumerable.Empty<CrmFirmContact>());
         }
-        return contact;
+
+        public async Task<IEnumerable<CrmFirmContact>> GetAllByOidAsync(string firmOid)
+        {
+            if (!Guid.TryParse(firmOid, out Guid firmGuid))
+            {
+                return Enumerable.Empty<CrmFirmContact>();
+            }
+
+            var contacts = await _crmContext.MT_Contact
+                .Include(c => c.PO_Phone_Number)
+                .Where(c => c.RelatedFirm == firmGuid && c.GCRecord == null)
+                .ToListAsync();
+
+            return contacts
+                .Select(c => _contactAdapter.ToLocalEntity(c, firmOid))
+                .Where(c => c != null);
+        }
+
+        public IQueryable<CrmFirmContact> Where(Expression<Func<CrmFirmContact, bool>> predicate)
+        {
+            var contacts = _crmContext.MT_Contact
+                .Include(c => c.PO_Phone_Number)
+                .Where(c => c.GCRecord == null)
+                .AsEnumerable()
+                .Select(c => _contactAdapter.ToLocalEntity(c))
+                .Where(c => c != null)
+                .AsQueryable();
+
+            return contacts.Where(predicate);
+        }
+
+        public async Task<CrmFirmContact?> GetByIdAsync(string id)
+        {
+            // Local Id doesn't exist in CRM
+            return await Task.FromResult<CrmFirmContact>(null);
+        }
+
+        public async Task<CrmFirmContact?> GetByOidAsync(string oid)
+        {
+            if (!Guid.TryParse(oid, out Guid contactGuid))
+            {
+                return null;
+            }
+
+            var contact = await _crmContext.MT_Contact
+                .Include(c => c.PO_Phone_Number)
+                .FirstOrDefaultAsync(c => c.Oid == contactGuid && c.GCRecord == null);
+
+            if (contact == null) return null;
+
+            return _contactAdapter.ToLocalEntity(contact);
+        }
     }
 }

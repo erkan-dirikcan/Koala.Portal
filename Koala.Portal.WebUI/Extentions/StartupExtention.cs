@@ -140,6 +140,11 @@ namespace Koala.Portal.WebUI.Extentions
         public static void AddApplicationRepositories(this IServiceCollection services)
         {
             //==============================CRM============================================================
+            // CRM Adapters for data transformation
+            services.AddScoped<Koala.Portal.Core.Adapters.ICrmPhoneAdapter, Koala.Portal.Core.Adapters.CrmPhoneAdapter>();
+            services.AddScoped<Koala.Portal.Core.Adapters.ICrmContactAdapter, Koala.Portal.Core.Adapters.CrmContactAdapter>();
+            services.AddScoped<Koala.Portal.Core.Adapters.ICrmFirmAdapter, Koala.Portal.Core.Adapters.CrmFirmAdapter>();
+
             services.AddScoped(typeof(ICrmBaseRepository<>), typeof(CrmBaseRepository<>));
             services.AddScoped<ICrmCategoryRepository, CrmCategoryRepository>();
             services.AddScoped<ICrmDepartmentRepository, CrmDepartmentRepository>();
