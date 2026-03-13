@@ -21,7 +21,16 @@
       "Bash(dotnet ef migrations remove:*)",
       "Bash(dotnet ef migrations add:*)",
       "Bash(dotnet ef database update:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(sqlcmd:*)",
+      "Bash(robocopy:*)",
+      "Bash(net use:*)",
+      "Bash(ipconfig:*)",
+      "Bash(\"D:/cSource/repos/Koala.Portal/Koala.Portal.WebUI/wwwroot/css/style.bundle.css\":*)",
+      "Bash(dotnet:*)"
     ]
+  },
+  "enabledPlugins": {
+    "hookify@claude-plugins-official": true
   }
 }
