@@ -514,14 +514,31 @@ var ProjectLineTable = function () {
 
         var table = $('#ProjectLineTable');
 
+        // Check if table has the "empty" row with colspan and remove it before DataTables initialization
+        // DataTables Responsive extension doesn't handle rows with colspan well
+        var $tbody = table.find('tbody.project-line-table-body');
+        var hasEmptyRow = $tbody.find('td[colspan]').length > 0;
+
         // begin first table
-        table.DataTable({
+        var dataTableOptions = {
             responsive: true,
             ordering: false,
             language: {
-                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json"
-            }
-        });
+                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/tr.json",
+                emptyTable: hasEmptyRow ? "Kayıtlı faz bulunmamaktadır." : "Tabloda kayıt bulunmamaktadır."
+            },
+            // Disable responsive feature if table is empty to avoid colspan issues
+            colReorder: false
+        };
+
+        // If table has empty row with colspan, disable responsive to prevent errors
+        if (hasEmptyRow) {
+            dataTableOptions.responsive = false;
+            // Remove the empty row and let DataTables show its own empty message
+            $tbody.find('td[colspan]').closest('tr').remove();
+        }
+
+        table.DataTable(dataTableOptions);
 
     };
 

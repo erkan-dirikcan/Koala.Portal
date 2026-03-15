@@ -253,7 +253,7 @@
                                     <th>İşlemler</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="project-line-table-body">
                                 @if (Model.project.ProjectLines != null && Model.project.ProjectLines.Any())
                                 {
                                     @foreach (var item in Model.project.ProjectLines)
@@ -298,12 +298,14 @@
                                 }
                                 else
                                 {
-                                    <tr>
-                                        <td colspan="11" class="text-center">Kayıtlı faz bulunmamaktadır.</td>
+                                    <tr class="text-center">
+                                        <td></td>
+                                        <td colspan="10">Kayıtlı faz bulunmamaktadır.</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
+                        <input type="hidden" id="projectLineTableEmpty" value="@(Model.project.ProjectLines == null || !Model.project.ProjectLines.Any())" />
                     </div>
 
                     <!-- Tab: İşler -->
