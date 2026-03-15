@@ -30,8 +30,21 @@ namespace Koala.Portal.Repository.Repositories
 
         public CrmFirm? GetFirmInfoById(string id)
         {
-            // Since we generate random Ids for local entities, we can't query CRM by local Id
-            // This method returns null - callers should use Oid-based methods instead
+            // Since local entities are no longer used, query CRM directly by Oid
+            // The 'id' parameter now represents the CRM Oid (not local Id)
+            if (Guid.TryParse(id, out Guid oid))
+            {
+                var crmFirm = _crmContext.MT_Firm
+                    .Include(f => f.PO_Phone_Number)
+                    .Include(f => f.MT_Contact)
+                        .ThenInclude(c => c.PO_Phone_Number)
+                    .FirstOrDefault(f => f.Oid == oid && f.GCRecord == null);
+
+                if (crmFirm != null)
+                {
+                    return _firmAdapter.ToLocalEntityWithPhones(crmFirm, crmFirm.PO_Phone_Number);
+                }
+            }
             return null;
         }
 
