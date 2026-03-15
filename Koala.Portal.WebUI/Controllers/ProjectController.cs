@@ -266,13 +266,25 @@ namespace Koala.Portal.WebUI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProjectManagement.Create")]
+        [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<IActionResult> UpdateProjectLine([FromBody] UpdateProjectLineViewModel model)
         {
+            // Debug: Model null kontrolü
+            Console.WriteLine($"=== UpdateProjectLine çağrıldı ===");
+            Console.WriteLine($"Model null mi?: {model == null}");
+
             if (model == null)
             {
                 return Json(new { isSuccess = false, message = "Model null geldi!" });
             }
+
+            Console.WriteLine($"Id: {model.Id}");
+            Console.WriteLine($"Title: {model.Title}");
+            Console.WriteLine($"Priority: {model.Priority}");
+            Console.WriteLine($"RowOrder: {model.RowOrder}");
+            Console.WriteLine($"DueDate: {model.DueDate}");
+            Console.WriteLine($"LineOfficialId: {model.LineOfficialId}");
+            Console.WriteLine($"LineFirmOfficialId: {model.LineFirmOfficialId}");
 
             if (!ModelState.IsValid)
             {

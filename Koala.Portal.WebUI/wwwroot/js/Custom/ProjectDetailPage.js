@@ -705,26 +705,9 @@ var ProjectLineTable = function () {
 
         console.log("Gönderilecek güncelleme verisi:", JSON.stringify(model, null, 2));
 
-        // ASP.NET Core camelCase bekler, C# property isimleriyle eşleşmesi için camelCase kullan
-        var payload = {
-            id: model.id,
-            lineOfficialId: model.lineOfficialId,
-            lineFirmOfficialId: model.lineFirmOfficialId,
-            title: model.title,
-            description: model.description,
-            dueDate: model.dueDate,
-            priority: model.priority,
-            rowOrder: model.rowOrder
-        };
-
         $("#edit_project_line_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Güncelleniyor...');
 
         $.ajax({
-            url: "/Project/UpdateProjectLine",
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            data: JSON.stringify(payload),
             url: "/Project/UpdateProjectLine",
             type: "POST",
             contentType: "application/json; charset=utf-8",
@@ -741,8 +724,9 @@ var ProjectLineTable = function () {
                     toastr.error(response.message || "Faz güncellenirken bir hata oluştu!", "Hata");
                 }
             },
-            error: function () {
-                toastr.error("İşlem sırasında bir hata oluştu!", "Hata");
+            error: function (xhr, status, error) {
+                console.error("Güncelleme hatası:", xhr, status, error);
+                toastr.error("İşlem sırasında bir hata oluştu! Detay için konsolu kontrol edin.", "Hata");
             },
             complete: function () {
                 $("#edit_project_line_save_bt").prop("disabled", false).text("Güncelle");
