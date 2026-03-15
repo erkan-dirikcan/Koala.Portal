@@ -127,3 +127,14 @@ yarn-error.log*
 *.tmp
 *.temp
 $tf/
+
+## Archive files
+*.rar
+*.zip
+*.tar
+*.gz
+
+## Project-specific excludes
+scripts/
+TicketReportRoadmap.md
+Koala.Portal.Tests/
