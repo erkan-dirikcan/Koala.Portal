@@ -103,7 +103,26 @@ app.UseHttpsRedirection();
 //        Path.Combine(builder.Environment.ContentRootPath, "Template")),
 //    RequestPath = "/Template"
 //});
-app.UseStaticFiles();//Root klas�r�n� kullan�ma a�ar
+app.UseStaticFiles();//Root klasörünü kullanıma açar
+
+// Request logging middleware for debugging
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/Project/UpdateProjectLine"))
+    {
+        context.Request.EnableBuffering();
+        using (var reader = new StreamReader(context.Request.Body, leaveOpen: true))
+        {
+            var body = await reader.ReadToEndAsync();
+            Console.WriteLine($"=== UPDATE PROJECT LINE REQUEST ===");
+            Console.WriteLine($"ContentType: {context.Request.ContentType}");
+            Console.WriteLine($"Body: {body}");
+            context.Request.Body.Position = 0;
+        }
+    }
+    await next();
+});
+
 app.UseRouting();
 //app.UseRouting();
 

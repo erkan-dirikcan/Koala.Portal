@@ -269,13 +269,15 @@ namespace Koala.Portal.WebUI.Controllers
         [Authorize(Policy = "ProjectManagement.Update")]
         public async Task<IActionResult> UpdateProjectLine([FromBody] UpdateProjectLineViewModel model)
         {
-            // Debug: Model null kontrolü
+            // Debug: Request bilgileri
             Console.WriteLine($"=== UpdateProjectLine çağrıldı ===");
+            Console.WriteLine($"Request.ContentType: {Request.ContentType}");
+            Console.WriteLine($"Request.Method: {Request.Method}");
             Console.WriteLine($"Model null mi?: {model == null}");
 
             if (model == null)
             {
-                return Json(new { isSuccess = false, message = "Model null geldi!" });
+                return Json(new { isSuccess = false, message = $"Model null geldi! ContentType: {Request.ContentType}" });
             }
 
             Console.WriteLine($"Id: {model.Id}");

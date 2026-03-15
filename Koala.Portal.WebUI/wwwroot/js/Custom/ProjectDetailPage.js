@@ -707,13 +707,24 @@ var ProjectLineTable = function () {
 
         $("#edit_project_line_save_bt").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Güncelleniyor...');
 
+        var jsonData = JSON.stringify(model);
+        console.log("JSON string to send:", jsonData);
+        console.log("JSON length:", jsonData.length);
+
         $.ajax({
             url: "/Project/UpdateProjectLine",
             type: "POST",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            data: JSON.stringify(model),
+            data: jsonData,
+            beforeSend: function(xhr) {
+                console.log("AJAX beforeSend - Request about to be sent");
+                console.log("URL:", "/Project/UpdateProjectLine");
+                console.log("ContentType:", "application/json; charset=utf-8");
+                console.log("Data:", jsonData);
+            },
             success: function (response) {
+                console.log("Success response:", response);
                 if (response.isSuccess) {
                     toastr.success(response.message || "Faz başarıyla güncellendi!", "Başarılı");
                     $("#edit-project-line-modal").modal('hide');
@@ -725,7 +736,12 @@ var ProjectLineTable = function () {
                 }
             },
             error: function (xhr, status, error) {
-                console.error("Güncelleme hatası:", xhr, status, error);
+                console.error("Güncelleme hatası:");
+                console.error("Status:", status);
+                console.error("Error:", error);
+                console.error("XHR:", xhr);
+                console.error("ResponseText:", xhr.responseText);
+                console.error("StatusCode:", xhr.status);
                 toastr.error("İşlem sırasında bir hata oluştu! Detay için konsolu kontrol edin.", "Hata");
             },
             complete: function () {
